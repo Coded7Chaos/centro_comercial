@@ -36,10 +36,10 @@ class LoginController extends Controller
 
     protected function redirectUser($user)
     {
-        // Cliente: forzamos /cliente-panel ignorando `intended()` para evitar
+        // Cliente: forzamos /dashboard-cliente ignorando `intended()` para evitar
         // que un /admin guardado en sesión lo mande a un panel al que no entra.
         if ($user->hasRole('cliente')) {
-            return redirect('/cliente-panel');
+            return redirect('/dashboard-cliente');
         }
 
         if ($user->hasRole('super_admin') || $user->hasRole('admin')) {

@@ -16,15 +16,26 @@
         <div class="flex items-center gap-3">
             {{-- Cuadro de navegación principal --}}
             <div class="glass-hud rounded-2xl px-4 py-2 flex items-center gap-4 shadow-2xl">
-                {{-- Login --}}
-                <a href="{{ route('login') }}"
-                    class="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/20 shadow-sm
-                    {{ Request::is('/') ? 'text-slate-50' : 'text-slate-950'}}"
-                    title="Iniciar Sesión">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </a>
+                {{-- Login / Dashboard --}}
+                @auth
+                    <a href="{{ auth()->user()->hasRole('cliente') ? route('cliente.dashboard') : '/admin' }}"
+                        class="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/20 shadow-sm
+                        {{ Request::is('/') ? 'text-slate-50' : 'text-slate-950'}}"
+                        title="Ir al Panel">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}"
+                        class="p-2 rounded-xl bg-white/10 hover:bg-white/20 transition-all border border-white/20 shadow-sm
+                        {{ Request::is('/') ? 'text-slate-50' : 'text-slate-950'}}"
+                        title="Iniciar Sesión">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                    </a>
+                @endauth
 
                 <div class="flex items-center gap-3">
                     <a href="/suscripciones"
@@ -157,12 +168,22 @@
             </div>
 
             <div class="pt-6 border-t border-white/20">
-                <a href="{{ route('login') }}" class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-all text-slate-900 dark:text-white">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span class="text-[11px] font-black tracking-widest uppercase">Iniciar sesión</span>
-                </a>
+                @auth
+                    <a href="{{ auth()->user()->hasRole('cliente') ? route('cliente.dashboard') : '/admin' }}" 
+                        class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-all text-slate-900 dark:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        <span class="text-[11px] font-black tracking-widest uppercase">Mi Panel</span>
+                    </a>
+                @else
+                    <a href="{{ route('login') }}" class="flex items-center gap-3 p-3 rounded-xl bg-white/10 hover:bg-white/20 transition-all text-slate-900 dark:text-white">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                        <span class="text-[11px] font-black tracking-widest uppercase">Iniciar sesión</span>
+                    </a>
+                @endauth
             </div>
         </div>
     </div>
