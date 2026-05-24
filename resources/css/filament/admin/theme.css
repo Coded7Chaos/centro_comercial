@@ -1,0 +1,14 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/vendor/filament/**/*';
+
+/* Fix Topbar User Menu Dropdown Background */
+.custom-topbar-user-menu {
+    background-color: #ffffff !important;
+}
+
+.dark .custom-topbar-user-menu {
+    background-color: #1e3a8a !important; /* Blue for dark mode */
+}
