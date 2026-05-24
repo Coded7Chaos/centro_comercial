@@ -24,50 +24,21 @@ class SuscripcionesPagosTable
                 |------------------------------------------------------------------
                 */
 
-                TextColumn::make('cliente')
-
+                TextColumn::make('cobro.suscripcion.cliente.user.nombres')
                     ->label('Cliente')
-
-                    ->state(function ($record) {
-
-                        $cliente =
-                            $record
-                            ?->cobro
-                            ?->suscripcion
-                            ?->cliente;
-
-                        return ($cliente?->nombres ?? '')
-
-                            . ' '
-
-                            .
-
-                            ($cliente?->apellidos ?? '');
+                    ->formatStateUsing(function ($record) {
+                        $user = $record->cobro?->suscripcion?->cliente?->user;
+                        if (!$user) return '---';
+                        return "{$user->nombres} {$user->apellido_paterno} {$user->apellido_materno}";
                     })
-
-                    ->limit(25)
-
-                    ->tooltip(function ($record) {
-
-                        $cliente =
-                            $record
-                            ?->cobro
-                            ?->suscripcion
-                            ?->cliente;
-
-                        return ($cliente?->nombres ?? '')
-
-                            . ' '
-
-                            .
-
-                            ($cliente?->apellidos ?? '');
+                    ->searchable(query: function ($query, $search) {
+                        $query->whereHas('cobro.suscripcion.cliente.user', function ($q) use ($search) {
+                            $q->where('nombres', 'like', "%{$search}%")
+                                ->orWhere('apellido_paterno', 'like', "%{$search}%")
+                                ->orWhere('apellido_materno', 'like', "%{$search}%");
+                        });
                     })
-
-                    ->searchable()
-
                     ->sortable()
-
                     ->weight('medium'),
 
                 /*
@@ -76,53 +47,23 @@ class SuscripcionesPagosTable
                 |------------------------------------------------------------------
                 */
 
-                TextColumn::make('tienda')
-
+                TextColumn::make('cobro.suscripcion.infraestructurasTienda.nombre')
                     ->label('Tienda')
-
-                    ->state(function ($record) {
-
-                        return
-                            $record
-                            ?->cobro
-                            ?->suscripcion
-                            ?->infraestructurasTienda
-                            ?->nombre;
-                    })
-
                     ->limit(20)
-
                     ->tooltip(function ($record) {
+                        $tienda = $record->cobro?->suscripcion?->infraestructurasTienda;
+                        if (!$tienda) return 'Sin tienda';
+                        
+                        $piso = $tienda->piso;
+                        $infra = $piso?->infraestructura;
 
-                        $tienda =
-                            $record
-                            ?->cobro
-                            ?->suscripcion
-                            ?->infraestructurasTienda;
-
-                        $piso =
-                            $tienda?->piso;
-
-                        $infra =
-                            $piso?->infraestructura;
-
-                        return ($tienda?->nombre ?? 'Sin nombre')
-
+                        return ($tienda->nombre ?? 'Sin nombre')
                             . "\n"
-
-                            .
-
-                            ($infra?->nombre ?? 'Sin infraestructura')
-
+                            . ($infra?->nombre ?? 'Sin infraestructura')
                             . ' - Piso '
-
-                            .
-
-                            ($piso?->nombre ?? '---');
+                            . ($piso?->nombre ?? '---');
                     })
-
                     ->searchable()
-
                     ->sortable(),
 
                 /*
