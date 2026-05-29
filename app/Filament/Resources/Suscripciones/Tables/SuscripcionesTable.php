@@ -26,20 +26,9 @@ class SuscripcionesTable
     */
 
                 TextColumn::make('cliente')
-
                     ->label('Cliente')
-
                     ->getStateUsing(function ($record) {
-
-                        return
-
-                            $record->cliente?->id .
-                            ' - ' .
-                            trim(
-                                $record->cliente?->nombres .
-                                    ' ' .
-                                    $record->cliente?->apellidos
-                            );
+                        return $record->cliente?->id . ' - ' . ($record->cliente?->nombre_completo ?? 'N/A');
                     })
 
                     ->limit(30)
@@ -212,6 +201,66 @@ class SuscripcionesTable
                     )
 
                     ->openUrlInNewTab(),
+
+                Action::make('contrato_pdf')
+                    ->label('Contrato PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('primary')
+                    ->url(fn($record) => route('pdf.contrato', $record->id))
+                    ->openUrlInNewTab(),
+
+                Action::make('renovar')
+                    ->label('Renovar')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('warning')
+                    ->form([
+                        \Filament\Forms\Components\DatePicker::make('fecha_inicio')
+                            ->label('Fecha Inicio')
+                            ->default(fn ($record) => $record->fecha_fin)
+                            ->required(),
+                        \Filament\Forms\Components\Select::make('tipo')
+                            ->label('Tipo de Suscripción')
+                            ->options([
+                                'anual' => 'Anual',
+                                'semestral' => 'Semestral',
+                                'trimestral' => 'Trimestral',
+                                'bimestral' => 'Bimestral',
+                                'mensual' => 'Mensual',
+                                'semanal' => 'Semanal',
+                                'personalizado' => 'Personalizado',
+                            ])
+                            ->default(fn ($record) => $record->tipo)
+                            ->required(),
+                        \Filament\Forms\Components\DatePicker::make('fecha_fin')
+                            ->label('Fecha Fin')
+                            ->default(fn ($record) => \Carbon\Carbon::parse($record->fecha_fin)->addMonth())
+                            ->required(),
+                        \Filament\Forms\Components\TextInput::make('precio')
+                            ->label('Precio')
+                            ->numeric()
+                            ->prefix('Bs.')
+                            ->default(fn ($record) => $record->precio)
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data) {
+                        \App\Models\Suscripciones::create([
+                            'cliente_id' => $record->cliente_id,
+                            'marca_id' => $record->marca_id,
+                            'infraestructuras_tienda_id' => $record->infraestructuras_tienda_id,
+                            'infraestructuras_piso_id' => $record->infraestructuras_piso_id,
+                            'tipo' => $data['tipo'],
+                            'precio' => $data['precio'],
+                            'fecha_inicio' => $data['fecha_inicio'],
+                            'fecha_fin' => $data['fecha_fin'],
+                            'tamano' => $record->tamano,
+                        ]);
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('Contrato Renovado')
+                            ->body('Se ha creado un nuevo contrato de arrendamiento exitosamente.')
+                            ->success()
+                            ->send();
+                    }),
             ])
 
             ->toolbarActions([

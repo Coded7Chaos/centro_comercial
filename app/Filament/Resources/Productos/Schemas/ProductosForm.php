@@ -211,13 +211,15 @@ class ProductosForm
 
             Select::make('marca_id')
                 ->label('Marca')
-
-                ->options(
-                    Marcas::pluck('nombre', 'id')
-                )
-
+                ->options(function (\Filament\Forms\Get $get) {
+                    $clienteId = $get('cliente_temp');
+                    $query = Marcas::query()->whereNull('cliente_id');
+                    if ($clienteId) {
+                        $query->orWhere('cliente_id', $clienteId);
+                    }
+                    return $query->pluck('nombre', 'id');
+                })
                 ->required()
-
                 ->validationMessages([
                     'required' => 'Debes seleccionar una marca.',
                 ]),

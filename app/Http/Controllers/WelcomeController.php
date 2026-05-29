@@ -55,6 +55,13 @@ class WelcomeController extends Controller
                                     ?? $t->marcas->first()?->nombre
                                 )
                                 : null,
+                            'marca_logo'   => $isAlquilada
+                                ? (
+                                    ($brand = $t->marcas->firstWhere('cliente_id', $t->cliente_id) ?? $t->marcas->first())
+                                    ? ($brand->logo ? \Illuminate\Support\Facades\Storage::url($brand->logo) : null)
+                                    : null
+                                )
+                                : null,
                             'inquilino'    => $isAlquilada && $t->cliente?->user
                                 ? trim($t->cliente->user->nombres . ' ' . $t->cliente->user->apellido_paterno)
                                 : null,
@@ -63,7 +70,7 @@ class WelcomeController extends Controller
                                     'id'       => $p->id,
                                     'nombre'   => $p->nombre,
                                     'precio'   => (float) $p->precio,
-                                    'imagenes' => $p->imagenes->map(fn ($img) => ['url' => $img->url])->values(),
+                                    'imagenes' => $p->imagenes->map(fn ($img) => ['url' => str_starts_with($img->url, 'http') ? $img->url : \Illuminate\Support\Facades\Storage::url($img->url)])->values(),
                                 ])->values()
                                 : [],
                             'accent' => $palettes[$t->id % count($palettes)],

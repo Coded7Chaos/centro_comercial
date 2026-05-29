@@ -60,12 +60,12 @@ class MarcasForm
 
                 // CLIENTE
                 Select::make('cliente_id')
-                    ->label('Cliente')
+                    ->label('Propietario / Cliente (Dejar vacío para hacer esta marca Global)')
                     ->relationship('cliente', 'ci')
                     ->getOptionLabelFromRecordUsing(fn ($record) => $record->nombre_completo)
                     ->searchable(['ci', 'user.nombres', 'user.apellido_paterno', 'user.apellido_materno'])
                     ->preload()
-                    ->required(),
+                    ->nullable(),
 
                 // DESCRIPCIÓN
                 Textarea::make('descripcion')

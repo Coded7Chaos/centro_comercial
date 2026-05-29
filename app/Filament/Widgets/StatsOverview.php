@@ -33,7 +33,9 @@ class StatsOverview extends BaseWidget
 
         $deudaVencida = (float) SuscripcionesCobros::whereIn('estado', ['vencido', 'parcial'])
             ->whereDate('fecha_vencimiento', '<', $now->toDateString())
-            ->sum('monto');
+            ->with('pagos')
+            ->get()
+            ->sum(fn ($c) => max(0, (float) $c->monto - (float) $c->pagos->sum('monto_pagado')));
 
         $tiendasTotal = InfraestructurasTiendas::count();
         $tiendasOcupadas = InfraestructurasTiendas::whereHas('estado', function ($q) {

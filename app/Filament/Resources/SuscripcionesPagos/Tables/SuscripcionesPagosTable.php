@@ -157,6 +157,38 @@ class SuscripcionesPagosTable
                     ->sinceTooltip()
 
                     ->sortable(),
+
+                TextColumn::make('dias_diferencia')
+                    ->label('Días de Diferencia')
+                    ->state(function ($record) {
+                        $vencimiento = $record->cobro?->fecha_vencimiento;
+                        $pago = $record->fecha_pago;
+                        if (!$vencimiento || !$pago) return '---';
+
+                        $vDate = \Carbon\Carbon::parse($vencimiento);
+                        $pDate = \Carbon\Carbon::parse($pago);
+                        $diff = $vDate->diffInDays($pDate, false);
+                        if ($diff > 0) {
+                            return "+{$diff} días (Tardío)";
+                        } elseif ($diff < 0) {
+                            $absDiff = abs($diff);
+                            return "-{$absDiff} días (Anticipado)";
+                        } else {
+                            return "En el vencimiento";
+                        }
+                    })
+                    ->badge()
+                    ->color(function ($record) {
+                        $vencimiento = $record->cobro?->fecha_vencimiento;
+                        $pago = $record->fecha_pago;
+                        if (!$vencimiento || !$pago) return 'gray';
+                        $vDate = \Carbon\Carbon::parse($vencimiento);
+                        $pDate = \Carbon\Carbon::parse($pago);
+                        $diff = $vDate->diffInDays($pDate, false);
+                        if ($diff > 0) return 'danger';
+                        if ($diff < 0) return 'success';
+                        return 'info';
+                    }),
             ])
 
             ->filters([

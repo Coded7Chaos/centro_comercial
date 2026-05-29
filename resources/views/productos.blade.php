@@ -21,7 +21,7 @@
                         'piso_nombre'    => $piso->nombre,
                         'categoria'      => $producto->categoria?->nombre ?? 'General',
                         'marca'          => $producto->marca?->nombre,
-                        'imagenes'       => $producto->imagenes->map(fn($i) => ['url' => $i->url])->values(),
+                        'imagenes'       => $producto->imagenes->map(fn($i) => ['url' => str_starts_with($i->url, 'http') ? $i->url : \Illuminate\Support\Facades\Storage::url($i->url)])->values(),
                     ]);
                 }
             }

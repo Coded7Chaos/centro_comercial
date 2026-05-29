@@ -53,7 +53,6 @@ class RolesAndPermissionsSeeder extends Seeder
         $pages = [
             'BalanceSuscripciones',
             'DirectorioInterno',
-            'GeneradorCobros',
             'MapaOcupacion',
             'MiEstadoDeCuenta',
             'ReporteMorosidad',
@@ -100,11 +99,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'DeleteAny:SuscripcionesCobros',
                 'ForceDelete:SuscripcionesCobros',
                 'ForceDeleteAny:SuscripcionesCobros',
-                // No puede modificar tarifas
-                'Create:SuscripcionesTarifas',
-                'Update:SuscripcionesTarifas',
-                'Delete:SuscripcionesTarifas',
-                // No accede al widget de top morosos (lista personal)
+                 // No accede al widget de top morosos (lista personal)
                 'View:TopMorososWidget',
                 // No accede a la auditoría del sistema
                 'View:Auditoria',

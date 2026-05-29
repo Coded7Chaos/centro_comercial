@@ -202,15 +202,14 @@
 
     {{-- SECTION BANNER --}}
     <div class="absolute inset-x-0 top-20 z-40 flex justify-center px-4 pointer-events-none">
-        <div class="pointer-events-auto flex items-center gap-3 md:gap-5 rounded-2xl border border-white/40 bg-slate-900/55 px-4 py-2 md:px-6 md:py-4 backdrop-blur-2xl shadow-2xl transition-all duration-500"
+        <div class="pointer-events-auto flex items-center gap-3 md:gap-5 rounded-2xl border border-white/40 bg-slate-900/55 px-4 py-1.5 md:px-6 md:py-2.5 backdrop-blur-2xl shadow-2xl transition-all duration-500"
             :key="'banner-' + floorIndex + '-' + storeIndex">
             <div class="pr-3 md:pr-5 border-r border-white/20 text-center md:text-left">
                 <div class="text-white/70 text-[8px] md:text-[10px] tracking-[0.3em] uppercase" x-text="'PISO ' + currentFloor.displayLevel + ' · LOCAL ' + currentStore.numero"></div>
-                <div class="text-white text-xl md:text-3xl font-black tracking-tighter" x-text="currentStore.nombre"></div>
+                <div class="text-white text-lg md:text-xl font-extrabold tracking-tight" x-text="currentFloor.name"></div>
             </div>
             <div class="hidden sm:block">
-                <div class="text-white/95 font-semibold text-[11px] md:text-sm" x-text="currentFloor.name"></div>
-                <div class="text-white/70 text-[9px] md:text-xs" x-text="currentFloor.vibe"></div>
+                <div class="text-white/95 font-bold text-[10px] md:text-xs" x-text="currentFloor.vibe"></div>
             </div>
         </div>
     </div>
@@ -241,16 +240,21 @@
                                     : 'bg-gradient-to-b from-emerald-600 to-emerald-800'">
                                 <div class="absolute inset-0 bg-[linear-gradient(110deg,transparent_30%,rgba(255,255,255,0.4)_45%,transparent_60%)] opacity-70 pointer-events-none"></div>
                                 <div class="relative flex items-center gap-3 md:gap-4 flex-1 min-w-0">
-                                    <div class="flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-xl border border-white/60 bg-white/30 backdrop-blur shadow-inner text-sm md:text-xl font-black text-white uppercase" x-text="getMonogram(store.nombre)"></div>
+                                    <div class="flex h-10 w-10 md:h-14 md:w-14 items-center justify-center rounded-xl border border-white/60 bg-white/30 backdrop-blur shadow-inner text-sm md:text-xl font-black text-white uppercase overflow-hidden">
+                                        <template x-if="store.marca_logo">
+                                            <img :src="store.marca_logo" class="h-full w-full object-cover">
+                                        </template>
+                                        <template x-if="!store.marca_logo">
+                                            <span x-text="getMonogram(store.nombre)"></span>
+                                        </template>
+                                    </div>
                                     <div class="min-w-0 flex-1">
                                         <div class="text-lg md:text-2xl font-black tracking-tight truncate text-white" x-text="store.nombre"></div>
                                         <div class="flex items-center gap-2 mt-0.5">
                                             <span class="text-[8px] md:text-[10px] tracking-[0.2em] font-bold opacity-80 uppercase truncate text-white" x-text="'Local ' + store.numero"></span>
-                                            <span class="text-[8px] md:text-[9px] font-black tracking-[0.2em] uppercase px-1.5 py-0.5 rounded border text-white whitespace-nowrap"
-                                                :class="store.is_alquilada
-                                                    ? 'bg-white/20 border-white/50'
-                                                    : 'bg-emerald-400/30 border-emerald-200/80'"
-                                                x-text="store.is_alquilada ? 'Alquilada' : 'Disponible'"></span>
+                                            <template x-if="!store.is_alquilada">
+                                                <span class="text-[8px] md:text-[9px] font-black tracking-[0.2em] uppercase px-1.5 py-0.5 rounded border border-emerald-200/80 bg-emerald-400/30 text-white whitespace-nowrap">Disponible para alquilar</span>
+                                            </template>
                                         </div>
                                     </div>
                                 </div>
@@ -451,13 +455,20 @@
                     </button>
 
                     <div class="relative flex items-center gap-4 md:gap-8">
-                        <div class="h-16 w-16 md:h-24 md:w-24 rounded-2xl bg-white/30 backdrop-blur border border-white/50 flex items-center justify-center text-xl md:text-4xl font-black uppercase"
-                            x-text="getMonogram(activeStore?.nombre || '')"></div>
+                        <div class="h-16 w-16 md:h-24 md:w-24 rounded-2xl bg-white/30 backdrop-blur border border-white/50 flex items-center justify-center text-xl md:text-4xl font-black uppercase overflow-hidden">
+                            <template x-if="activeStore?.marca_logo">
+                                <img :src="activeStore?.marca_logo" class="h-full w-full object-cover">
+                            </template>
+                            <template x-if="!activeStore?.marca_logo">
+                                <span x-text="getMonogram(activeStore?.nombre || '')"></span>
+                            </template>
+                        </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-2 mb-1">
                                 <span class="text-white/70 text-[8px] md:text-xs font-black tracking-[0.3em] uppercase" x-text="'Local ' + activeStore?.numero"></span>
-                                <span class="text-[9px] md:text-[11px] font-black tracking-[0.2em] uppercase px-2 py-0.5 rounded-full border border-white/40 bg-white/15"
-                                    x-text="activeStore?.is_alquilada ? 'Alquilada' : 'Disponible'"></span>
+                                <template x-if="!activeStore?.is_alquilada">
+                                    <span class="text-[9px] md:text-[11px] font-black tracking-[0.2em] uppercase px-2 py-0.5 rounded-full border border-white/40 bg-white/15 text-white">Disponible para alquilar</span>
+                                </template>
                             </div>
                             <h2 class="text-2xl md:text-5xl font-black tracking-tighter truncate" x-text="activeStore?.nombre"></h2>
                             <p class="text-white/90 text-sm md:text-lg font-medium italic mt-1 line-clamp-2" x-text="activeStore?.descripcion"></p>

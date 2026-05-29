@@ -10,9 +10,9 @@ class DirectorioController extends Controller
 {
     public function index()
     {
-        // Listar tiendas que están alquiladas (tienen cliente o marca)
-        $tiendas = InfraestructurasTiendas::whereNotNull('marca_id')
-            ->with(['marca', 'piso'])
+        // Listar tiendas que están alquiladas (tienen marcas asignadas)
+        $tiendas = InfraestructurasTiendas::whereHas('marcas')
+            ->with(['marcas', 'piso'])
             ->get();
             
         return view('directorio.index', compact('tiendas'));
@@ -20,10 +20,11 @@ class DirectorioController extends Controller
 
     public function catalogo($id)
     {
-        $tienda = InfraestructurasTiendas::with(['marca'])->findOrFail($id);
+        $tienda = InfraestructurasTiendas::with(['marcas'])->findOrFail($id);
         
-        // Asumiendo que los productos se asocian a la marca o a la tienda (usaremos marca para ser flexibles)
-        $productos = Productos::where('marca_id', $tienda->marca_id)
+        // Asumiendo que los productos se asocian a las marcas de la tienda
+        $marcaIds = $tienda->marcas->pluck('id')->toArray();
+        $productos = Productos::whereIn('marca_id', $marcaIds)
             ->with('imagenes')
             ->get();
             

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('codigo_pais')->default('+591');
             $table->integer('numero_celular');
             $table->string('correo_secundario')->nullable();
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null');
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('foto')->nullable();
             $table->timestamps();
             $table->softDeletes();

@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('cobros:marcar-vencidos')->dailyAt('00:30');
+Schedule::command('suscripciones:liberar-expiradas')->dailyAt('00:00');

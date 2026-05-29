@@ -36,10 +36,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
-            // Leaflet para mapas
+            // Leaflet para mapas y Datalabels para gráficos
             ->renderHook(
                 PanelsRenderHook::HEAD_END,
-                fn(): string => Blade::render("@vite('resources/js/leaflet-field.js')")
+                fn(): string => Blade::render("@vite('resources/js/leaflet-field.js')") . '<script src="/js/chart-datalabels.js" defer></script>'
             )
             ->renderHook(
                 PanelsRenderHook::PAGE_START,

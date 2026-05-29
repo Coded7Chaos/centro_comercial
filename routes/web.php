@@ -41,8 +41,56 @@ Route::post('/email/verification-notification', function (Illuminate\Http\Reques
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard-cliente', function () {
-        return view('cliente.dashboard');
-    })->name('cliente.dashboard');
+        return redirect()->route('cliente.dashboard');
+    });
+
+    Route::get('/pdf/contrato/{id}', [App\Http\Controllers\Pdf\ReporteContratoController::class, 'descargar'])
+        ->name('pdf.contrato');
+
+    Route::prefix('cliente')->name('cliente.')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'dashboard'])
+            ->name('dashboard');
+
+        // Mi Tienda
+        Route::get('/tienda', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'tienda'])
+            ->name('tienda');
+        Route::post('/tienda', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'actualizarTienda'])
+            ->name('tienda.update');
+
+        // Productos CRUD
+        Route::get('/productos', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'productos'])
+            ->name('productos.index');
+        Route::get('/productos/crear', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'crearProducto'])
+            ->name('productos.create');
+        Route::post('/productos', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'guardarProducto'])
+            ->name('productos.store');
+        Route::get('/productos/{id}/editar', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'editarProducto'])
+            ->name('productos.edit');
+        Route::put('/productos/{id}', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'actualizarProducto'])
+            ->name('productos.update');
+        Route::delete('/productos/{id}', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'eliminarProducto'])
+            ->name('productos.destroy');
+
+        // Marcas CRUD
+        Route::get('/marcas', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'marcas'])
+            ->name('marcas.index');
+        Route::get('/marcas/crear', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'crearMarca'])
+            ->name('marcas.create');
+        Route::post('/marcas', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'guardarMarca'])
+            ->name('marcas.store');
+        Route::get('/marcas/{id}/editar', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'editarMarca'])
+            ->name('marcas.edit');
+        Route::put('/marcas/{id}', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'actualizarMarca'])
+            ->name('marcas.update');
+        Route::delete('/marcas/{id}', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'eliminarMarca'])
+            ->name('marcas.destroy');
+
+        // Estado de Cuenta
+        Route::get('/estado-cuenta', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'estadoCuenta'])
+            ->name('estado-cuenta');
+        Route::post('/estado-cuenta/reportar-pago', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'registrarPago'])
+            ->name('reportar-pago');
+    });
 });
 
 Route::get('/cobros/pdf/{id}', [ReporteCobrosController::class, 'cobro'])

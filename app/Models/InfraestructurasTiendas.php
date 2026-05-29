@@ -65,6 +65,17 @@ class InfraestructurasTiendas extends Model
         )->withTimestamps();
     }
 
+    public function getMarcaAttribute()
+    {
+        if ($this->cliente_id) {
+            $matchingBrand = $this->marcas->firstWhere('cliente_id', $this->cliente_id);
+            if ($matchingBrand) {
+                return $matchingBrand;
+            }
+        }
+        return $this->marcas->first();
+    }
+
     public function productos(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(

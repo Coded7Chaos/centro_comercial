@@ -43,6 +43,17 @@ class UsuariosResource extends Resource
             });
     }
 
+    public static function canCreate(): bool
+    {
+        $user = auth()->user();
+
+        if ($user && $user->hasRole('admin')) {
+            return false;
+        }
+
+        return parent::canCreate();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return UsuariosForm::configure($schema);

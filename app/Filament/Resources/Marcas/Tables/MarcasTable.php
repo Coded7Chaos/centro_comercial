@@ -18,14 +18,20 @@ class MarcasTable
                 TextColumn::make('id')
                     ->label('Marca ID')
                     ->sortable(),
+                \Filament\Tables\Columns\ImageColumn::make('logo')
+                    ->label('Logo')
+                    ->disk('public')
+                    ->circular(),
                 TextColumn::make('nombre')
                     ->searchable(),
                 TextColumn::make('cliente_id')
                     ->label('Cliente ID')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->default('-'),
                 TextColumn::make('cliente.nombre_completo')
                     ->label('Cliente')
+                    ->default('Global')
                     ->searchable(query: function ($query, string $search) {
                         return $query->whereHas('cliente.user', function ($q) use ($search) {
                             $q->where('nombres', 'like', "%{$search}%")
@@ -34,7 +40,7 @@ class MarcasTable
                         });
                     })
                     ->limit(20)
-                    ->tooltip(fn($record) => $record->cliente?->nombre_completo)
+                    ->tooltip(fn($record) => $record->cliente?->nombre_completo ?? 'Marca Global')
                     ->width('220px'),
                 TextColumn::make('estado')
                     ->badge()

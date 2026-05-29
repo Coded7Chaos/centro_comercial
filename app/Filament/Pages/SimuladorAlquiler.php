@@ -18,6 +18,8 @@ class SimuladorAlquiler extends Page implements HasForms
     use InteractsWithForms;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calculator';
+    protected static ?string $title = 'Calculadora de Alquileres';
+    protected static ?string $navigationLabel = 'Calculadora de Alquileres';
     protected static string|\UnitEnum|null $navigationGroup = 'Suscripciones';
     public ?array $data = [];
     protected string $view = 'filament.pages.simulador-alquiler';
@@ -36,7 +38,7 @@ class SimuladorAlquiler extends Page implements HasForms
     {
         return $form
             ->schema([
-                Section::make('Simulador de Costos de Alquiler')
+                Section::make('Calculadora de Alquileres')
                     ->description('Ingrese los metros cuadrados y el tipo de suscripción para obtener una cotización automática según las tarifas vigentes.')
                     ->schema([
                         TextInput::make('tamano')

@@ -72,22 +72,5 @@ class CreateSuscripciones extends CreateRecord
         }
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | ACTUALIZAR TIENDA AUTOMÁTICAMENTE
-    |--------------------------------------------------------------------------
-    */
 
-    protected function afterCreate(): void
-    {
-        $tienda = InfraestructurasTiendas::find($this->record->infraestructuras_tienda_id);
-        $estadoAlquilada = EstadoTienda::where('estado', 'Alquilada')->first();
-
-        if ($tienda && $estadoAlquilada) {
-            $tienda->update([
-                'cliente_id' => $this->record->cliente_id,
-                'id_estado' => $estadoAlquilada->id,
-            ]);
-        }
-    }
 }

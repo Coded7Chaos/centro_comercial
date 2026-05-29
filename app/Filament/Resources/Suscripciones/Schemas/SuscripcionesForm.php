@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Suscripciones\Schemas;
 use App\Models\Clientes;
 use App\Models\InfraestructurasTiendas;
 use App\Models\SuscripcionesTarifas;
+use App\Models\Marcas;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Hidden;
@@ -56,6 +57,19 @@ class SuscripcionesForm
                             $set('tamano', $tienda->tamano);
                         }
                     )
+                    ->required(),
+
+                Select::make('marca_id')
+                    ->label('Marca')
+                    ->options(function (Get $get) {
+                        $clienteId = $get('cliente_id');
+                        $query = Marcas::query()->whereNull('cliente_id');
+                        if ($clienteId) {
+                            $query->orWhere('cliente_id', $clienteId);
+                        }
+                        return $query->pluck('nombre', 'id');
+                    })
+                    ->searchable()
                     ->required(),
 
                 /*
@@ -256,6 +270,14 @@ class SuscripcionesForm
                         if (!$tienda) return;
                         $set('tamano', $tienda->tamano);
                     }),
+
+                \Filament\Forms\Components\FileUpload::make('contrato_firmado')
+                    ->label('Contrato Firmado (PDF/Imagen)')
+                    ->disk('public')
+                    ->directory('contratos-firmados')
+                    ->acceptedFileTypes(['application/pdf', 'image/*'])
+                    ->maxSize(10240)
+                    ->nullable(),
             ]);
     }
 }

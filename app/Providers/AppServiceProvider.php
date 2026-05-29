@@ -33,5 +33,7 @@ class AppServiceProvider extends ServiceProvider
             $infraestructura = Infraestructuras::first();
             $view->with('mallName', $infraestructura ? $infraestructura->nombre : 'Infraestructuras');
         });
+
+        \App\Models\Suscripciones::observe(\App\Observers\SuscripcionObserver::class);
     }
 }
