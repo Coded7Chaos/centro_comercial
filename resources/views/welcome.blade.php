@@ -75,13 +75,38 @@
         
         get currentFloor() { return this.mall.floors[this.floorIndex]; },
         get currentStore() { return this.currentFloor.stores[this.storeIndex]; },
-        get nextStore() { 
-            let idx = (this.storeIndex + 1) % this.currentFloor.stores.length;
-            return this.currentFloor.stores[idx];
+        
+        get matchingStoreIndices() {
+            const q = Alpine.store('search')?.q || '';
+            const indices = [];
+            this.currentFloor.stores.forEach((s, idx) => {
+                if (window.matchesSearchQuery(s.nombre, q)) {
+                    indices.push(idx);
+                }
+            });
+            return indices;
         },
+
+        get nextStore() {
+            const indices = this.matchingStoreIndices;
+            if (indices.length <= 1) return this.currentStore;
+            let pos = indices.indexOf(this.storeIndex);
+            if (pos === -1) {
+                return this.currentFloor.stores[indices[0]];
+            }
+            let nextPos = (pos + 1) % indices.length;
+            return this.currentFloor.stores[indices[nextPos]];
+        },
+
         get prevStore() {
-            let idx = (this.storeIndex - 1 + this.currentFloor.stores.length) % this.currentFloor.stores.length;
-            return this.currentFloor.stores[idx];
+            const indices = this.matchingStoreIndices;
+            if (indices.length <= 1) return this.currentStore;
+            let pos = indices.indexOf(this.storeIndex);
+            if (pos === -1) {
+                return this.currentFloor.stores[indices[0]];
+            }
+            let prevPos = (pos - 1 + indices.length) % indices.length;
+            return this.currentFloor.stores[indices[prevPos]];
         },
 
         setFloor(i) {
@@ -106,6 +131,32 @@
             this.triggerLock();
         },
 
+        navigateStore(direction) {
+            if (this.lock) return;
+            const indices = this.matchingStoreIndices;
+            if (indices.length <= 1) return;
+            
+            let pos = indices.indexOf(this.storeIndex);
+            let nextPos;
+            if (pos === -1) {
+                nextPos = 0;
+            } else {
+                nextPos = (pos + direction + indices.length) % indices.length;
+            }
+            const nextStoreIndex = indices[nextPos];
+            
+            let prev = this.storeIndex;
+            let total = this.currentFloor.stores.length;
+            let next = nextStoreIndex;
+            let delta = next - prev;
+            if (delta > total / 2) delta -= total;
+            else if (delta < -total / 2) delta += total;
+            
+            this.storeTurns += delta;
+            this.storeIndex = next;
+            this.triggerLock();
+        },
+
         triggerLock() {
             this.lock = true;
             setTimeout(() => this.lock = false, 800);
@@ -118,8 +169,8 @@
             if (Math.max(absX, absY) < 8) return;
 
             if (absX > absY) {
-                if (e.deltaX > 0) this.setStore(this.storeIndex + 1);
-                else this.setStore(this.storeIndex - 1);
+                if (e.deltaX > 0) this.navigateStore(1);
+                else this.navigateStore(-1);
             } else {
                 if (e.deltaY < 0) this.setFloor(this.floorIndex - 1);
                 else this.setFloor(this.floorIndex + 1);
@@ -150,32 +201,118 @@
             return (parts[0][0] + (parts[1] ? parts[1][0] : '')).toUpperCase();
         },
 
-        // Salta al piso/tienda que matchea con el search global del navbar
+        // Salta al piso/tienda que matchea con el search global del navbar (solo por título/nombre)
         jumpToSearchMatch(q) {
-            const needle = (q || '').toLowerCase().trim();
-            if (!needle) return;
+            if (!q) return;
+            
+            // 1. Check current floor first
+            const currentStores = this.currentFloor.stores;
+            const currentMatchIdx = currentStores.findIndex(s => window.matchesSearchQuery(s.nombre, q));
+            if (currentMatchIdx !== -1) {
+                let prev = this.storeIndex;
+                let total = currentStores.length;
+                let next = currentMatchIdx;
+                let delta = next - prev;
+                if (delta > total / 2) delta -= total;
+                else if (delta < -total / 2) delta += total;
+                
+                this.storeTurns += delta;
+                this.storeIndex = next;
+                return;
+            }
+            
+            // 2. Check other floors
             for (let fi = 0; fi < this.mall.floors.length; fi++) {
+                if (fi === this.floorIndex) continue;
                 const stores = this.mall.floors[fi].stores;
-                for (let si = 0; si < stores.length; si++) {
-                    const s = stores[si];
-                    const hay = (s.nombre || '').toLowerCase()
-                        + ' ' + (s.marca || '').toLowerCase()
-                        + ' ' + (s.numero || '').toString().toLowerCase();
-                    if (hay.includes(needle)) {
-                        this.setFloor(fi);
-                        this.setStore(si);
-                        return;
-                    }
+                const matchIdx = stores.findIndex(s => window.matchesSearchQuery(s.nombre, q));
+                if (matchIdx !== -1) {
+                    this.floorIndex = fi;
+                    
+                    let prev = this.storeIndex;
+                    let total = stores.length;
+                    let next = matchIdx;
+                    let delta = next - prev;
+                    if (delta > total / 2) delta -= total;
+                    else if (delta < -total / 2) delta += total;
+                    
+                    this.storeTurns += delta;
+                    this.storeIndex = next;
+                    return;
+                }
+            }
+        },
+
+        matchesSearch(store) {
+            const q = Alpine.store('search')?.q || '';
+            return window.matchesSearchQuery(store.nombre, q);
+        },
+
+        get hasMatchingStores() {
+            const q = Alpine.store('search')?.q || '';
+            return this.currentFloor.stores.some(s => window.matchesSearchQuery(s.nombre, q));
+        }
+    }"
+    x-init="
+        $watch('$store.search.q', q => jumpToSearchMatch(q));
+        const urlParams = new URLSearchParams(window.location.search);
+        const tiendaId = urlParams.get('tienda_id');
+        if (tiendaId) {
+            const parsedId = parseInt(tiendaId, 10);
+            for (let fi = 0; fi < mall.floors.length; fi++) {
+                const floor = mall.floors[fi];
+                const si = floor.stores.findIndex(s => s.id === parsedId);
+                if (si !== -1) {
+                    floorIndex = fi;
+                    storeIndex = si;
+                    storeTurns = si;
+                    activeStore = floor.stores[si];
+                    break;
                 }
             }
         }
-    }"
-    x-init="$watch('$store.search.q', q => jumpToSearchMatch(q))"
+
+        // Auto-sync store changes from personalization panel without manual refresh
+        const dataObj = $data;
+        setInterval(() => {
+            fetch('/?json=1')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.mall && data.mall.floors) {
+                        data.mall.floors.forEach((floor, fi) => {
+                            if (dataObj.mall.floors[fi]) {
+                                floor.stores.forEach((store, si) => {
+                                    const target = dataObj.mall.floors[fi].stores[si];
+                                    if (target) {
+                                        target.nombre = store.nombre;
+                                        target.descripcion = store.descripcion;
+                                        target.telefono = store.telefono;
+                                        target.marca = store.marca;
+                                        target.marca_logo = store.marca_logo;
+                                        target.inquilino = store.inquilino;
+                                        target.vitrina_1 = store.vitrina_1;
+                                        target.vitrina_2 = store.vitrina_2;
+                                        target.vitrina_3 = store.vitrina_3;
+                                        target.productos = store.productos;
+
+                                        // Auto-sync details modal if currently open
+                                        if (dataObj.activeStore && dataObj.activeStore.id === target.id) {
+                                            dataObj.activeStore = target;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                })
+                .catch(err => console.error('Error sync:', err));
+        }, 4000);
+    "
     @wheel="handleWheel"
     @keydown.up.window="setFloor(floorIndex - 1)"
     @keydown.down.window="setFloor(floorIndex + 1)"
-    @keydown.left.window="setStore(storeIndex - 1)"
-    @keydown.right.window="setStore(storeIndex + 1)"
+    @keydown.left.window="navigateStore(-1)"
+    @keydown.right.window="navigateStore(1)"
     @keydown.escape.window="activeStore = null"
 >
     <x-public-navbar />
@@ -186,7 +323,7 @@
     {{-- PANORAMA BACKGROUND --}}
     <div class="absolute inset-0 z-10 transition-all duration-1000 ease-[cubic-bezier(0.22,1,0.36,1)]"
         :key="'bg-' + floorIndex">
-        <img src="https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=2000&q=80" 
+        <img :src="currentFloor.imagen_fondo || '/images/backgrounds/bg_mall_white.jpg'" 
             class="h-full w-full object-cover saturate-[0.85] brightness-[1.02]">
         
         <div class="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent to-slate-900/30"></div>
@@ -205,7 +342,7 @@
         <div class="pointer-events-auto flex items-center gap-3 md:gap-5 rounded-2xl border border-white/40 bg-slate-900/55 px-4 py-1.5 md:px-6 md:py-2.5 backdrop-blur-2xl shadow-2xl transition-all duration-500"
             :key="'banner-' + floorIndex + '-' + storeIndex">
             <div class="pr-3 md:pr-5 border-r border-white/20 text-center md:text-left">
-                <div class="text-white/70 text-[8px] md:text-[10px] tracking-[0.3em] uppercase" x-text="'PISO ' + currentFloor.displayLevel + ' · LOCAL ' + currentStore.numero"></div>
+                <div class="text-white/70 text-[8px] md:text-[10px] tracking-[0.3em] uppercase" x-text="(currentFloor.displayLevel.toString().toLowerCase().includes('piso') || currentFloor.displayLevel.toString().toLowerCase().includes('planta') || currentFloor.displayLevel.toString().toLowerCase() === 'pb' ? currentFloor.displayLevel.toUpperCase() : 'PISO ' + currentFloor.displayLevel.toUpperCase()) + ' · LOCAL ' + currentStore.numero"></div>
                 <div class="text-white text-lg md:text-xl font-extrabold tracking-tight" x-text="currentFloor.name"></div>
             </div>
             <div class="hidden sm:block">
@@ -217,6 +354,18 @@
     {{-- INTERIOR CONTAINER --}}
     <div class="absolute inset-0 z-30" 
         :style="viewMode === '3d' ? 'perspective: 1600px; perspective-origin: 50% 50%' : ''">
+
+        {{-- NO MATCHING RESULTS OVERLAY --}}
+        <div x-show="!hasMatchingStores" x-cloak
+             class="absolute inset-0 flex items-center justify-center z-40 pointer-events-none">
+            <div class="glass-hud rounded-[2rem] p-8 max-w-sm text-center shadow-2xl border border-white/40 pointer-events-auto">
+                <svg class="w-12 h-12 text-slate-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <h3 class="text-base font-black text-slate-900">No hay resultados coincidentes</h3>
+                <p class="text-xs text-slate-500 mt-1 font-semibold">Prueba buscando el título de otra tienda.</p>
+            </div>
+        </div>
         
         <div class="relative h-full w-full rotate-container"
             :style="viewMode === '3d' 
@@ -225,6 +374,13 @@
             
             <template x-for="(store, i) in currentFloor.stores" :key="store.id">
                 <div class="absolute inset-0 flex items-center md:justify-center transition-all duration-700"
+                    x-show="matchesSearch(store)"
+                    x-transition:enter="transition ease-out duration-350"
+                    x-transition:enter-start="opacity-0 scale-95"
+                    x-transition:enter-end="opacity-100 scale-100"
+                    x-transition:leave="transition ease-in duration-250"
+                    x-transition:leave-start="opacity-100 scale-100"
+                    x-transition:leave-end="opacity-0 scale-95"
                     :style="viewMode === '3d'
                         ? 'transform: rotateY(' + (i * (360 / currentFloor.stores.length)) + 'deg) translateZ(' + (window.innerWidth < 768 ? 600 : window.innerWidth/1.5) + 'px); backface-visibility: hidden; transform-style: preserve-3d;'
                         : 'transform: translateX(' + ((i - storeIndex) * (window.innerWidth < 768 ? 260 : 480)) + 'px) scale(' + (1 - Math.abs(i - storeIndex) * 0.15) + '); opacity: ' + (1 - Math.abs(i - storeIndex) * 0.4) + '; z-index: ' + (20 - Math.abs(i - storeIndex)) + ';'">
@@ -251,7 +407,7 @@
                                     <div class="min-w-0 flex-1">
                                         <div class="text-lg md:text-2xl font-black tracking-tight truncate text-white" x-text="store.nombre"></div>
                                         <div class="flex items-center gap-2 mt-0.5">
-                                            <span class="text-[8px] md:text-[10px] tracking-[0.2em] font-bold opacity-80 uppercase truncate text-white" x-text="'Local ' + store.numero"></span>
+                                            <span x-show="store.is_alquilada" class="text-[8px] md:text-[10px] tracking-[0.2em] font-bold opacity-80 uppercase truncate text-white" x-text="'Local ' + store.numero"></span>
                                             <template x-if="!store.is_alquilada">
                                                 <span class="text-[8px] md:text-[9px] font-black tracking-[0.2em] uppercase px-1.5 py-0.5 rounded border border-emerald-200/80 bg-emerald-400/30 text-white whitespace-nowrap">Disponible para alquilar</span>
                                             </template>
@@ -268,60 +424,76 @@
 
                                 {{-- Vidriera izquierda: producto o panel "disponible" --}}
                                 <div class="relative flex-1 border-r border-white/30"
-                                    :class="store.is_alquilada
-                                        ? 'bg-gradient-to-br from-white/50 via-slate-200/40 to-slate-300/50'
-                                        : 'bg-gradient-to-br from-emerald-50/70 via-white/60 to-emerald-100/60'">
-                                    <template x-if="store.is_alquilada">
-                                        <div class="absolute inset-2 md:inset-4 grid grid-cols-1 gap-2 md:gap-4">
-                                            <template x-for="p in store.productos.slice(0,2)" :key="p.id">
-                                                <div class="relative overflow-hidden rounded-lg border border-white/40 bg-black/10 shadow-inner h-full">
-                                                    <img :src="p.imagenes?.[0]?.url" class="h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
-                                                </div>
-                                            </template>
-                                        </div>
-                                    </template>
-                                    <template x-if="! store.is_alquilada">
-                                        <div class="absolute inset-2 md:inset-4 rounded-lg border-2 border-dashed border-emerald-400/60 bg-emerald-50/40 flex items-center justify-center p-2">
-                                            <div class="text-center">
-                                                <div class="text-emerald-700 text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">Espacio Libre</div>
-                                                <div class="text-emerald-800/80 text-[9px] md:text-[11px] font-bold mt-1">Listo para alquilar</div>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-
-                                {{-- Puerta central --}}
-                                <div class="relative flex w-[80px] md:w-[130px] flex-col items-center border-x border-white/35"
-                                    :class="store.is_alquilada
-                                        ? 'bg-gradient-to-b from-white/50 via-slate-100/60 to-slate-300/70'
-                                        : 'bg-gradient-to-b from-emerald-100/60 via-white/60 to-emerald-200/70'">
-                                    <div class="absolute inset-x-2 md:inset-x-4 top-4 bottom-7 rounded-t-lg border border-white/50 bg-gradient-to-b from-white/70 via-white/50 to-white/60 backdrop-blur-md shadow-inner overflow-hidden">
-                                        <div class="absolute top-3 left-0 right-0 text-[7px] md:text-[9px] font-bold text-slate-700/80 tracking-[0.3em] text-center"
-                                            x-text="store.is_alquilada ? 'ENTRAR' : 'ALQUILAR'"></div>
-                                    </div>
-                                    <div class="absolute right-2 md:right-6 top-1/2 h-8 w-1.5 md:w-2 -translate-y-1/2 rounded-full bg-gradient-to-b from-slate-200 via-slate-400 to-slate-500 shadow-md"></div>
-                                </div>
-
-                                {{-- Vidriera derecha --}}
-                                <div class="relative flex-1 border-l border-white/30"
-                                    :class="store.is_alquilada
-                                        ? 'bg-gradient-to-bl from-white/50 via-slate-200/40 to-slate-300/50'
-                                        : 'bg-gradient-to-bl from-emerald-50/70 via-white/60 to-emerald-100/60'">
-                                    <template x-if="store.is_alquilada && store.productos[2]">
-                                        <div class="absolute inset-2 md:inset-4">
-                                            <div class="h-full relative overflow-hidden rounded-lg border border-white/40 bg-black/10 shadow-inner">
-                                                <img :src="store.productos[2].imagenes?.[0]?.url" class="h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
-                                            </div>
-                                        </div>
-                                    </template>
-                                    <template x-if="! store.is_alquilada">
-                                        <div class="absolute inset-2 md:inset-4 rounded-lg border-2 border-dashed border-emerald-400/60 bg-emerald-50/40 flex items-center justify-center">
-                                            <svg class="w-8 h-8 md:w-10 md:h-10 text-emerald-600/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                                            </svg>
-                                        </div>
-                                    </template>
-                                </div>
+                                     :class="store.is_alquilada
+                                         ? 'bg-gradient-to-br from-white/50 via-slate-200/40 to-slate-300/50'
+                                         : 'bg-gradient-to-br from-emerald-50/70 via-white/60 to-emerald-100/60'">
+                                     <template x-if="store.is_alquilada">
+                                         <div class="absolute inset-2 md:inset-4 grid grid-cols-1 gap-2 md:gap-4">
+                                             <div class="relative overflow-hidden rounded-lg border border-white/40 bg-black/10 shadow-inner h-full flex items-center justify-center">
+                                                 <template x-if="store.vitrina_1">
+                                                     <img :src="store.vitrina_1" class="h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                                 </template>
+                                                 <template x-if="!store.vitrina_1">
+                                                     <div class="text-[8px] md:text-[9px] text-slate-400 font-bold uppercase tracking-wider text-center p-1">Vitrina 1</div>
+                                                 </template>
+                                             </div>
+                                             <div class="relative overflow-hidden rounded-lg border border-white/40 bg-black/10 shadow-inner h-full flex items-center justify-center">
+                                                 <template x-if="store.vitrina_2">
+                                                     <img :src="store.vitrina_2" class="h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                                 </template>
+                                                 <template x-if="!store.vitrina_2">
+                                                     <div class="text-[8px] md:text-[9px] text-slate-400 font-bold uppercase tracking-wider text-center p-1">Vitrina 2</div>
+                                                 </template>
+                                             </div>
+                                         </div>
+                                     </template>
+                                     <template x-if="! store.is_alquilada">
+                                         <div class="absolute inset-2 md:inset-4 rounded-lg border-2 border-dashed border-emerald-400/60 bg-emerald-50/40 flex items-center justify-center p-2">
+                                             <div class="text-center">
+                                                 <div class="text-emerald-700 text-[10px] md:text-xs font-black tracking-[0.2em] uppercase">Espacio Libre</div>
+                                                 <div class="text-emerald-800/80 text-[9px] md:text-[11px] font-bold mt-1">Listo para alquilar</div>
+                                             </div>
+                                         </div>
+                                     </template>
+                                 </div>
+ 
+                                 {{-- Puerta central --}}
+                                 <div class="relative flex w-[80px] md:w-[130px] flex-col items-center border-x border-white/35"
+                                     :class="store.is_alquilada
+                                         ? 'bg-gradient-to-b from-white/50 via-slate-100/60 to-slate-300/70'
+                                         : 'bg-gradient-to-b from-emerald-100/60 via-white/60 to-emerald-200/70'">
+                                     <div class="absolute inset-x-2 md:inset-x-4 top-4 bottom-7 rounded-t-lg border border-white/50 bg-gradient-to-b from-white/70 via-white/50 to-white/60 backdrop-blur-md shadow-inner overflow-hidden">
+                                         <div class="absolute top-3 left-0 right-0 text-[7px] md:text-[9px] font-bold text-slate-700/80 tracking-[0.3em] text-center"
+                                             x-text="store.is_alquilada ? 'ENTRAR' : 'ALQUILAR'"></div>
+                                     </div>
+                                     <div class="absolute right-2 md:right-6 top-1/2 h-8 w-1.5 md:w-2 -translate-y-1/2 rounded-full bg-gradient-to-b from-slate-200 via-slate-400 to-slate-500 shadow-md"></div>
+                                 </div>
+ 
+                                 {{-- Vidriera derecha --}}
+                                 <div class="relative flex-1 border-l border-white/30"
+                                     :class="store.is_alquilada
+                                         ? 'bg-gradient-to-bl from-white/50 via-slate-200/40 to-slate-300/50'
+                                         : 'bg-gradient-to-bl from-emerald-50/70 via-white/60 to-emerald-100/60'">
+                                     <template x-if="store.is_alquilada">
+                                         <div class="absolute inset-2 md:inset-4">
+                                             <div class="h-full relative overflow-hidden rounded-lg border border-white/40 bg-black/10 shadow-inner flex items-center justify-center">
+                                                 <template x-if="store.vitrina_3">
+                                                     <img :src="store.vitrina_3" class="h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                                 </template>
+                                                 <template x-if="!store.vitrina_3">
+                                                     <div class="text-[8px] md:text-[9px] text-slate-400 font-bold uppercase tracking-wider text-center p-1">Vitrina 3</div>
+                                                 </template>
+                                             </div>
+                                         </div>
+                                     </template>
+                                     <template x-if="! store.is_alquilada">
+                                         <div class="absolute inset-2 md:inset-4 rounded-lg border-2 border-dashed border-emerald-400/60 bg-emerald-50/40 flex items-center justify-center">
+                                             <svg class="w-8 h-8 md:w-10 md:h-10 text-emerald-600/70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                             </svg>
+                                         </div>
+                                     </template>
+                                 </div>
                             </div>
 
                         </button>
@@ -367,7 +539,7 @@
                     <button @click="setFloor(i)"
                         class="relative h-8 w-10 md:h-11 md:w-14 rounded-lg border transition flex flex-col items-center justify-center"
                         :class="i === floorIndex ? 'border-white bg-white text-slate-950 shadow-lg' : 'border-white/30 bg-white/10 text-slate-600 hover:bg-white/20'">
-                        <div class="text-sm md:text-lg font-black leading-none" x-text="f.displayLevel"></div>
+                        <div :class="f.displayLevel.toString().length > 2 ? 'text-[8px] md:text-[9px] font-extrabold leading-tight px-0.5 uppercase text-center' : 'text-sm md:text-lg font-black leading-none'" x-text="f.displayLevel"></div>
                         <div x-show="i === floorIndex" class="absolute -left-1 top-1/2 -translate-y-1/2 w-1 h-4 md:h-6 bg-emerald-500 rounded-full"></div>
                     </button>
                 </template>
@@ -393,6 +565,7 @@
                     :style="'transform: rotate(' + (-storeTurns * (360 / currentFloor.stores.length)) + 'deg)'">
                     <template x-for="(s, i) in currentFloor.stores" :key="s.id">
                         <button @click="setStore(i)"
+                            x-show="matchesSearch(s)"
                             class="absolute left-1/2 top-1/2 -ml-2.5 -mt-2.5 h-5 w-5 rounded-full border flex items-center justify-center transition-all duration-300"
                             :class="i === storeIndex ? 'border-emerald-400 bg-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.5)] scale-125' : 'border-white/30 bg-white/20 hover:bg-white/40'"
                             :style="'transform: rotate(' + (i * (360 / currentFloor.stores.length)) + 'deg) translateY(-76px) rotate(' + (-i * (360 / currentFloor.stores.length)) + 'deg)'">
@@ -411,7 +584,7 @@
     {{-- Bottom Navigation --}}
     <div class="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[90vw] md:w-auto">
         <div class="flex items-center justify-between md:justify-center gap-2 md:gap-4 rounded-2xl md:rounded-[2rem] glass-hud p-2 md:p-3">
-            <button @click="setStore(storeIndex - 1)"
+            <button @click="navigateStore(-1)"
                 class="rounded-xl border border-white/50 bg-white/60 p-2 md:p-3 text-slate-700 hover:bg-white transition shadow-sm active:scale-95">
                 <x-heroicon-o-chevron-left class="w-4 h-4 md:w-6 md:h-6" />
             </button>
@@ -419,7 +592,7 @@
                 <div class="text-[7px] md:text-[9px] font-black tracking-[0.2em] text-slate-500 uppercase mb-0.5">Siguiente Tienda</div>
                 <div class="text-slate-900 font-black text-[10px] md:text-lg tracking-tight truncate max-w-[150px] md:max-w-none mx-auto" x-text="nextStore.nombre"></div>
             </div>
-            <button @click="setStore(storeIndex + 1)"
+            <button @click="navigateStore(1)"
                 class="rounded-xl border border-white/50 bg-white/60 p-2 md:p-3 text-slate-700 hover:bg-white transition shadow-sm active:scale-95">
                 <x-heroicon-o-chevron-right class="w-4 h-4 md:w-6 md:h-6" />
             </button>
@@ -465,7 +638,7 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-2 mb-1">
-                                <span class="text-white/70 text-[8px] md:text-xs font-black tracking-[0.3em] uppercase" x-text="'Local ' + activeStore?.numero"></span>
+                                <span x-show="activeStore?.is_alquilada" class="text-white/70 text-[8px] md:text-xs font-black tracking-[0.3em] uppercase" x-text="'Local ' + activeStore?.numero"></span>
                                 <template x-if="!activeStore?.is_alquilada">
                                     <span class="text-[9px] md:text-[11px] font-black tracking-[0.2em] uppercase px-2 py-0.5 rounded-full border border-white/40 bg-white/15 text-white">Disponible para alquilar</span>
                                 </template>

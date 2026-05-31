@@ -31,7 +31,22 @@ class SuscripcionesCobros extends Model
         'fecha_pago',
         'estado',
         'observaciones',
+        'saldo_pendiente',
+        'estado_snapshot',
+        'es_parcial',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function ($cobro) {
+            if ($cobro->saldo_pendiente === null) {
+                $cobro->saldo_pendiente = $cobro->monto;
+            }
+            if ($cobro->estado_snapshot === null) {
+                $cobro->estado_snapshot = $cobro->estado;
+            }
+        });
+    }
 
     public function suscripcion(): BelongsTo
     {

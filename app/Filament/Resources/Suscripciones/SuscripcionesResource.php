@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Suscripciones;
 use App\Filament\Resources\Suscripciones\Pages\CreateSuscripciones;
 use App\Filament\Resources\Suscripciones\Pages\EditSuscripciones;
 use App\Filament\Resources\Suscripciones\Pages\ListSuscripciones;
+use App\Filament\Resources\Suscripciones\Pages\ViewSuscripciones;
 use App\Filament\Resources\Suscripciones\Schemas\SuscripcionesForm;
 use App\Filament\Resources\Suscripciones\Tables\SuscripcionesTable;
 use App\Models\Suscripciones;
@@ -52,6 +53,7 @@ class SuscripcionesResource extends Resource
         return [
             'index' => ListSuscripciones::route('/'),
             'create' => CreateSuscripciones::route('/create'),
+            'view' => ViewSuscripciones::route('/{record}'),
             'edit' => EditSuscripciones::route('/{record}/edit'),
         ];
     }

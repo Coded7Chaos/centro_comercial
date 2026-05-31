@@ -30,8 +30,22 @@ class AppServiceProvider extends ServiceProvider
         });
 
         View::composer('components.public-navbar', function ($view) {
-            $infraestructura = Infraestructuras::first();
-            $view->with('mallName', $infraestructura ? $infraestructura->nombre : 'Infraestructuras');
+            $infraestructuras = Infraestructuras::select('id', 'nombre')->get();
+            
+            $activeId = request('infraestructura_id');
+            $activeInfra = null;
+            if ($activeId) {
+                $activeInfra = $infraestructuras->firstWhere('id', $activeId);
+            }
+            if (!$activeInfra) {
+                $activeInfra = $infraestructuras->first();
+            }
+            
+            $view->with([
+                'mallName' => $activeInfra ? $activeInfra->nombre : 'Infraestructuras',
+                'todasInfraestructuras' => $infraestructuras,
+                'activeInfraestructuraId' => $activeInfra ? $activeInfra->id : null,
+            ]);
         });
 
         \App\Models\Suscripciones::observe(\App\Observers\SuscripcionObserver::class);

@@ -284,27 +284,74 @@ class ClientDashboardController extends Controller
         $cobro = SuscripcionesCobros::whereIn('suscripcion_id', $suscripcionIds)
             ->findOrFail($request->suscripcion_cobro_id);
 
-        $totalPagado = $cobro->pagos()->sum('monto_pagado');
-        $pendiente = max(0, $cobro->monto - $totalPagado - $request->monto_pagado);
+        $totalPagado = $cobro->pagos()->sum('monto_pagado') + $request->monto_pagado;
+        $pendiente = max(0, $cobro->monto - $totalPagado);
 
         $comprobantePath = null;
         if ($request->hasFile('comprobante')) {
             $comprobantePath = $request->file('comprobante')->store('comprobantes-pagos', 'public');
         }
 
-        SuscripcionesPagos::create([
-            'suscripcion_cobro_id' => $cobro->id,
-            'monto_pagado' => $request->monto_pagado,
-            'pago_pendiente' => $pendiente,
-            'fecha_pago' => now()->toDateString(),
-            'metodo_pago' => $request->metodo_pago,
-            'estado_verificacion' => 'verificado', // Se asume verificado temporalmente o en espera de auditoría
-            'nombre_pagador' => $request->nombre_pagador,
-            'numero_transaccion' => $request->numero_transaccion,
-            'banco_origen' => $request->banco_origen,
-            'comprobante' => $comprobantePath,
-            'observaciones' => 'Pago reportado por el cliente desde el panel.',
-        ]);
+        if ($pendiente > 0) {
+            // Unpaid balance. Split it into a new cobro!
+            $fechaVencimientoCobro = \Carbon\Carbon::parse($cobro->fecha_vencimiento)->addMonth()->toDateString();
+            
+            $pago = SuscripcionesPagos::create([
+                'suscripcion_cobro_id' => $cobro->id,
+                'monto_pagado' => $request->monto_pagado,
+                'pago_pendiente' => 0, // set to 0 as the balance is transferred to the new cobro
+                'fecha_pago' => now()->toDateString(),
+                'metodo_pago' => $request->metodo_pago,
+                'estado_verificacion' => 'verificado',
+                'nombre_pagador' => $request->nombre_pagador,
+                'numero_transaccion' => $request->numero_transaccion,
+                'banco_origen' => $request->banco_origen,
+                'comprobante' => $comprobantePath,
+                'observaciones' => 'Pago reportado por el cliente desde el panel. Saldo pendiente diferido al siguiente mes.',
+                'estado_snapshot' => 'pagado',
+            ]);
+
+            // Create new cobro
+            SuscripcionesCobros::create([
+                'suscripcion_id' => $cobro->suscripcion_id,
+                'concepto' => 'Saldo pendiente de: ' . $cobro->concepto,
+                'monto' => $pendiente,
+                'fecha_inicio' => now()->toDateString(),
+                'fecha_vencimiento' => $fechaVencimientoCobro,
+                'estado' => 'pendiente',
+                'observaciones' => 'Cobro generado de saldo pendiente reportado por el cliente en pago #' . $pago->id,
+            ]);
+
+            // Adjust original cobro
+            $cobro->update([
+                'monto' => $totalPagado,
+                'saldo_pendiente' => 0,
+                'estado' => 'pagado',
+                'estado_snapshot' => 'pagado',
+            ]);
+        } else {
+            // Fully paid
+            SuscripcionesPagos::create([
+                'suscripcion_cobro_id' => $cobro->id,
+                'monto_pagado' => $request->monto_pagado,
+                'pago_pendiente' => 0,
+                'fecha_pago' => now()->toDateString(),
+                'metodo_pago' => $request->metodo_pago,
+                'estado_verificacion' => 'verificado',
+                'nombre_pagador' => $request->nombre_pagador,
+                'numero_transaccion' => $request->numero_transaccion,
+                'banco_origen' => $request->banco_origen,
+                'comprobante' => $comprobantePath,
+                'observaciones' => 'Pago reportado por el cliente desde el panel.',
+                'estado_snapshot' => 'pagado',
+            ]);
+
+            $cobro->update([
+                'saldo_pendiente' => 0,
+                'estado' => 'pagado',
+                'estado_snapshot' => 'pagado',
+            ]);
+        }
 
         return redirect()->route('cliente.estado-cuenta')->with('success', 'El pago ha sido registrado y reportado correctamente al administrador.');
     }
@@ -410,4 +457,177 @@ class ClientDashboardController extends Controller
 
         return redirect()->route('cliente.marcas.index')->with('success', 'Marca privada eliminada correctamente.');
     }
+
+    public function personalizar(Request $request)
+    {
+        $cliente = $this->getClienteOrAbort();
+        $tiendas = $cliente->tiendas()->with(['piso.infraestructura', 'marcas', 'productos.imagenes'])->get();
+        
+        $selectedTiendaId = $request->input('tienda_id');
+        $tienda = null;
+        if ($selectedTiendaId) {
+            $tienda = $tiendas->firstWhere('id', $selectedTiendaId);
+        }
+        if (!$tienda && $tiendas->isNotEmpty()) {
+            $tienda = $tiendas->first();
+        }
+
+        $productosVitrina = $tienda ? $tienda->productos()->with(['imagenes', 'categoria', 'marca'])->take(3)->get() : collect();
+        
+        $categorias = Categorias::whereNull('categoria_padre_id')->with('subcategorias')->get();
+        $marcas = Marcas::where('cliente_id', $cliente->id)->orWhereNull('cliente_id')->get();
+
+        return view('cliente.personalizar', compact('cliente', 'tiendas', 'tienda', 'productosVitrina', 'categorias', 'marcas'));
+    }
+
+    public function actualizarTiendaPersonalizar(Request $request)
+    {
+        $cliente = $this->getClienteOrAbort();
+        $request->validate([
+            'tienda_id' => 'required|exists:infraestructuras_tiendas,id',
+            'nombre' => 'required|string|max:100',
+            'descripcion' => 'nullable|string|max:1000',
+            'telefono_referencia' => 'nullable|string|max:30',
+            'marca_id' => 'nullable|exists:marcas,id',
+        ]);
+
+        $tienda = $cliente->tiendas()->findOrFail($request->tienda_id);
+        
+        $tienda->nombre = $request->nombre;
+        $tienda->descripcion = $request->descripcion;
+        $tienda->telefono_referencia = $request->telefono_referencia;
+        
+        if ($request->filled('marca_id')) {
+            $tienda->marcas()->sync([$request->marca_id]);
+        } else {
+            $tienda->marcas()->detach();
+        }
+
+        $tienda->save();
+
+        return redirect()->route('cliente.personalizar', ['tienda_id' => $tienda->id])
+            ->with('success', 'Información de la tienda y del modal actualizada correctamente.');
+    }
+
+    public function actualizarVitrina(Request $request)
+    {
+        $cliente = $this->getClienteOrAbort();
+        $request->validate([
+            'tienda_id' => 'required|exists:infraestructuras_tiendas,id',
+            'slot' => 'required|in:1,2,3',
+            'imagen' => 'required|image|max:5120',
+        ]);
+
+        $tienda = $cliente->tiendas()->findOrFail($request->tienda_id);
+        $slotField = 'vitrina_' . $request->slot;
+
+        if ($tienda->$slotField) {
+            Storage::disk('public')->delete($tienda->$slotField);
+        }
+
+        $path = $request->file('imagen')->store('vitrinas', 'public');
+        $tienda->$slotField = $path;
+        $tienda->save();
+
+        return redirect()->route('cliente.personalizar', ['tienda_id' => $tienda->id])
+            ->with('success', 'Imagen del escaparate actualizada correctamente.');
+    }
+
+    public function actualizarProductoVitrina(Request $request)
+    {
+        $cliente = $this->getClienteOrAbort();
+        $tiendaIds = $cliente->tiendas->pluck('id')->toArray();
+
+        $request->validate([
+            'producto_id' => 'nullable|exists:productos,id',
+            'tienda_id' => 'required|in:' . implode(',', $tiendaIds),
+            'nombre' => 'required|string|max:80',
+            'precio' => 'required|numeric|min:0',
+            'descripcion' => 'nullable|string|max:1000',
+            'categoria_id' => 'nullable|exists:categorias,id',
+            'subcategoria_id' => 'nullable|exists:categorias,id',
+            'marca_id' => 'nullable|exists:marcas,id',
+            'imagen' => 'nullable|image|max:5120',
+        ]);
+
+        $tienda = $cliente->tiendas()->findOrFail($request->tienda_id);
+
+        if ($request->producto_id) {
+            $producto = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)->findOrFail($request->producto_id);
+            $producto->update([
+                'nombre' => $request->nombre,
+                'precio' => $request->precio,
+                'descripcion' => $request->descripcion,
+            ]);
+
+            if ($request->hasFile('imagen')) {
+                $imgPrincipal = $producto->imagenes()->where('tipo', 'principal')->first();
+                if ($imgPrincipal) {
+                    Storage::disk('public')->delete($imgPrincipal->url);
+                    $imgPrincipal->delete();
+                }
+
+                $path = $request->file('imagen')->store('productos', 'public');
+                ProductosImagenes::create([
+                    'producto_id' => $producto->id,
+                    'url' => $path,
+                    'tipo' => 'principal',
+                ]);
+            }
+            
+            $msg = 'Producto actualizado correctamente.';
+        } else {
+            $request->validate([
+                'categoria_id' => 'required',
+                'subcategoria_id' => 'required',
+                'marca_id' => 'required',
+                'imagen' => 'required|image|max:5120',
+            ]);
+
+            $producto = Productos::create([
+                'nombre' => $request->nombre,
+                'precio' => $request->precio,
+                'descripcion' => $request->descripcion,
+                'infraestructuras_tienda_id' => $tienda->id,
+                'categoria_id' => $request->subcategoria_id,
+                'marca_id' => $request->marca_id,
+                'estado' => 'activo',
+            ]);
+
+            $path = $request->file('imagen')->store('productos', 'public');
+            ProductosImagenes::create([
+                'producto_id' => $producto->id,
+                'url' => $path,
+                'tipo' => 'principal',
+            ]);
+
+            $msg = 'Nuevo producto creado correctamente.';
+        }
+
+        return redirect()->route('cliente.personalizar', ['tienda_id' => $tienda->id])
+            ->with('success', $msg);
+    }
+
+    public function actualizarMarcaLogoRapido(Request $request)
+    {
+        $cliente = $this->getClienteOrAbort();
+        $request->validate([
+            'marca_id' => 'required|exists:marcas,id',
+            'logo' => 'required|image|max:2048',
+        ]);
+
+        $marca = Marcas::where('cliente_id', $cliente->id)->findOrFail($request->marca_id);
+
+        if ($request->hasFile('logo')) {
+            if ($marca->logo) {
+                Storage::disk('public')->delete($marca->logo);
+            }
+            $path = $request->file('logo')->store('marcas-logos', 'public');
+            $marca->logo = $path;
+            $marca->save();
+        }
+
+        return back()->with('success', 'Logotipo de la marca actualizado correctamente.');
+    }
 }
+

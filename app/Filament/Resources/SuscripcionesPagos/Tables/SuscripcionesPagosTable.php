@@ -102,14 +102,14 @@ class SuscripcionesPagosTable
 
                     ->money('BOB')
 
-                    ->badge()
+                    ->badge(fn($state) => $state > 0)
 
                     ->color(
                         fn($state) =>
 
                         $state <= 0
 
-                            ? 'success'
+                            ? null
 
                             : 'danger'
                     ),
@@ -126,11 +126,15 @@ class SuscripcionesPagosTable
 
                     ->badge()
 
+                    ->formatStateUsing(function ($state) {
+                        return $state === 'pagado' ? 'completo' : $state;
+                    })
+
                     ->color(function ($state) {
 
                         return match ($state) {
 
-                            'pagado' => 'success',
+                            'pagado', 'completo' => 'success',
 
                             'parcial' => 'warning',
 
@@ -165,29 +169,25 @@ class SuscripcionesPagosTable
                         $pago = $record->fecha_pago;
                         if (!$vencimiento || !$pago) return '---';
 
-                        $vDate = \Carbon\Carbon::parse($vencimiento);
-                        $pDate = \Carbon\Carbon::parse($pago);
-                        $diff = $vDate->diffInDays($pDate, false);
-                        if ($diff > 0) {
-                            return "+{$diff} días (Tardío)";
-                        } elseif ($diff < 0) {
-                            $absDiff = abs($diff);
-                            return "-{$absDiff} días (Anticipado)";
-                        } else {
-                            return "En el vencimiento";
-                        }
+                        $vDate = \Carbon\Carbon::parse($vencimiento)->startOfDay();
+                        $pDate = \Carbon\Carbon::parse($pago)->startOfDay();
+                        return (int)$vDate->diffInDays($pDate, false);
                     })
-                    ->badge()
-                    ->color(function ($record) {
-                        $vencimiento = $record->cobro?->fecha_vencimiento;
-                        $pago = $record->fecha_pago;
-                        if (!$vencimiento || !$pago) return 'gray';
-                        $vDate = \Carbon\Carbon::parse($vencimiento);
-                        $pDate = \Carbon\Carbon::parse($pago);
-                        $diff = $vDate->diffInDays($pDate, false);
-                        if ($diff > 0) return 'danger';
-                        if ($diff < 0) return 'success';
-                        return 'info';
+                    ->badge(fn($state) => $state !== '---' && $state !== 0)
+                    ->color(function ($state) {
+                        if ($state === '---' || $state === 0) return null;
+                        return $state > 0 ? 'danger' : 'success';
+                    })
+                    ->formatStateUsing(function ($state) {
+                        if ($state === '---') return '---';
+                        $val = (int)$state;
+                        if ($val > 0) {
+                            return "+{$val} días (Tardío)";
+                        } elseif ($val < 0) {
+                            return "{$val} días (Anticipado)";
+                        } else {
+                            return "0 días";
+                        }
                     }),
             ])
 

@@ -31,6 +31,7 @@ class InfraestructurasPisos extends Model
         'cliente_id',
         'marca_id',
         'estado',
+        'imagen_fondo',
     ];
 
     public function infraestructura(): BelongsTo

@@ -58,6 +58,9 @@ class InfraestructurasPisosDiseno extends Page
                 $nombre = $i === 1
                     ? 'PB'
                     : 'P' . ($i - 1);
+                $numero = $i === 1
+                    ? 'Planta baja'
+                    : 'Piso ' . ($i - 1);
 
                 InfraestructurasPisos::create([
 
@@ -66,6 +69,9 @@ class InfraestructurasPisosDiseno extends Page
 
                     'nombre' =>
                     $nombre,
+
+                    'numero' =>
+                    $numero,
 
                     'cantidad_tiendas' => 0,
 
@@ -106,6 +112,8 @@ class InfraestructurasPisosDiseno extends Page
 
                 'nombre' => $piso->nombre,
 
+                'numero' => $piso->numero ?: $piso->nombre,
+
                 'cantidad_tiendas' =>
                 $piso->cantidad_tiendas,
 
@@ -129,6 +137,9 @@ class InfraestructurasPisosDiseno extends Page
 
                     'nombre' =>
                     $pisoData['nombre'],
+
+                    'numero' =>
+                    $pisoData['numero'] ?? null,
 
                     'cantidad_tiendas' =>
                     $pisoData['cantidad_tiendas'],

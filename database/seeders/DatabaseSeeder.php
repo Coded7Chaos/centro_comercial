@@ -21,10 +21,11 @@ class DatabaseSeeder extends Seeder
             EstadosTiendasSeeder::class,
             SuscripcionesTarifasSeeder::class,
 
-            // 3. Usuarios base (super_admin, admin, cliente de prueba)
-            AdminUserSeeder::class,
+            // 3. Usuarios base (super_admin, admin, clientes separados)
+            AdministradoresSeeder::class,
+            ClientesSeeder::class,
 
-            // 4. Datos del mall (infraestructura, pisos, tiendas, productos)
+            // 4. Datos del mall (infraestructura, pisos, tiendas vacías)
             MallDataSeeder::class,
 
             // 5. Demo de contratos, cobros y pagos para auditoría / morosidad

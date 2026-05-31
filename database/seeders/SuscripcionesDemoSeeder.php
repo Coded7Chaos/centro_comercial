@@ -6,6 +6,9 @@ use App\Models\Clientes;
 use App\Models\EstadoTienda;
 use App\Models\InfraestructurasTiendas;
 use App\Models\Marcas;
+use App\Models\Productos;
+use App\Models\ProductosImagenes;
+use App\Models\Categorias;
 use App\Models\Suscripciones;
 use App\Models\SuscripcionesCobros;
 use App\Models\SuscripcionesPagos;
@@ -42,26 +45,221 @@ class SuscripcionesDemoSeeder extends Seeder
                 return;
             }
 
-            // Asignar cada tienda a un cliente, marcarla como Alquilada y crearle una marca
+            $datosTiendas = [
+                [
+                    'nombre' => 'Nébula Coffee',
+                    'desc' => 'Café de especialidad en las alturas con granos seleccionados.',
+                    'telefono' => '+591 72200001',
+                    'brand' => 'Nébula',
+                    'brand_desc' => 'Cafetería de especialidad y pastelería fina.',
+                    'subcat' => 'Café & Pastelería',
+                    'products' => [
+                        [
+                            'nombre' => 'Café Espresso Doble',
+                            'desc' => 'Extracción intensa de granos de café de origen 100% Arábica.',
+                            'precio' => 18.00,
+                            'img' => 'https://images.unsplash.com/photo-1510972527409-cef7e2b247f9?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Cappuccino Vainilla',
+                            'desc' => 'Café espresso con leche vaporizada sedosa y un toque de vainilla.',
+                            'precio' => 22.00,
+                            'img' => 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Tarta Rústica de Chocolate',
+                            'desc' => 'Porción de tarta de chocolate húmeda con ganache de cacao al 70%.',
+                            'precio' => 25.00,
+                            'img' => 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&auto=format&fit=crop&q=80'
+                        ]
+                    ]
+                ],
+                [
+                    'nombre' => 'Pixel Arcade',
+                    'desc' => 'Sala arcade retro con las mejores máquinas recreativas de los 90s.',
+                    'telefono' => '+591 72200002',
+                    'brand' => 'Pixel Arcade',
+                    'brand_desc' => 'Entretenimiento gaming retro y moderno.',
+                    'subcat' => 'Videojuegos & Consolas',
+                    'products' => [
+                        [
+                            'nombre' => 'Pase de Juego - 1 Hora',
+                            'desc' => 'Acceso ilimitado a todas las máquinas arcade y consolas retro por 60 minutos.',
+                            'precio' => 40.00,
+                            'img' => 'https://images.unsplash.com/photo-1538481199705-c710c4e965fc?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Ficha Virtual x10',
+                            'desc' => 'Paquete de 10 créditos para máquinas de gacha y simuladores avanzados.',
+                            'precio' => 25.00,
+                            'img' => 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Torneo Retro Entry',
+                            'desc' => 'Inscripción para los torneos semanales de Street Fighter o Pacman.',
+                            'precio' => 30.00,
+                            'img' => 'https://images.unsplash.com/photo-1511512578047-dfb367046420?w=600&auto=format&fit=crop&q=80'
+                        ]
+                    ]
+                ],
+                [
+                    'nombre' => 'Zen Sushi',
+                    'desc' => 'Cocina nipona moderna y refinada en un ambiente minimalista.',
+                    'telefono' => '+591 72200003',
+                    'brand' => 'Zen Sushi',
+                    'brand_desc' => 'Alta cocina japonesa y mariscos frescos.',
+                    'subcat' => 'Comida Asiática',
+                    'products' => [
+                        [
+                            'nombre' => 'Combo Roll Zen x12',
+                            'desc' => 'Selección premium de 12 piezas de sushi (Maki, Uramaki y Nigiri).',
+                            'precio' => 75.00,
+                            'img' => 'https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Ramen Tonkotsu Clásico',
+                            'desc' => 'Caldo concentrado de cerdo, fideos artesanales, chashu, huevo marinado y nori.',
+                            'precio' => 55.00,
+                            'img' => 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Tempura Mixto de Langostinos',
+                            'desc' => 'Vegetales y langostinos gigantes fritos en tempura extra crujiente.',
+                            'precio' => 48.00,
+                            'img' => 'https://images.unsplash.com/photo-1615361413125-147e4c76f264?w=600&auto=format&fit=crop&q=80'
+                        ]
+                    ]
+                ],
+                [
+                    'nombre' => 'Luna Bar',
+                    'desc' => 'Cócteles de autor con la mejor vista panorámica nocturna.',
+                    'telefono' => '+591 72200004',
+                    'brand' => 'Luna',
+                    'brand_desc' => 'Mixología y coctelería fina en el rooftop del mall.',
+                    'subcat' => 'Bares & Coctelería',
+                    'products' => [
+                        [
+                            'nombre' => 'Mojito de Maracuyá',
+                            'desc' => 'Ron premium, menta fresca, limón, pulpa de maracuyá y soda.',
+                            'precio' => 35.00,
+                            'img' => 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Gin Tonic Botánico',
+                            'desc' => 'Ginebra destilada, agua tónica premium, frutos rojos y cardamomo.',
+                            'precio' => 45.00,
+                            'img' => 'https://images.unsplash.com/photo-1570598912132-0ba1dd952b7d?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Tabla de Quesos Selectos',
+                            'desc' => 'Variedad de quesos curados maduros servidos con frutos secos y miel de abejas.',
+                            'precio' => 60.00,
+                            'img' => 'https://images.unsplash.com/photo-1486427944299-d1955d23e317?w=600&auto=format&fit=crop&q=80'
+                        ]
+                    ]
+                ],
+                [
+                    'nombre' => 'Circuit Lab',
+                    'desc' => 'Gadgets, audio y accesorios de última tecnología.',
+                    'telefono' => '+591 72200005',
+                    'brand' => 'Circuit',
+                    'brand_desc' => 'Tecnología móvil, cargadores y periféricos premium.',
+                    'subcat' => 'Accesorios & Gadgets',
+                    'products' => [
+                        [
+                            'nombre' => 'Cargador Inalámbrico Rápido 15W',
+                            'desc' => 'Base de carga rápida magnética compatible con dispositivos iOS y Android.',
+                            'precio' => 120.00,
+                            'img' => 'https://images.unsplash.com/photo-1622445262465-2481c4574875?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Auriculares Bluetooth Pro ANC',
+                            'desc' => 'Auriculares in-ear con cancelación activa de ruido y 24 horas de batería.',
+                            'precio' => 380.00,
+                            'img' => 'https://images.unsplash.com/photo-1608156639585-b3a032ef9689?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Soporte de Auto MagSafe',
+                            'desc' => 'Soporte magnético premium para rejilla de ventilación de auto.',
+                            'precio' => 90.00,
+                            'img' => 'https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=600&auto=format&fit=crop&q=80'
+                        ]
+                    ]
+                ],
+                [
+                    'nombre' => 'Velvet Shoes',
+                    'desc' => 'Calzado artesanal premium de cuero para hombres y mujeres.',
+                    'telefono' => '+591 72200006',
+                    'brand' => 'Velvet',
+                    'brand_desc' => 'Zapatería fina y manufactura en cueros genuinos.',
+                    'subcat' => 'Calzado Premium',
+                    'products' => [
+                        [
+                            'nombre' => 'Botas de Cuero Oxford',
+                            'desc' => 'Botas de vestir de cuero curtido vegetal con costuras de alta durabilidad.',
+                            'precio' => 520.00,
+                            'img' => 'https://images.unsplash.com/photo-1533867617858-e7b97e060509?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Mocasines de Gamuza Café',
+                            'desc' => 'Calzado liviano y flexible sin cordones en fina gamuza marrón.',
+                            'precio' => 380.00,
+                            'img' => 'https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&auto=format&fit=crop&q=80'
+                        ],
+                        [
+                            'nombre' => 'Tacones Clásicos Charol',
+                            'desc' => 'Zapatos de tacón alto en charol negro pulido para ocasiones formales.',
+                            'precio' => 450.00,
+                            'img' => 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?w=600&auto=format&fit=crop&q=80'
+                        ]
+                    ]
+                ]
+            ];
+
+            // Asignar cada tienda a un cliente, marcarla como Alquilada y crearle una marca y productos coherentes
             $asignaciones = [];
             foreach ($clientes as $i => $cliente) {
                 $tienda = $tiendas[$i];
+                $storeData = $datosTiendas[$i];
 
                 $tienda->cliente_id = $cliente->id;
                 $tienda->id_estado  = $alquilada->id;
+                $tienda->nombre = $storeData['nombre'];
+                $tienda->descripcion = $storeData['desc'];
+                $tienda->telefono_referencia = $storeData['telefono'];
                 $tienda->save();
 
-                $marca = Marcas::firstOrCreate(
-                    ['nombre' => 'Marca ' . $cliente->user->nombres],
-                    [
-                        'cliente_id'  => $cliente->id,
-                        'descripcion' => 'Marca demo de ' . $cliente->user->nombres,
-                        'estado'      => 'activo',
-                    ]
-                );
+                // Crear marca del cliente
+                $marca = Marcas::create([
+                    'nombre'      => $storeData['brand'],
+                    'cliente_id'  => $cliente->id,
+                    'descripcion' => $storeData['brand_desc'],
+                    'estado'      => 'activo',
+                ]);
 
-                if (! $tienda->marcas()->where('marca_id', $marca->id)->exists()) {
-                    $tienda->marcas()->attach($marca->id);
+                $tienda->marcas()->attach($marca->id);
+
+                // Obtener subcategoría por nombre
+                $subcat = Categorias::where('nombre', $storeData['subcat'])->first();
+                $categoriaId = $subcat ? $subcat->id : 1; // fallback
+
+                // Crear 3 productos para la tienda
+                foreach ($storeData['products'] as $prodData) {
+                    $prod = Productos::create([
+                        'nombre' => $prodData['nombre'],
+                        'descripcion' => $prodData['desc'],
+                        'precio' => $prodData['precio'],
+                        'categoria_id' => $categoriaId,
+                        'marca_id' => $marca->id,
+                        'estado' => 'activo',
+                        'infraestructuras_tienda_id' => $tienda->id,
+                    ]);
+
+                    ProductosImagenes::create([
+                        'producto_id' => $prod->id,
+                        'url' => $prodData['img'],
+                        'tipo' => 'principal',
+                    ]);
                 }
 
                 $asignaciones[] = ['cliente' => $cliente, 'tienda' => $tienda, 'marca' => $marca];
@@ -85,43 +283,23 @@ class SuscripcionesDemoSeeder extends Seeder
 
     private function crearClientesDemo(): array
     {
-        $datos = [
-            ['nombres' => 'Lucía',   'apellido_paterno' => 'Vargas',   'apellido_materno' => 'Mendoza', 'email' => 'lucia.demo@mall.com',  'ci' => '7001001'],
-            ['nombres' => 'Mateo',   'apellido_paterno' => 'Quispe',   'apellido_materno' => 'Rojas',   'email' => 'mateo.demo@mall.com',  'ci' => '7001002'],
-            ['nombres' => 'Sofía',   'apellido_paterno' => 'Suárez',   'apellido_materno' => 'Aliaga',  'email' => 'sofia.demo@mall.com',  'ci' => '7001003'],
-            ['nombres' => 'Diego',   'apellido_paterno' => 'Choque',   'apellido_materno' => 'Ortega',  'email' => 'diego.demo@mall.com',  'ci' => '7001004'],
-            ['nombres' => 'Camila',  'apellido_paterno' => 'Mamani',   'apellido_materno' => 'Vega',    'email' => 'camila.demo@mall.com', 'ci' => '7001005'],
-            ['nombres' => 'Joaquín', 'apellido_paterno' => 'Flores',   'apellido_materno' => 'Lima',    'email' => 'joaquin.demo@mall.com','ci' => '7001006'],
+        $emails = [
+            'cliente@prueba.com',
+            'mateo.demo@mall.com',
+            'sofia.demo@mall.com',
+            'diego.demo@mall.com',
+            'camila.demo@mall.com',
+            'joaquin.demo@mall.com',
         ];
 
         $clientes = [];
-        foreach ($datos as $d) {
-            $user = User::firstOrCreate(
-                ['email' => $d['email']],
-                [
-                    'nombres'          => $d['nombres'],
-                    'apellido_paterno' => $d['apellido_paterno'],
-                    'apellido_materno' => $d['apellido_materno'],
-                    'password'         => Hash::make('password'),
-                    'email_verified_at' => now(),
-                ]
-            );
-            if (! $user->hasRole('cliente')) {
-                $user->assignRole('cliente');
+        foreach ($emails as $email) {
+            $user = User::where('email', $email)->first();
+            if ($user && $user->cliente) {
+                $cliente = $user->cliente;
+                $cliente->setRelation('user', $user);
+                $clientes[] = $cliente;
             }
-
-            $cliente = Clientes::firstOrCreate(
-                ['user_id' => $user->id],
-                [
-                    'ci'              => $d['ci'],
-                    'numero_celular'  => '7' . rand(1000000, 9999999),
-                    'genero'          => collect(['masculino', 'femenino'])->random(),
-                    'codigo_pais'     => '+591',
-                ]
-            );
-
-            $cliente->setRelation('user', $user);
-            $clientes[] = $cliente;
         }
 
         return $clientes;

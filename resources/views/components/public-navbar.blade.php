@@ -9,6 +9,23 @@
                 Alpine.store('search', { q: '' });
             }
         });
+
+        // Global search normalization and permissive matching helpers
+        window.normalizeSearchText = function(text) {
+            return (text || '')
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .trim();
+        };
+
+        window.matchesSearchQuery = function(targetText, query) {
+            const cleanTarget = window.normalizeSearchText(targetText);
+            const cleanQuery = window.normalizeSearchText(query);
+            if (!cleanQuery) return true;
+            const terms = cleanQuery.split(/\s+/).filter(Boolean);
+            return terms.every(term => cleanTarget.includes(term));
+        };
     </script>
 
     {{-- DESKTOP NAVBAR --}}
@@ -38,6 +55,15 @@
                 @endauth
 
                 <div class="flex items-center gap-3">
+                    <a href="/"
+                        class="px-4 py-2 rounded-xl text-sm tracking-widest transition-all relative group
+                        {{ Request::is('/') ? 'glass-hud text-slate-900 border-white shadow-lg scale-105 font-bold' : 'text-slate-950 hover:text-slate-900 font-light' }}">
+                        Inicio
+                        @if(!Request::is('/'))
+                            <span class="absolute bottom-1 left-4 right-4 h-0.5 bg-white scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-center"></span>
+                        @endif
+                    </a>
+
                     <a href="/suscripciones"
                         class="px-4 py-2 rounded-xl text-sm tracking-widest transition-all relative group
                         {{ Request::is('suscripciones') ? 'glass-hud text-slate-900 border-white shadow-lg scale-105 font-bold' : 'text-slate-950 hover:text-slate-900 font-light' }}">
@@ -79,6 +105,46 @@
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"/></svg>
                 </button>
             </div>
+
+            {{-- Selector de Establecimiento / Dropdown --}}
+            @if(isset($todasInfraestructuras) && count($todasInfraestructuras) > 0)
+                <div class="glass-hud rounded-2xl px-4 py-2 flex items-center gap-2 shadow-2xl ml-auto relative" x-data="{ open: false }">
+                    @if(count($todasInfraestructuras) > 1)
+                        {{-- Dropdown Toggle Button --}}
+                        <button @click="open = !open" @click.away="open = false" 
+                            class="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer">
+                            <x-heroicon-o-building-office-2 class="w-4 h-4 text-slate-700 dark:text-slate-350" />
+                            <span>{{ $mallName }}</span>
+                            <x-heroicon-m-chevron-down class="w-4 h-4 text-slate-500 transition-transform duration-300" :class="open ? 'rotate-180' : ''" />
+                        </button>
+                        
+                        {{-- Dropdown Menu --}}
+                        <div x-show="open" x-cloak
+                            x-transition:enter="transition ease-out duration-100"
+                            x-transition:enter-start="transform opacity-0 scale-95 -translate-y-2"
+                            x-transition:enter-end="transform opacity-100 scale-100 translate-y-0"
+                            x-transition:leave="transition ease-in duration-75"
+                            x-transition:leave-start="transform opacity-100 scale-100 translate-y-0"
+                            x-transition:leave-end="transform opacity-0 scale-95 -translate-y-2"
+                            class="absolute right-0 top-full mt-2 w-56 rounded-xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border border-white/40 dark:border-slate-800 shadow-xl py-1 z-[150]">
+                            @foreach($todasInfraestructuras as $infra)
+                                <a href="/?infraestructura_id={{ $infra->id }}"
+                                    class="flex items-center gap-2 px-4 py-2.5 text-xs font-bold hover:bg-slate-900/10 dark:hover:bg-white/10 transition-colors
+                                    {{ $activeInfraestructuraId == $infra->id ? 'text-primary-600 font-extrabold' : 'text-slate-700 dark:text-slate-300' }}">
+                                    <x-heroicon-o-building-office-2 class="w-3.5 h-3.5 text-slate-500" />
+                                    <span>{{ $infra->nombre }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    @else
+                        {{-- Solo una infraestructura --}}
+                        <div class="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white">
+                            <x-heroicon-o-building-office-2 class="w-4 h-4 text-slate-700 dark:text-slate-350" />
+                            <span>{{ $mallName }}</span>
+                        </div>
+                    @endif
+                </div>
+            @endif
         </div>
     </nav>
 
@@ -151,8 +217,22 @@
                 <a href="/" @click="mobileMenuOpen = false"
                     class="flex items-center gap-3 p-3 rounded-xl transition-all {{ Request::is('/') ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-700 dark:text-white/80 hover:bg-white/10' }}">
                     <x-heroicon-o-building-office-2 class="w-5 h-5" />
-                    <span class="text-[11px] font-bold tracking-widest uppercase">{{ $mallName }}</span>
+                    <span class="text-[11px] font-bold tracking-widest uppercase">Inicio</span>
                 </a>
+
+                @if(isset($todasInfraestructuras) && count($todasInfraestructuras) > 1)
+                    <div class="mt-2 p-3 rounded-xl border border-white/20 bg-white/5 dark:bg-black/10">
+                        <label class="block text-[9px] font-black uppercase text-slate-500 dark:text-slate-400 mb-2 tracking-widest">Establecimiento</label>
+                        <select onchange="window.location.href=this.value" 
+                            class="w-full text-xs font-bold bg-transparent border-none focus:ring-0 p-0 text-slate-700 dark:text-white/85 cursor-pointer">
+                            @foreach($todasInfraestructuras as $infra)
+                                <option value="/?infraestructura_id={{ $infra->id }}" {{ $activeInfraestructuraId == $infra->id ? 'selected' : '' }}>
+                                    {{ $infra->nombre }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
 
                 <a href="/suscripciones" @click="mobileMenuOpen = false"
                     class="flex items-center gap-3 p-3 rounded-xl transition-all {{ Request::is('suscripciones') ? 'bg-slate-900 text-white shadow-lg' : 'text-slate-700 dark:text-white/80 hover:bg-white/10' }}">

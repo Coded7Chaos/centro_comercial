@@ -980,6 +980,26 @@ class SuscripcionesPagosForm
 
                         : 'Sin observaciones'
                 ),
+
+            Select::make('cobro_pendiente_opcion')
+                ->label('Cobrar saldo pendiente en')
+                ->options([
+                    'siguiente_mes' => 'Junto al pago del siguiente mes',
+                    'fecha_intermedia' => 'Elegir una fecha intermedia',
+                ])
+                ->default('siguiente_mes')
+                ->live()
+                ->visible(fn (Get $get) => (float)$get('pago_pendiente') > 0)
+                ->required(fn (Get $get) => (float)$get('pago_pendiente') > 0)
+                ->dehydrated(false),
+
+            DatePicker::make('fecha_cobro_pendiente')
+                ->label('Fecha de cobro intermedia')
+                ->minDate(fn (Get $get) => $get('fecha_pago') ? \Carbon\Carbon::parse($get('fecha_pago'))->addDay() : today())
+                ->maxDate(fn (Get $get) => $get('fecha_vencimiento') ? \Carbon\Carbon::parse($get('fecha_vencimiento'))->addMonth()->subDay() : null)
+                ->visible(fn (Get $get) => (float)$get('pago_pendiente') > 0 && $get('cobro_pendiente_opcion') === 'fecha_intermedia')
+                ->required(fn (Get $get) => (float)$get('pago_pendiente') > 0 && $get('cobro_pendiente_opcion') === 'fecha_intermedia')
+                ->dehydrated(false),
         ]);
     }
 }

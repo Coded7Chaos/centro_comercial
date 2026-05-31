@@ -42,9 +42,62 @@
                 }
             },
             renderChart() {
-                setTimeout(() => {
-                    let ctx = this.$refs.canvas;
+                let self = this;
+                setTimeout(function() {
+                    let ctx = self.$refs.canvas;
                     if(ctx) {
+                        const permanentLabelsPlugin = (window.filamentChartJsGlobalPlugins && window.filamentChartJsGlobalPlugins.find(function(p) { return p.id === 'permanentLabels'; })) || {
+                            id: 'permanentLabels',
+                            afterDatasetsDraw(chart) {
+                                const { ctx } = chart;
+                                ctx.save();
+                                chart.data.datasets.forEach(function(dataset, i) {
+                                    const meta = chart.getDatasetMeta(i);
+                                    if (meta.hidden) return;
+                                    meta.data.forEach(function(element, index) {
+                                        const dataValue = dataset.data[index];
+                                        if (dataValue === 0 || dataValue === null || dataValue === undefined) return;
+                                        
+                                        if (['pie', 'doughnut'].includes(chart.config.type)) {
+                                            ctx.font = 'bold 10px Inter, sans-serif';
+                                            let sum = dataset.data.reduce(function(a, b) { return a + Number(b); }, 0);
+                                            let percentage = (sum === 0) ? '0%' : (dataValue * 100 / sum).toFixed(1) + '%';
+                                            let textLine1 = 'Bs. ' + Number(dataValue).toLocaleString();
+                                            let textLine2 = '(' + percentage + ')';
+                                            const center = element.tooltipPosition();
+                                            
+                                            ctx.save();
+                                            let maxW = Math.max(ctx.measureText(textLine1).width, ctx.measureText(textLine2).width);
+                                            let w = maxW + 12;
+                                            let h = 28;
+                                            let r = 6;
+                                            ctx.beginPath();
+                                            ctx.moveTo(center.x - w/2 + r, center.y - h/2);
+                                            ctx.lineTo(center.x + w/2 - r, center.y - h/2);
+                                            ctx.quadraticCurveTo(center.x + w/2, center.y - h/2, center.x + w/2, center.y - h/2 + r);
+                                            ctx.lineTo(center.x + w/2, center.y + h/2 - r);
+                                            ctx.quadraticCurveTo(center.x + w/2, center.y + h/2, center.x + w/2 - r, center.y + h/2);
+                                            ctx.lineTo(center.x - w/2 + r, center.y + h/2);
+                                            ctx.quadraticCurveTo(center.x - w/2, center.y + h/2, center.x - w/2, center.y + h/2 - r);
+                                            ctx.lineTo(center.x - w/2, center.y - h/2 + r);
+                                            ctx.quadraticCurveTo(center.x - w/2, center.y - h/2, center.x - w/2 + r, center.y - h/2);
+                                            ctx.closePath();
+                                            ctx.fillStyle = '#0f172a';
+                                            ctx.fill();
+                                            ctx.restore();
+                                            
+                                            ctx.fillStyle = '#ffffff';
+                                            ctx.textAlign = 'center';
+                                            ctx.textBaseline = 'middle';
+                                            ctx.fillText(textLine1, center.x, center.y - 6);
+                                            ctx.fillText(textLine2, center.x, center.y + 6);
+                                        }
+                                    });
+                                });
+                                ctx.restore();
+                            }
+                        };
+
                         new Chart(ctx, {
                             type: 'doughnut',
                             data: {
@@ -63,7 +116,8 @@
                                     legend: { position: 'bottom', labels: { color: '#9ca3af', font: { size: 11 } } }
                                 },
                                 cutout: '75%'
-                            }
+                            },
+                            plugins: [permanentLabelsPlugin]
                         });
                     }
                 }, 150);

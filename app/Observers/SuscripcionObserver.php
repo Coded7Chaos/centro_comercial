@@ -35,18 +35,22 @@ class SuscripcionObserver
             if ($estadoAlquilada) {
                 $tienda->update([
                     'cliente_id' => $suscripcionActiva->cliente_id,
-                    'marca_id' => $suscripcionActiva->marca_id,
                     'id_estado' => $estadoAlquilada->id,
                 ]);
+                if ($suscripcionActiva->marca_id) {
+                    $tienda->marcas()->sync([$suscripcionActiva->marca_id]);
+                } else {
+                    $tienda->marcas()->detach();
+                }
             }
         } else {
             $estadoDisponible = EstadoTienda::where('estado', 'Disponible')->first();
             if ($estadoDisponible) {
                 $tienda->update([
                     'cliente_id' => null,
-                    'marca_id' => null,
                     'id_estado' => $estadoDisponible->id,
                 ]);
+                $tienda->marcas()->detach();
             }
         }
     }

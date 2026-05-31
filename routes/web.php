@@ -57,6 +57,18 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/tienda', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'actualizarTienda'])
             ->name('tienda.update');
 
+        // Personalización de Inicio
+        Route::get('/personalizar', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'personalizar'])
+            ->name('personalizar');
+        Route::post('/personalizar/tienda', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'actualizarTiendaPersonalizar'])
+            ->name('personalizar.tienda.update');
+        Route::post('/personalizar/vitrina', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'actualizarVitrina'])
+            ->name('personalizar.vitrina.update');
+        Route::post('/personalizar/producto', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'actualizarProductoVitrina'])
+            ->name('personalizar.producto.update');
+        Route::post('/personalizar/marca/logo', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'actualizarMarcaLogoRapido'])
+            ->name('personalizar.marca.logo.update');
+
         // Productos CRUD
         Route::get('/productos', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'productos'])
             ->name('productos.index');
@@ -106,9 +118,22 @@ Route::get('/directorio', [DirectorioController::class, 'index'])->name('directo
 Route::get('/directorio/{id}/catalogo', [DirectorioController::class, 'catalogo'])->name('directorio.catalogo');
 
 Route::get('/suscripciones', function () {
-    return view('suscripciones');
+    $tarifas = \App\Models\SuscripcionesTarifas::orderBy('precio', 'asc')->get();
+    return view('suscripciones', compact('tarifas'));
 })->name('suscripciones');
 
 Route::get('/productos', function () {
     return view('productos');
 })->name('productos');
+
+Route::middleware(['auth'])->prefix('admin/suscripciones-custom')->group(function () {
+    Route::get('/crear', [App\Http\Controllers\Admin\SuscripcionCustomController::class, 'create'])->name('admin.suscripciones.crear-custom');
+    Route::post('/guardar', [App\Http\Controllers\Admin\SuscripcionCustomController::class, 'store'])->name('admin.suscripciones.guardar-custom');
+    Route::get('/tienda-precio/{tienda_id}', [App\Http\Controllers\Admin\SuscripcionCustomController::class, 'getTiendaPrecio']);
+    Route::get('/pago/{id}', [App\Http\Controllers\Admin\SuscripcionCustomController::class, 'pago'])->name('admin.suscripciones.pago-custom');
+    Route::post('/pago/{id}/guardar', [App\Http\Controllers\Admin\SuscripcionCustomController::class, 'storePayment'])->name('admin.suscripciones.pagar-custom');
+    Route::get('/contrato/{id}/descargar', [App\Http\Controllers\Admin\SuscripcionCustomController::class, 'descargarContrato'])->name('admin.suscripciones.contrato-descargar');
+    
+    Route::get('/renovar/{id}', [App\Http\Controllers\Admin\SuscripcionCustomController::class, 'renovar'])->name('admin.suscripciones.renovar-custom');
+    Route::post('/renovar/{id}/guardar', [App\Http\Controllers\Admin\SuscripcionCustomController::class, 'storeRenewal'])->name('admin.suscripciones.guardar-renovacion');
+});

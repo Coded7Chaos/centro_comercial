@@ -52,7 +52,6 @@ class RolesAndPermissionsSeeder extends Seeder
         // Pages
         $pages = [
             'BalanceSuscripciones',
-            'DirectorioInterno',
             'MapaOcupacion',
             'MiEstadoDeCuenta',
             'ReporteMorosidad',
@@ -68,6 +67,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'OcupacionPorPisoChart',
             'MetodoPagoChart',
             'TopMorososWidget',
+            'CostoOportunidadVacanciaChart',
         ];
 
         // Create Permissions

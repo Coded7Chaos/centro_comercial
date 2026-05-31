@@ -39,9 +39,12 @@ class CreateInfraestructurasCustom extends Page
     public function addPiso()
     {
         $numeroPiso = count($this->pisos) + 1;
+        $nivelDefault = $numeroPiso === 1 ? 'Planta baja' : "Piso " . ($numeroPiso - 1);
         $this->pisos[] = [
             'nombre' => "Piso $numeroPiso",
+            'numero' => $nivelDefault,
             'estado' => 'activo',
+            'imagen_fondo' => '/images/backgrounds/bg_mall_white.jpg',
             'tiendas' => [
                 [
                     'nombre' => '',
@@ -92,7 +95,9 @@ class CreateInfraestructurasCustom extends Page
             'lat' => 'required',
             'long' => 'required',
             'pisos.*.nombre' => 'required',
+            'pisos.*.numero' => 'required',
             'pisos.*.estado' => 'required|in:activo,inactivo',
+            'pisos.*.imagen_fondo' => 'required|string',
             'pisos.*.tiendas.*.nombre' => 'nullable',
             'pisos.*.tiendas.*.numero' => 'required',
             'pisos.*.tiendas.*.telefono_referencia' => 'nullable',
@@ -115,8 +120,10 @@ class CreateInfraestructurasCustom extends Page
                     $piso = InfraestructurasPisos::create([
                         'infraestructura_id' => $infra->id,
                         'nombre' => $pisoData['nombre'],
+                        'numero' => $pisoData['numero'],
                         'cantidad_tiendas' => count($pisoData['tiendas']),
                         'estado' => $pisoData['estado'] ?? 'activo',
+                        'imagen_fondo' => $pisoData['imagen_fondo'] ?? '/images/backgrounds/bg_mall_white.jpg',
                     ]);
 
                     foreach ($pisoData['tiendas'] as $tiendaData) {

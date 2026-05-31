@@ -10,6 +10,10 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Filament\Forms\Components\Select;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Enums\FiltersLayout;
+use Illuminate\Database\Eloquent\Builder;
 
 class SuscripcionesCobrosTable
 {
@@ -41,7 +45,7 @@ class SuscripcionesCobrosTable
 
                 /*
                 |--------------------------------------------------------------------------
-                | MONTO
+                | MONTO A PAGAR
                 |--------------------------------------------------------------------------
                 */
 
@@ -51,74 +55,135 @@ class SuscripcionesCobrosTable
 
                     ->money('BOB')
 
-                    ->sortable(),
+                    ->sortable()
+
+                    ->visible(fn ($livewire) => in_array($livewire->activeTab ?? 'mensuales', ['mensuales', 'parciales'])),
 
                 /*
                 |--------------------------------------------------------------------------
-                | FECHA INICIO
+                | FECHA DE VENCIMIENTO (FECHA PAGO TEÓRICA)
                 |--------------------------------------------------------------------------
                 */
 
-                TextColumn::make('fecha_inicio')
-
-                    ->label('Fecha inicio')
-
-                    ->date('d/m/Y')
-
-                    ->sortable(),
-
-                /*
-                |--------------------------------------------------------------------------
-                | FECHA PAGO
-                |--------------------------------------------------------------------------
-                */
-
-                TextColumn::make('fecha_pago')
+                TextColumn::make('fecha_vencimiento')
 
                     ->label('Fecha pago')
 
                     ->date('d/m/Y')
 
-                    ->placeholder('Sin registrar')
+                    ->sortable()
 
-                    ->sortable(),
+                    ->visible(fn ($livewire) => in_array($livewire->activeTab ?? 'mensuales', ['mensuales', 'parciales'])),
 
                 /*
                 |--------------------------------------------------------------------------
-                | ESTADO
+                | MONTO DE DEUDA (MOROSOS)
                 |--------------------------------------------------------------------------
                 */
 
-                BadgeColumn::make('estado')
+                TextColumn::make('monto_deuda')
 
-                    ->colors([
+                    ->label('Monto de deuda')
 
-                        'warning' => 'pendiente',
+                    ->money('BOB')
 
-                        'success' => 'pagado',
+                    ->state(function ($record) {
+                        $pagado = $record->pagos()->sum('monto_pagado');
+                        return max(0, $record->monto - $pagado);
+                    })
 
-                        'danger' => 'vencido',
+                    ->visible(fn ($livewire) => ($livewire->activeTab ?? null) === 'morosos'),
 
-                        'gray' => 'anulado',
-                    ])
+                /*
+                |--------------------------------------------------------------------------
+                | DÍAS SIN PAGAR (MOROSOS)
+                |--------------------------------------------------------------------------
+                */
 
-                    ->formatStateUsing(fn($state) => match ($state) {
+                TextColumn::make('dias_sin_pagar')
 
-                        'pendiente' => 'Pendiente',
+                    ->label('Días sin pagar')
 
-                        'pagado' => 'Pagado',
+                    ->state(function ($record) {
+                        if (!$record->fecha_vencimiento) return '---';
+                        $venc = \Carbon\Carbon::parse($record->fecha_vencimiento)->startOfDay();
+                        $hoy = now()->startOfDay();
+                        return max(0, $venc->diffInDays($hoy, false));
+                    })
 
-                        'vencido' => 'Vencido',
+                    ->badge()
 
-                        'anulado' => 'Anulado',
+                    ->color('danger')
 
-                        default => ucfirst($state),
-                    }),
+                    ->visible(fn ($livewire) => ($livewire->activeTab ?? null) === 'morosos'),
             ])
 
             ->filters([
-                //
+                Filter::make('fecha_filtro')
+                    ->form([
+                        Select::make('anio')
+                            ->label('Año')
+                            ->options(function () {
+                                $currentYear = now()->year;
+                                $years = [];
+                                for ($i = 0; $i <= 5; $i++) {
+                                    $years[$currentYear + $i] = $currentYear + $i;
+                                }
+                                return $years;
+                            })
+                            ->default(now()->year)
+                            ->reactive(),
+                        Select::make('mes')
+                            ->label('Mes')
+                            ->options(function (callable $get) {
+                                $selectedYear = $get('anio') ?? now()->year;
+                                $currentYear = now()->year;
+                                $currentMonth = now()->month;
+                                
+                                $months = [
+                                    1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+                                    5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+                                    9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+                                ];
+                                
+                                if ((int)$selectedYear === (int)$currentYear) {
+                                    return array_filter($months, function ($key) use ($currentMonth) {
+                                        return $key >= $currentMonth;
+                                    }, ARRAY_FILTER_USE_KEY);
+                                }
+                                
+                                return $months;
+                            })
+                            ->default(now()->month),
+                    ])
+                    ->query(function (Builder $query, array $data, $livewire): Builder {
+                        $activeTab = $livewire->activeTab ?? 'mensuales';
+                        if ($activeTab !== 'mensuales') {
+                            return $query;
+                        }
+
+                        $mes = $data['mes'] ?? now()->month;
+                        $anio = $data['anio'] ?? now()->year;
+
+                        return $query
+                            ->whereMonth('fecha_vencimiento', $mes)
+                            ->whereYear('fecha_vencimiento', $anio);
+                    })
+                    ->indicateUsing(function (array $data): array {
+                        $indicators = [];
+                        if (!empty($data['mes']) && !empty($data['anio'])) {
+                            $months = [
+                                1 => 'Enero', 2 => 'Febrero', 3 => 'Marzo', 4 => 'Abril',
+                                5 => 'Mayo', 6 => 'Junio', 7 => 'Julio', 8 => 'Agosto',
+                                9 => 'Septiembre', 10 => 'Octubre', 11 => 'Noviembre', 12 => 'Diciembre'
+                            ];
+                            $mesNom = $months[(int)$data['mes']] ?? '';
+                            $indicators[] = "Período: {$mesNom} {$data['anio']}";
+                        }
+                        return $indicators;
+                    })
             ])
+            ->filtersLayout(FiltersLayout::AboveContent)
 
             ->recordActions([
 

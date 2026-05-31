@@ -11,21 +11,44 @@ use Filament\Actions\CreateAction;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 
+use Filament\Schemas\Components\Tabs\Tab;
+use Illuminate\Database\Eloquent\Builder;
+
 class ListSuscripcionesCobros extends ListRecords
 {
     protected static string $resource = SuscripcionesCobrosResource::class;
 
     protected function getHeaderActions(): array
     {
-        return [
-            CreateAction::make(),
+        return [];
+    }
 
-            Action::make('generar_cobros')
-                ->label('Generar cobros del mes')
-                ->icon('heroicon-o-banknotes')
-                ->color('success')
-                ->action(fn() => $this->generarCobrosMensuales()),
+    public function getTabs(): array
+    {
+        return [
+            'mensuales' => Tab::make('Cobros mensuales')
+                ->modifyQueryUsing(fn (Builder $query) => $query
+                    ->where('es_parcial', false)
+                    ->whereNotIn('estado', ['pagado', 'anulado'])
+                    ->where('fecha_vencimiento', '>=', now()->toDateString())
+                ),
+            'morosos' => Tab::make('Morosos')
+                ->modifyQueryUsing(fn (Builder $query) => $query
+                    ->where('es_parcial', false)
+                    ->whereNotIn('estado', ['pagado', 'anulado'])
+                    ->where('fecha_vencimiento', '<', now()->toDateString())
+                ),
+            'parciales' => Tab::make('Cobros parciales')
+                ->modifyQueryUsing(fn (Builder $query) => $query
+                    ->where('es_parcial', true)
+                    ->whereNotIn('estado', ['pagado', 'anulado'])
+                ),
         ];
+    }
+
+    public function getDefaultActiveTab(): string | int | null
+    {
+        return 'mensuales';
     }
 
     public function generarCobrosMensuales(): void

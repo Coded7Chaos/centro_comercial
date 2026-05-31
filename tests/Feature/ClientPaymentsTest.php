@@ -77,7 +77,7 @@ class ClientPaymentsTest extends TestCase
             'infraestructuras_tienda_id' => $this->shop->id,
             'suscripciones_tarifa_id' => $this->fee->id,
             'fecha_inicio' => now()->toDateString(),
-            'fecha_fin' => now()->addYear()->toDateString(),
+            'fecha_fin' => now()->addMonth()->subDay()->toDateString(),
             'estado' => 'activo',
             'tipo' => 'mensual',
             'precio' => 1000.00,
@@ -161,5 +161,45 @@ class ClientPaymentsTest extends TestCase
         ]);
 
         $response->assertSessionHasErrors(['nombre_pagador']);
+    }
+
+    public function test_report_payment_partial_splits_charge(): void
+    {
+        $comprobante = UploadedFile::fake()->create('comprobante.pdf', 500, 'application/pdf');
+
+        // We make a partial payment of 400 for a 1000 charge.
+        $response = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
+            'suscripcion_cobro_id' => $this->charge->id,
+            'monto_pagado' => 400,
+            'metodo_pago' => 'transferencia',
+            'numero_transaccion' => 'TX-12345',
+            'banco_origen' => 'BNB',
+            'comprobante' => $comprobante,
+        ]);
+
+        $response->assertRedirect(route('cliente.estado-cuenta'));
+
+        // The original charge should have its amount adjusted to 400 (what was paid) and marked as pagado.
+        $this->charge->refresh();
+        $this->assertEquals(400, $this->charge->monto);
+        $this->assertEquals('pagado', $this->charge->estado);
+
+        // A new charge (cobro) of 600 should be created.
+        $newCharge = SuscripcionesCobros::where('suscripcion_id', $this->subscription->id)
+            ->where('id', '!=', $this->charge->id)
+            ->first();
+
+        $this->assertNotNull($newCharge);
+        $this->assertEquals(600, $newCharge->monto);
+        $this->assertEquals('pendiente', $newCharge->estado);
+        $this->assertStringContainsString('Saldo pendiente de:', $newCharge->concepto);
+
+        // The payment record should be created with pago_pendiente = 0 because the balance was transferred.
+        $this->assertDatabaseHas('suscripciones_pagos', [
+            'suscripcion_cobro_id' => $this->charge->id,
+            'monto_pagado' => 400,
+            'pago_pendiente' => 0,
+            'estado_snapshot' => 'pagado',
+        ]);
     }
 }

@@ -21,6 +21,9 @@ class UserPolicy
 
     public function create(AuthUser $authUser): bool
     {
+        if ($authUser->hasRole('admin')) {
+            return false;
+        }
         return $authUser->can('Create:User');
     }
 

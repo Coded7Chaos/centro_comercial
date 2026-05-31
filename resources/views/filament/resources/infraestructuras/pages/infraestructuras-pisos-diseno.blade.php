@@ -19,6 +19,33 @@
 
                 </div>
 
+                {{-- NÚMERO / NIVEL --}}
+                <div class="mb-4">
+
+                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Número / Nivel del piso
+                    </label>
+
+                    <input
+                        type="text"
+                        wire:model="pisos.{{ $index }}.numero"
+                        class="
+                            w-full
+                            rounded-lg
+                            border-gray-300 dark:border-gray-700
+                            bg-white dark:bg-gray-800
+                            text-gray-900 dark:text-white
+                            focus:border-primary-600
+                            focus:ring-2
+                            focus:ring-primary-600/30
+                            focus:outline-none
+                            transition
+                        "
+                        placeholder="Ej. Planta baja o Piso 1"
+                    >
+
+                </div>
+
                 {{-- NOMBRE --}}
                 <div class="mb-4">
 

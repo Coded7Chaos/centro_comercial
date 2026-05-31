@@ -131,20 +131,18 @@
         <tr>
             <th>Tamaño del Local</th>
             <td>{{ ucfirst($tienda?->tamano ?? 'pequeño') }}</td>
-            <th>Marca Principal</th>
-            <td>{{ $marca?->nombre ?? 'N/A' }}</td>
-        </tr>
-        <tr>
             <th>Precio de Alquiler</th>
             <td class="bold">Bs. {{ number_format($suscripcion->precio, 2) }}</td>
-            <th>Tipo de Suscripción</th>
-            <td>{{ ucfirst($suscripcion->tipo) }}</td>
         </tr>
         <tr>
             <th>Fecha de Inicio</th>
             <td>{{ \Carbon\Carbon::parse($suscripcion->fecha_inicio)->format('d/m/Y') }}</td>
             <th>Fecha de Finalización</th>
             <td>{{ \Carbon\Carbon::parse($suscripcion->fecha_fin)->format('d/m/Y') }}</td>
+        </tr>
+        <tr>
+            <th>Tipo de Suscripción</th>
+            <td colspan="3">{{ ucfirst($suscripcion->tipo) }}</td>
         </tr>
     </table>
 
@@ -155,18 +153,37 @@
             El ARRENDADOR otorga en calidad de arrendamiento comercial el local identificado en los detalles superiores a favor del ARRENDATARIO. El ARRENDATARIO se compromete a destinar dicho local comercial única y exclusivamente para la explotación de actividades comerciales acordes a la marca <span class="bold">{{ $marca?->nombre ?? 'General' }}</span>, quedando estrictamente prohibido cambiar el giro comercial sin autorización expresa y escrita del ARRENDADOR.
         </div>
 
+        @php
+            $tipoStr = strtolower($suscripcion->tipo);
+            $esMayorAMensual = true;
+            if (str_contains($tipoStr, '1 mes') || str_contains($tipoStr, 'mensual') || str_contains($tipoStr, '1 semanas') || str_contains($tipoStr, 'semanal')) {
+                $esMayorAMensual = false;
+            }
+        @endphp
+
         <div class="clause">
             <div class="clause-title">TERCERA: CANON Y FORMA DE PAGO.</div>
             El canon de arrendamiento acordado es el monto detallado en la tabla superior, el cual deberá ser pagado periódicamente según el tipo de suscripción (<span class="bold">{{ $suscripcion->tipo }}</span>) dentro de los primeros cinco (5) días hábiles de cada periodo de facturación. Los pagos se realizarán mediante los canales de transferencia, depósito o cajas habilitadas por el ARRENDADOR.
         </div>
 
+        @if($esMayorAMensual)
+            <div class="clause">
+                <div class="clause-title">CUARTA: DEPÓSITO DE GARANTÍA.</div>
+                @if($suscripcion->renovacion_de_id)
+                    Se deja constancia de que el depósito de garantía entregado por el ARRENDATARIO en el contrato original se mantiene y transfiere plenamente para garantizar las obligaciones del presente contrato de renovación, por lo cual no se requiere un desembolso adicional por este concepto. Por tanto, el pago inicial requerido es de un (1) mes de alquiler correspondiente al primer mes adelantado.
+                @else
+                    El ARRENDATARIO entregará al ARRENDADOR al momento de la firma de este contrato la suma equivalente a un (1) mes de alquiler en calidad de garantía de cumplimiento del presente contrato. Esta suma no devengará intereses y será devuelta al ARRENDATARIO al término del contrato, previa deducción de cualquier deuda pendiente o costo de reparación de daños ocasionados en el local comercial. Por tanto, el pago inicial requerido es de dos (2) meses de alquiler (primer mes adelantado más el mes de garantía).
+                @endif
+            </div>
+        @endif
+
         <div class="clause">
-            <div class="clause-title">CUARTA: PLAZO DE DURACIÓN Y RENOVACIÓN.</div>
+            <div class="clause-title">{{ $esMayorAMensual ? 'QUINTA' : 'CUARTA' }}: PLAZO DE DURACIÓN Y RENOVACIÓN.</div>
             El plazo de duración del presente contrato es determinado, rigiendo desde el <span class="bold">{{ \Carbon\Carbon::parse($suscripcion->fecha_inicio)->format('d/m/Y') }}</span> hasta el <span class="bold">{{ \Carbon\Carbon::parse($suscripcion->fecha_fin)->format('d/m/Y') }}</span>. Al vencimiento de dicho plazo, y en caso de que el ARRENDATARIO desee continuar con la ocupación del local comercial, las partes deberán manifestar su voluntad de <span class="bold">renovar</span> el contrato al menos quince (15) días antes de su finalización, formalizando un nuevo periodo y tarifa.
         </div>
 
         <div class="clause">
-            <div class="clause-title">QUINTA: MANTENIMIENTO Y MEJORAS.</div>
+            <div class="clause-title">{{ $esMayorAMensual ? 'SEXTA' : 'QUINTA' }}: MANTENIMIENTO Y MEJORAS.</div>
             El ARRENDATARIO declara recibir el local en perfectas condiciones de habitabilidad y funcionamiento y se obliga a devolverlo en el mismo estado. Cualquier mejora estructural requerirá el consentimiento previo y por escrito del ARRENDADOR.
         </div>
     </div>

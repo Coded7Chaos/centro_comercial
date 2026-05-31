@@ -54,82 +54,82 @@ class CreateSuscripcionesPagos extends CreateRecord
         }
 
         /*
-    |--------------------------------------------------------------------------
-    | TOTAL PAGADO ACUMULADO
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | TOTAL PAGADO ACUMULADO
+        |--------------------------------------------------------------------------
+        */
 
         $totalPagado = $cobro->pagos()->sum(
             'monto_pagado'
         );
 
         /*
-    |--------------------------------------------------------------------------
-    | SALDO PENDIENTE
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | SALDO PENDIENTE
+        |--------------------------------------------------------------------------
+        */
 
-        $saldoPendiente =
-            $cobro->monto - $totalPagado;
+        $saldoPendiente = $cobro->monto - $totalPagado;
 
         /*
-    |--------------------------------------------------------------------------
-    | EVITAR NEGATIVOS
-    |--------------------------------------------------------------------------
-    */
+        |--------------------------------------------------------------------------
+        | EVITAR NEGATIVOS
+        |--------------------------------------------------------------------------
+        */
 
         if ($saldoPendiente < 0) {
             $saldoPendiente = 0;
         }
 
-        /*
-    |--------------------------------------------------------------------------
-    | ESTADO
-    |--------------------------------------------------------------------------
-    */
+        $data = $this->form->getState();
 
-        if ($saldoPendiente == 0) {
+        if ($saldoPendiente > 0) {
+            // There is a pending balance. We split it into a new cobro!
+            $opcion = $data['cobro_pendiente_opcion'] ?? 'siguiente_mes';
+            $fechaVencimientoCobro = null;
+            if ($opcion === 'fecha_intermedia' && !empty($data['fecha_cobro_pendiente'])) {
+                $fechaVencimientoCobro = $data['fecha_cobro_pendiente'];
+            } else {
+                $fechaVencimientoCobro = \Carbon\Carbon::parse($cobro->fecha_vencimiento)->addMonth()->toDateString();
+            }
 
-            $estado = 'pagado';
-        } elseif ($totalPagado > 0) {
+            // Create new SuscripcionesCobros
+            SuscripcionesCobros::create([
+                'suscripcion_id' => $cobro->suscripcion_id,
+                'concepto' => 'Saldo pendiente de: ' . $cobro->concepto,
+                'monto' => $saldoPendiente,
+                'fecha_inicio' => $pago->fecha_pago ?? now()->toDateString(),
+                'fecha_vencimiento' => $fechaVencimientoCobro,
+                'estado' => 'pendiente',
+                'observaciones' => 'Cobro generado de saldo pendiente del pago #' . $pago->id,
+                'es_parcial' => true,
+            ]);
 
-            $estado = 'parcial';
+            // Adjust original cobro
+            $cobro->update([
+                'monto' => $totalPagado,
+                'saldo_pendiente' => 0,
+                'estado' => 'pagado',
+                'estado_snapshot' => 'pagado',
+            ]);
+
+            // Adjust payment snapshot
+            $pago->update([
+                'pago_pendiente' => 0,
+                'estado_snapshot' => 'pagado',
+            ]);
         } else {
+            // Fully paid
+            $pago->update([
+                'pago_pendiente' => 0,
+                'estado_snapshot' => 'pagado',
+            ]);
 
-            $estado = 'pendiente';
+            $cobro->update([
+                'saldo_pendiente' => 0,
+                'estado' => 'pagado',
+                'estado_snapshot' => 'pagado',
+            ]);
         }
-
-        /*
-    /*
-|--------------------------------------------------------------------------
-| ACTUALIZAR EL PAGO RECIÉN CREADO
-|--------------------------------------------------------------------------
-*/
-
-        $pago->update([
-
-            /*
-    | Nuevo saldo restante después de este pago
-    */
-            'pago_pendiente' => $saldoPendiente,
-            'estado_snapshot' => $estado,
-        ]);
-
-        /*
-|--------------------------------------------------------------------------
-| ACTUALIZAR COBRO
-|--------------------------------------------------------------------------
-*/
-
-        $cobro->update([
-
-            'saldo_pendiente' =>
-            $saldoPendiente,
-
-            'estado' =>
-            $estado,
-
-            'estado_snapshot' => $estado,
-        ]);
     }
 }

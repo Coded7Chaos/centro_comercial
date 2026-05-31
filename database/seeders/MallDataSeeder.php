@@ -6,9 +6,6 @@ use App\Models\Categorias;
 use App\Models\Infraestructuras;
 use App\Models\InfraestructurasPisos;
 use App\Models\InfraestructurasTiendas;
-use App\Models\Productos;
-use App\Models\ProductosImagenes;
-use App\Models\Marcas;
 use App\Models\Clientes;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -20,35 +17,60 @@ class MallDataSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            // 0. Crear un usuario y cliente para marcas/tiendas por defecto
-            $user = User::firstOrCreate(['email' => 'admin@admin.com'], [
-                'nombres' => 'Administrador',
-                'apellido_paterno' => 'Mall',
-                'apellido_materno' => 'Global',
-                'password' => Hash::make('password'),
-            ]);
+            // 1. Crear Estructura Jerárquica de Categorías Reales
+            $categoriasEstructura = [
+                'Gastronomía' => [
+                    'Café & Pastelería',
+                    'Comida Asiática',
+                    'Bares & Coctelería',
+                    'Gourmet & Delicatessen'
+                ],
+                'Tecnología' => [
+                    'Smartphones',
+                    'Accesorios & Gadgets',
+                    'Robótica & Drones',
+                    'Videojuegos & Consolas'
+                ],
+                'Moda & Estilo' => [
+                    'Ropa Femenina',
+                    'Ropa Masculina',
+                    'Calzado Premium',
+                    'Joyería & Relojería'
+                ],
+                'Entretenimiento & Cultura' => [
+                    'Librería & Cómics',
+                    'Galería de Arte',
+                    'Juegos de Mesa'
+                ]
+            ];
 
-            $cliente = Clientes::firstOrCreate(['user_id' => $user->id], [
-                'ci' => '0000000',
-                'numero_celular' => '00000000',
-                'genero' => 'masculino',
-            ]);
+            foreach ($categoriasEstructura as $padreNombre => $subcategorias) {
+                $padre = Categorias::firstOrCreate(['nombre' => $padreNombre], [
+                    'descripcion' => "Categoría principal de {$padreNombre}",
+                    'estado' => 'activo',
+                    'tipo' => 'categoria',
+                ]);
 
-            // 1. Crear Categoria General para productos
-            $catGral = Categorias::firstOrCreate(['nombre' => 'General'], [
+                foreach ($subcategorias as $subNombre) {
+                    Categorias::firstOrCreate([
+                        'nombre' => $subNombre,
+                        'categoria_padre_id' => $padre->id
+                    ], [
+                        'descripcion' => "Subcategoría de {$subNombre}",
+                        'estado' => 'activo',
+                        'tipo' => 'categoria',
+                    ]);
+                }
+            }
+
+            // Fallback general
+            Categorias::firstOrCreate(['nombre' => 'General'], [
                 'descripcion' => 'Categoría general por defecto',
                 'estado' => 'activo',
                 'tipo' => 'categoria',
             ]);
 
-            // 1.1 Crear Marca General para productos
-            $marcaGral = Marcas::firstOrCreate(['nombre' => 'General'], [
-                'cliente_id' => $cliente->id,
-                'descripcion' => 'Marca general por defecto',
-                'estado' => 'activo',
-            ]);
-
-            // 2. Crear Infraestructura (idempotente por nombre)
+            // 2. Crear Infraestructura (Marble Galleria)
             $infra = Infraestructuras::firstOrCreate(
                 ['nombre' => 'Marble Galleria'],
                 [
@@ -64,90 +86,35 @@ class MallDataSeeder extends Seeder
                 return;
             }
 
-            $mallData = [
-                [
-                    'level' => 3,
-                    'name' => 'Sky Lounge',
-                    'stores' => [
-                        ['name' => 'Nébula Coffee', 'desc' => 'Café de especialidad en las alturas.'],
-                        ['name' => 'Pixel Arcade', 'desc' => 'Sala arcade retro con las mejores máquinas.'],
-                        ['name' => 'Zen Sushi', 'desc' => 'Cocina nipona moderna y refinada.'],
-                        ['name' => 'Luna Bar', 'desc' => 'Cócteles de autor con vista a la ciudad.'],
-                    ]
-                ],
-                [
-                    'level' => 2,
-                    'name' => 'Tech Plaza',
-                    'stores' => [
-                        ['name' => 'Circuit Lab', 'desc' => 'Gadgets y accesorios de última generación.'],
-                        ['name' => 'Droid Shop', 'desc' => 'Robótica y drones para aficionados y pros.'],
-                        ['name' => 'Game Vault', 'desc' => 'Todo en videojuegos y consolas.'],
-                        ['name' => 'Phone Galaxy', 'desc' => 'Móviles de última generación y soporte.'],
-                    ]
-                ],
-                [
-                    'level' => 1,
-                    'name' => 'Fashion Street',
-                    'stores' => [
-                        ['name' => 'Aurora', 'desc' => 'Lo último en moda femenina contemporánea.'],
-                        ['name' => 'Velvet', 'desc' => 'Calzado premium para toda ocasión.'],
-                        ['name' => 'Urban Edge', 'desc' => 'Streetwear y sneakers de edición limitada.'],
-                        ['name' => 'Gold & Co.', 'desc' => 'Joyería de lujo y relojería fina.'],
-                    ]
-                ],
-                [
-                    'level' => 0,
-                    'name' => 'Grand Lobby',
-                    'stores' => [
-                        ['name' => 'Info Desk', 'desc' => 'Atención al visitante y servicios generales.'],
-                        ['name' => 'Fresh Market', 'desc' => 'Productos gourmet y orgánicos seleccionados.'],
-                        ['name' => 'Book Haven', 'desc' => 'Librería boutique con títulos exclusivos.'],
-                        ['name' => 'Art Gallery', 'desc' => 'Galería de arte rotativa con artistas locales.'],
-                    ]
-                ]
+            // 3. Estructura de Tiendas vacías por piso
+            $floors = [
+                ['level' => 3, 'name' => 'Sky Lounge', 'imagen_fondo' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Piso 3'],
+                ['level' => 2, 'name' => 'Tech Plaza', 'imagen_fondo' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Piso 2'],
+                ['level' => 1, 'name' => 'Fashion Street', 'imagen_fondo' => 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Piso 1'],
+                ['level' => 0, 'name' => 'Grand Lobby', 'imagen_fondo' => 'https://images.unsplash.com/photo-1582037928867-677256512289?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Planta baja'],
             ];
 
-            foreach ($mallData as $floorData) {
+            foreach ($floors as $floorData) {
                 $piso = InfraestructurasPisos::create([
                     'infraestructura_id' => $infra->id,
                     'nombre' => $floorData['name'],
-                    'cantidad_tiendas' => count($floorData['stores']),
+                    'numero' => $floorData['numero'],
+                    'cantidad_tiendas' => $floorData['count'],
                     'estado' => 'activo',
+                    'imagen_fondo' => $floorData['imagen_fondo']
                 ]);
 
-                foreach ($floorData['stores'] as $index => $store) {
-                    $tienda = InfraestructurasTiendas::create([
+                for ($index = 0; $index < $floorData['count']; $index++) {
+                    InfraestructurasTiendas::create([
                         'infraestructura_piso_id' => $piso->id,
-                        'nombre' => $store['name'],
+                        'nombre' => null, // Disponible/Vacía no tiene nombre comercial
                         'numero' => sprintf('%03d', ($floorData['level'] * 100) + ($index + 1)),
-                        'descripcion' => $store['desc'],
-                        'id_estado' => 1,
-                        'telefono_referencia' => '+591 7' . rand(1000000, 9999999),
-                        'tamano' => rand(20, 100),
+                        'descripcion' => null,
+                        'id_estado' => 1, // Disponible
+                        'telefono_referencia' => null,
+                        'tamano' => rand(25, 90),
+                        'cliente_id' => null,
                     ]);
-
-                    // Asociar marca a la tienda (muchos a muchos)
-                    $tienda->marcas()->attach($marcaGral->id);
-
-                    // Crear productos para la tienda
-                    for ($i = 1; $i <= 3; $i++) {
-                        $prod = Productos::create([
-                            'nombre' => "Producto {$i} de " . $store['name'],
-                            'descripcion' => "Descripción detallada del producto {$i} que se vende en " . $store['name'],
-                            'precio' => rand(50, 500),
-                            'categoria_id' => $catGral->id,
-                            'marca_id' => $marcaGral->id,
-                            'estado' => 'activo',
-                            'infraestructuras_tienda_id' => $tienda->id,
-                        ]);
-
-                        // Añadir una imagen de placeholder
-                        ProductosImagenes::create([
-                            'producto_id' => $prod->id,
-                            'url' => 'https://picsum.photos/seed/' . md5($prod->nombre) . '/600/400',
-                            'tipo' => 'principal',
-                        ]);
-                    }
                 }
             }
         });

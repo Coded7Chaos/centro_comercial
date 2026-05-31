@@ -58,7 +58,9 @@ class EditInfraestructurasCustom extends Page
             $this->pisos[] = [
                 'id' => $piso->id,
                 'nombre' => $piso->nombre,
+                'numero' => $piso->numero ?: $piso->nombre,
                 'estado' => $piso->estado ?? 'activo',
+                'imagen_fondo' => $piso->imagen_fondo ?? '/images/backgrounds/bg_mall_white.jpg',
                 'tiendas' => $tiendas,
             ];
         }
@@ -67,9 +69,12 @@ class EditInfraestructurasCustom extends Page
     public function addPiso()
     {
         $numeroPiso = count($this->pisos) + 1;
+        $nivelDefault = $numeroPiso === 1 ? 'Planta baja' : "Piso " . ($numeroPiso - 1);
         $this->pisos[] = [
             'nombre' => "Piso $numeroPiso",
+            'numero' => $nivelDefault,
             'estado' => 'activo',
+            'imagen_fondo' => '/images/backgrounds/bg_mall_white.jpg',
             'tiendas' => [
                 [
                     'nombre' => '',
@@ -118,7 +123,9 @@ class EditInfraestructurasCustom extends Page
             'lat' => 'required',
             'long' => 'required',
             'pisos.*.nombre' => 'required',
+            'pisos.*.numero' => 'required',
             'pisos.*.estado' => 'required|in:activo,inactivo',
+            'pisos.*.imagen_fondo' => 'required|string',
             'pisos.*.tiendas.*.nombre' => 'nullable',
             'pisos.*.tiendas.*.numero' => 'required',
             'pisos.*.tiendas.*.telefono_referencia' => 'nullable',
@@ -144,8 +151,10 @@ class EditInfraestructurasCustom extends Page
                         [
                             'infraestructura_id' => $infra->id,
                             'nombre' => $pisoData['nombre'],
+                            'numero' => $pisoData['numero'],
                             'cantidad_tiendas' => count($pisoData['tiendas']),
                             'estado' => $pisoData['estado'] ?? 'activo',
+                            'imagen_fondo' => $pisoData['imagen_fondo'] ?? '/images/backgrounds/bg_mall_white.jpg',
                         ]
                     );
 

@@ -119,7 +119,6 @@ class SuscripcionesPagos extends Model
         */
         'observaciones',
         'estado_snapshot',
-        'estado_snapshot',
     ];
 
     /*
@@ -170,12 +169,34 @@ class SuscripcionesPagos extends Model
 
     /*
 |--------------------------------------------------------------------------
-| RECALCULAR COBRO AUTOMÁTICAMENTE
+| RECALCULAR COBRO AUTOMÁTICAMENTE Y APLICAR SNAPS
 |--------------------------------------------------------------------------
 */
 
     protected static function booted(): void
     {
+        static::creating(function ($pago) {
+            $cobro = $pago->cobro;
+            if (!$cobro) {
+                return;
+            }
+
+            if ($pago->pago_pendiente === null) {
+                $totalPagadoHastaAhora = self::where('suscripcion_cobro_id', $pago->suscripcion_cobro_id)->sum('monto_pagado');
+                $pago->pago_pendiente = max(0, $cobro->monto - ($totalPagadoHastaAhora + $pago->monto_pagado));
+            }
+
+            if ($pago->estado_snapshot === null) {
+                $totalPagadoHastaAhora = self::where('suscripcion_cobro_id', $pago->suscripcion_cobro_id)->sum('monto_pagado');
+                $totalConEste = $totalPagadoHastaAhora + $pago->monto_pagado;
+                if ($totalConEste >= $cobro->monto) {
+                    $pago->estado_snapshot = 'pagado';
+                } else {
+                    $pago->estado_snapshot = 'parcial';
+                }
+            }
+        });
+
         static::created(function ($pago) {
 
             $cobro = $pago->cobro;

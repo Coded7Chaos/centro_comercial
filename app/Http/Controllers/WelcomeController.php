@@ -9,16 +9,60 @@ class WelcomeController extends Controller
 {
     public function __invoke()
     {
-        $infraestructura = Infraestructuras::with([
+        $infraestructuraId = request('infraestructura_id');
+
+        $query = Infraestructuras::with([
             'pisosInfraestructura.tiendas.estado',
             'pisosInfraestructura.tiendas.marcas',
             'pisosInfraestructura.tiendas.cliente.user',
             'pisosInfraestructura.tiendas.productos.imagenes',
-        ])->first();
+        ]);
+
+        if ($infraestructuraId) {
+            $infraestructura = $query->find($infraestructuraId);
+        }
+
+        if (!isset($infraestructura) || !$infraestructura) {
+            $infraestructura = $query->first();
+        }
 
         if (! $infraestructura) {
+            $mall = [
+                'id'     => 'mall-none',
+                'name'   => 'Mall Centro Comercial',
+                'city'   => 'Distrito Central',
+                'floors' => [
+                    [
+                        'level' => 1,
+                        'displayLevel' => 1,
+                        'name' => 'Planta Baja',
+                        'vibe' => 'Comercio & Servicios',
+                        'imagen_fondo' => '/images/backgrounds/bg_mall_white.jpg',
+                        'stores' => [
+                            [
+                                'id' => 1,
+                                'numero' => 101,
+                                'nombre' => 'Local Comercial',
+                                'descripcion' => 'Espacio comercial disponible.',
+                                'tamano' => '10.00',
+                                'telefono' => null,
+                                'estado' => 'Disponible',
+                                'is_alquilada' => false,
+                                'marca' => null,
+                                'marca_logo' => null,
+                                'inquilino' => null,
+                                'vitrina_1' => null,
+                                'vitrina_2' => null,
+                                'vitrina_3' => null,
+                                'productos' => [],
+                                'accent' => 'graphite',
+                            ]
+                        ]
+                    ]
+                ],
+            ];
             return view('welcome', [
-                'mall'             => null,
+                'mall'             => $mall,
                 'contacto'         => $this->contactoAdmin(),
                 'suscripcionesUrl' => route('suscripciones'),
             ]);
@@ -65,6 +109,15 @@ class WelcomeController extends Controller
                             'inquilino'    => $isAlquilada && $t->cliente?->user
                                 ? trim($t->cliente->user->nombres . ' ' . $t->cliente->user->apellido_paterno)
                                 : null,
+                            'vitrina_1'    => $t->vitrina_1
+                                ? (str_starts_with($t->vitrina_1, 'http') ? $t->vitrina_1 : \Illuminate\Support\Facades\Storage::url($t->vitrina_1))
+                                : null,
+                            'vitrina_2'    => $t->vitrina_2
+                                ? (str_starts_with($t->vitrina_2, 'http') ? $t->vitrina_2 : \Illuminate\Support\Facades\Storage::url($t->vitrina_2))
+                                : null,
+                            'vitrina_3'    => $t->vitrina_3
+                                ? (str_starts_with($t->vitrina_3, 'http') ? $t->vitrina_3 : \Illuminate\Support\Facades\Storage::url($t->vitrina_3))
+                                : null,
                             'productos'    => $isAlquilada
                                 ? $t->productos->map(fn ($p) => [
                                     'id'       => $p->id,
@@ -79,9 +132,10 @@ class WelcomeController extends Controller
 
                 return [
                     'level'        => $piso->id,
-                    'displayLevel' => $pisoIndex + 1,
+                    'displayLevel' => $piso->numero ?: ($pisoIndex + 1),
                     'name'         => $piso->nombre,
                     'vibe'         => $this->vibeDelPiso($piso->nombre),
+                    'imagen_fondo' => $piso->imagen_fondo ?: '/images/backgrounds/bg_mall_white.jpg',
                     'stores'       => $stores,
                 ];
             });
@@ -92,6 +146,12 @@ class WelcomeController extends Controller
             'city'   => $infraestructura->ubicacion ?? 'Distrito Central',
             'floors' => $floors,
         ];
+
+        if (request()->wantsJson() || request()->ajax() || request()->has('json')) {
+            return response()->json([
+                'mall' => $mall,
+            ]);
+        }
 
         return view('welcome', [
             'mall'             => $mall,

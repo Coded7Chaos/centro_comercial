@@ -32,8 +32,8 @@ class Suscripciones extends Model
         'fecha_inicio',
         'fecha_fin',
         'infraestructuras_tienda_id',
-
         'infraestructuras_piso_id',
+        'renovacion_de_id',
     ];
 
     public function cliente(): BelongsTo
@@ -69,10 +69,15 @@ class Suscripciones extends Model
     }
 
     /*
-|--------------------------------------------------------------------------
-| CREAR COBRO AUTOMÁTICO
-|--------------------------------------------------------------------------
-*/
+    |--------------------------------------------------------------------------
+    | CREAR COBRO AUTOMÁTICO
+    |--------------------------------------------------------------------------
+    */
+
+    public function renovadaDe(): BelongsTo
+    {
+        return $this->belongsTo(Suscripciones::class, 'renovacion_de_id');
+    }
 
     protected static function booted(): void
     {
@@ -95,22 +100,41 @@ class Suscripciones extends Model
 
             /*
         |--------------------------------------------------------------------------
-        | CREAR COBRO
+        | CREAR COBROS MENSUALES
         |--------------------------------------------------------------------------
         */
 
-            SuscripcionesCobros::create([
-                'suscripcion_id' => $suscripcion->id,
-                'concepto' => 'Cobro '
-                    . ucfirst($suscripcion->tipo)
-                    . ' - '
-                    . ($suscripcion->infraestructurasTienda?->nombre ?? 'Sin nombre'),
-                'monto' => $suscripcion->precio,
-                'fecha_inicio' => $suscripcion->fecha_inicio,
-                'fecha_vencimiento' => $suscripcion->fecha_fin,
-                'estado' => 'pendiente',
-                'observaciones' => 'Cobro generado automáticamente',
-            ]);
+            $start = \Carbon\Carbon::parse($suscripcion->fecha_inicio);
+            $end = \Carbon\Carbon::parse($suscripcion->fecha_fin)->addDay();
+            $totalMonths = (int) max(1, round($start->diffInMonths($end)));
+
+            $monthlyRent = (float)$suscripcion->precio / $totalMonths;
+            $isRenewal = $suscripcion->renovacion_de_id !== null;
+            $pago_inicial = ($totalMonths > 1 && !$isRenewal) ? $monthlyRent * 2 : $monthlyRent;
+
+            $tienda = $suscripcion->infraestructurasTienda;
+
+            for ($i = 0; $i < $totalMonths; $i++) {
+                $fechaVencimiento = $start->copy()->addMonths($i)->toDateString();
+                
+                $monto = ($i === 0) ? $pago_inicial : $monthlyRent;
+                
+                $concepto = 'Cobro Mes ' . ($i + 1) . ' - ' . ($suscripcion->tipo) . ' - ' . ($tienda?->nombre ?? 'Sin nombre');
+                if ($i === 0 && $totalMonths > 1 && !$isRenewal) {
+                    $concepto = 'Cobro Mes 1 + Garantía - ' . ($suscripcion->tipo) . ' - ' . ($tienda?->nombre ?? 'Sin nombre');
+                }
+
+                SuscripcionesCobros::create([
+                    'suscripcion_id' => $suscripcion->id,
+                    'concepto' => $concepto,
+                    'monto' => $monto,
+                    'fecha_inicio' => $fechaVencimiento,
+                    'fecha_vencimiento' => $fechaVencimiento,
+                    'estado' => 'pendiente',
+                    'observaciones' => 'Cobro generado automáticamente',
+                    'es_parcial' => false,
+                ]);
+            }
         });
     }
 }

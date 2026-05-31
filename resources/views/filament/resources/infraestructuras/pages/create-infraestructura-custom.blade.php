@@ -91,16 +91,41 @@
             @foreach($pisos as $pIndex => $piso)
                 <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-3xl overflow-hidden shadow-sm" wire:key="piso-{{ $pIndex }}">
                     <div class="px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-                        <div class="flex items-center gap-3 flex-1">
-                            <div class="text-gray-400">
+                        <div class="flex items-center gap-4 flex-1">
+                            <div class="text-gray-400 flex-shrink-0">
                                 <x-heroicon-m-bars-3 class="w-5 h-5" />
                             </div>
-                            <input type="text" wire:model="pisos.{{ $pIndex }}.nombre" 
-                                class="font-bold text-gray-900 dark:text-white uppercase tracking-wider text-sm border-none bg-transparent focus:ring-0 p-0 w-full"
-                                placeholder="Ej. PISO 1">
+                            <div class="flex flex-col sm:flex-row gap-3 w-full mr-4">
+                                <div class="flex items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-1.5 bg-gray-50/50 dark:bg-gray-900/50">
+                                    <span class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider flex-shrink-0">Nivel/Número:</span>
+                                    <input type="text" wire:model="pisos.{{ $pIndex }}.numero" 
+                                        class="font-extrabold text-gray-800 dark:text-gray-200 text-xs border-none bg-transparent focus:ring-0 p-0 w-28 placeholder-gray-400"
+                                        placeholder="Ej. Planta baja">
+                                </div>
+                                <div class="flex items-center gap-2 border border-gray-200 dark:border-gray-700 rounded-xl px-3 py-1.5 bg-gray-50/50 dark:bg-gray-900/50 flex-1">
+                                    <span class="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-wider flex-shrink-0">Nombre:</span>
+                                    <input type="text" wire:model="pisos.{{ $pIndex }}.nombre" 
+                                        class="font-extrabold text-gray-800 dark:text-gray-200 text-xs border-none bg-transparent focus:ring-0 p-0 w-full placeholder-gray-400"
+                                        placeholder="Ej. Sky Lounge">
+                                </div>
+                            </div>
                         </div>
 
-                        <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-4 flex-wrap">
+                            <div class="flex items-center gap-2 bg-gray-50 dark:bg-gray-900 rounded-lg px-2.5 py-1 border border-gray-200 dark:border-gray-700">
+                                <span class="text-[10px] font-bold text-gray-400 uppercase">Fondo:</span>
+                                <select wire:model="pisos.{{ $pIndex }}.imagen_fondo" 
+                                    class="text-xs font-bold border-none bg-transparent focus:ring-0 p-0 cursor-pointer text-gray-700 dark:text-gray-300">
+                                    <option value="/images/backgrounds/bg_mall_white.jpg">Blanco</option>
+                                    <option value="/images/backgrounds/bg_mall_warm.jpg">Cálido</option>
+                                    <option value="/images/backgrounds/bg_mall_grey.jpg">Gris</option>
+                                    <option value="/images/backgrounds/bg_mall_dark.jpg">Oscuro</option>
+                                </select>
+                                <div class="w-6 h-4 rounded border border-gray-300 dark:border-gray-600 bg-cover bg-center transition-all duration-300 shadow-sm"
+                                     style="background-image: url('{{ $piso['imagen_fondo'] ?? '/images/backgrounds/bg_mall_white.jpg' }}')">
+                                </div>
+                            </div>
+
                             <div class="flex items-center gap-2">
                                 <span class="text-[10px] font-bold text-gray-400 uppercase">Estado:</span>
                                 <select wire:model="pisos.{{ $pIndex }}.estado" 
@@ -165,20 +190,11 @@
                                                 class="block w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm px-4 py-2.5 focus:ring-primary-500"
                                                 placeholder="0.00">
                                         </div>
-                                        <div class="md:col-span-6">
+                                        <div class="md:col-span-8">
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Descripción</label>
                                             <textarea wire:model="pisos.{{ $pIndex }}.tiendas.{{ $tIndex }}.descripcion" rows="1"
                                                 class="block w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm px-4 py-2.5 focus:ring-primary-500"
                                                 placeholder="Breve descripción..."></textarea>
-                                        </div>
-                                        <div class="md:col-span-2">
-                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Estado <span class="text-red-500">*</span></label>
-                                            <select wire:model="pisos.{{ $pIndex }}.tiendas.{{ $tIndex }}.estado"
-                                                class="block w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm px-4 py-2.5 focus:ring-primary-500">
-                                                @foreach(\App\Models\EstadoTienda::all() as $estado)
-                                                <option value= {{ $estado->id }} > {{$estado->estado}}  </option>
-                                                @endforeach
-                                            </select>
                                         </div>
                                         </div>
 
