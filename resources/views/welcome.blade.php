@@ -699,7 +699,7 @@
                                             <img :src="p.imagenes?.[0]?.url" class="h-full w-full object-cover">
                                         </div>
                                         <div class="space-y-1 md:space-y-2">
-                                            <h4 class="font-black text-slate-800 dark:text-white truncate text-sm md:text-lg" x-text="p.nombre"></h4>
+                                            <h4 class="font-black text-slate-800 dark:text-white truncate text-sm md:text-lg cursor-help" :title="p.nombre" x-text="p.nombre"></h4>
                                             <div class="flex items-center justify-between">
                                                 <span class="text-lg md:text-2xl font-black text-emerald-600 dark:text-emerald-400" x-text="'Bs. ' + Number(p.precio).toFixed(2)"></span>
                                             </div>
@@ -767,7 +767,7 @@
                                     <p class="text-slate-700 dark:text-slate-200 text-sm md:text-base flex-1">
                                         Tenemos tarifas mensuales, trimestrales, semestrales y anuales según el tamaño del local. Revisa las opciones publicadas y elige la que mejor se ajuste a tu proyecto.
                                     </p>
-                                    <a :href="suscripcionesUrl"
+                                    <a :href="suscripcionesUrl + (activeStore?.tamano ? '?tamano=' + activeStore.tamano : '')"
                                         class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black px-5 py-3 text-sm md:text-base shadow-lg transition">
                                         Ver las suscripciones disponibles
                                         <x-heroicon-o-arrow-right class="w-4 h-4 md:w-5 md:h-5" />

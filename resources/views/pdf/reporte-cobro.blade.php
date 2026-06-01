@@ -297,7 +297,7 @@
 
         <div class="info">
             <span class="label">Piso:</span>
-            {{ $piso?->nombre ?? '---' }}
+            {{ $piso?->nombre ?? '---' }} {{ $piso?->numero ? '(' . $piso->numero . ')' : '' }}
         </div>
 
         <div class="info">

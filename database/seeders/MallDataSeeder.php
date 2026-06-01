@@ -91,7 +91,7 @@ class MallDataSeeder extends Seeder
                 ['level' => 3, 'name' => 'Sky Lounge', 'imagen_fondo' => 'https://images.unsplash.com/photo-1519167758481-83f550bb49b3?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Piso 3'],
                 ['level' => 2, 'name' => 'Tech Plaza', 'imagen_fondo' => 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Piso 2'],
                 ['level' => 1, 'name' => 'Fashion Street', 'imagen_fondo' => 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Piso 1'],
-                ['level' => 0, 'name' => 'Grand Lobby', 'imagen_fondo' => 'https://images.unsplash.com/photo-1582037928867-677256512289?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Planta baja'],
+                ['level' => 0, 'name' => 'Grand Lobby', 'imagen_fondo' => 'https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=2000&q=80', 'count' => 4, 'numero' => 'Planta baja'],
             ];
 
             foreach ($floors as $floorData) {

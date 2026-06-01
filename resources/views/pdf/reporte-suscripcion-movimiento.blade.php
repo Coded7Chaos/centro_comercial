@@ -292,7 +292,14 @@
                 Piso:
             </span>
 
-            {{ $piso?->nombre ?? '---' }}
+            @if($piso?->numero)
+                Piso {{ $piso->numero }}
+                @if($piso->nombre && $piso->nombre !== $piso->numero)
+                    - {{ $piso->nombre }}
+                @endif
+            @else
+                {{ $piso?->nombre ?? '---' }}
+            @endif
 
         </div>
 

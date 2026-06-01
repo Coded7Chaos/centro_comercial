@@ -60,7 +60,37 @@ class ClientDashboardController extends Controller
             $totalDeuda += max(0, $c->monto - $c->pagos->sum('monto_pagado'));
         }
 
-        return view('cliente.dashboard', compact('cliente', 'tiendas', 'cantProductos', 'suscripciones', 'cobrosPendientes', 'totalDeuda'));
+        // Gráficos de productos por categoría y por marca
+        $productosPorCategoria = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)
+            ->with('categoria')
+            ->selectRaw('categoria_id, count(*) as total')
+            ->groupBy('categoria_id')
+            ->get()
+            ->map(fn($p) => [
+                'nombre' => $p->categoria ? $p->categoria->nombre : 'Sin Categoría',
+                'total' => (int) $p->total
+            ]);
+
+        $productosPorMarca = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)
+            ->with('marca')
+            ->selectRaw('marca_id, count(*) as total')
+            ->groupBy('marca_id')
+            ->get()
+            ->map(fn($p) => [
+                'nombre' => $p->marca ? $p->marca->nombre : 'Sin Marca',
+                'total' => (int) $p->total
+            ]);
+
+        return view('cliente.dashboard', compact(
+            'cliente', 
+            'tiendas', 
+            'cantProductos', 
+            'suscripciones', 
+            'cobrosPendientes', 
+            'totalDeuda',
+            'productosPorCategoria',
+            'productosPorMarca'
+        ));
     }
 
     public function tienda()
@@ -359,7 +389,10 @@ class ClientDashboardController extends Controller
     public function marcas()
     {
         $cliente = $this->getClienteOrAbort();
-        $marcas = Marcas::where('cliente_id', $cliente->id)->orderBy('id', 'desc')->get();
+        $marcas = Marcas::where('cliente_id', $cliente->id)
+            ->orWhereNull('cliente_id')
+            ->orderBy('id', 'desc')
+            ->get();
         return view('cliente.marcas.index', compact('marcas'));
     }
 

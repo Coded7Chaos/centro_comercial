@@ -124,7 +124,16 @@
         </tr>
         <tr>
             <th>Piso / Nivel</th>
-            <td>{{ $piso?->nombre ?? 'N/A' }}</td>
+            <td>
+                @if($piso?->numero)
+                    Piso {{ $piso->numero }}
+                    @if($piso->nombre && $piso->nombre !== $piso->numero)
+                        - {{ $piso->nombre }}
+                    @endif
+                @else
+                    {{ $piso?->nombre ?? 'N/A' }}
+                @endif
+            </td>
             <th>Local Comercial</th>
             <td>Local N° {{ $tienda?->numero }} - {{ $tienda?->nombre ?? 'Sin nombre' }}</td>
         </tr>

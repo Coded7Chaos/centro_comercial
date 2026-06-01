@@ -45,24 +45,7 @@
                                           class="w-full rounded-2xl border-slate-200 py-3 px-4 focus:ring-indigo-500 focus:border-indigo-500 text-sm">{{ old('descripcion', $tienda->descripcion) }}</textarea>
                             </div>
 
-                            <!-- Imagen / Logo / Fachada -->
-                            <div class="space-y-4 md:col-span-2">
-                                <label class="block text-sm font-bold text-slate-700">Imagen / Fachada Comercial</label>
-                                
-                                <div class="flex flex-col md:flex-row items-center gap-6">
-                                    <div class="w-32 h-32 rounded-2xl bg-slate-100 border border-slate-200 overflow-hidden shrink-0 flex items-center justify-center">
-                                        @if($tienda->foto_referencial)
-                                            <img src="{{ Storage::url($tienda->foto_referencial) }}" class="w-full h-full object-cover">
-                                        @else
-                                            <svg class="w-10 h-10 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                        @endif
-                                    </div>
-                                    <div class="flex-1 w-full space-y-2">
-                                        <input type="file" name="foto" class="block w-full text-xs text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
-                                        <p class="text-[10px] text-slate-400 font-medium">Recomendado: Imágenes cuadradas, JPG o PNG de hasta 5MB.</p>
-                                    </div>
-                                </div>
-                            </div>
+
                         </div>
 
                         <div class="pt-4">

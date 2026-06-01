@@ -58,7 +58,7 @@ class SuscripcionesDemoSeeder extends Seeder
                             'nombre' => 'Café Espresso Doble',
                             'desc' => 'Extracción intensa de granos de café de origen 100% Arábica.',
                             'precio' => 18.00,
-                            'img' => 'https://images.unsplash.com/photo-1510972527409-cef7e2b247f9?w=600&auto=format&fit=crop&q=80'
+                            'img' => 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=600&auto=format&fit=crop&q=80'
                         ],
                         [
                             'nombre' => 'Cappuccino Vainilla',
@@ -126,7 +126,7 @@ class SuscripcionesDemoSeeder extends Seeder
                             'nombre' => 'Tempura Mixto de Langostinos',
                             'desc' => 'Vegetales y langostinos gigantes fritos en tempura extra crujiente.',
                             'precio' => 48.00,
-                            'img' => 'https://images.unsplash.com/photo-1615361413125-147e4c76f264?w=600&auto=format&fit=crop&q=80'
+                            'img' => 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=600&auto=format&fit=crop&q=80'
                         ]
                     ]
                 ],
@@ -148,13 +148,13 @@ class SuscripcionesDemoSeeder extends Seeder
                             'nombre' => 'Gin Tonic Botánico',
                             'desc' => 'Ginebra destilada, agua tónica premium, frutos rojos y cardamomo.',
                             'precio' => 45.00,
-                            'img' => 'https://images.unsplash.com/photo-1570598912132-0ba1dd952b7d?w=600&auto=format&fit=crop&q=80'
+                            'img' => 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=600&auto=format&fit=crop&q=80'
                         ],
                         [
                             'nombre' => 'Tabla de Quesos Selectos',
                             'desc' => 'Variedad de quesos curados maduros servidos con frutos secos y miel de abejas.',
                             'precio' => 60.00,
-                            'img' => 'https://images.unsplash.com/photo-1486427944299-d1955d23e317?w=600&auto=format&fit=crop&q=80'
+                            'img' => 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&auto=format&fit=crop&q=80'
                         ]
                     ]
                 ],
@@ -170,7 +170,7 @@ class SuscripcionesDemoSeeder extends Seeder
                             'nombre' => 'Cargador Inalámbrico Rápido 15W',
                             'desc' => 'Base de carga rápida magnética compatible con dispositivos iOS y Android.',
                             'precio' => 120.00,
-                            'img' => 'https://images.unsplash.com/photo-1622445262465-2481c4574875?w=600&auto=format&fit=crop&q=80'
+                            'img' => 'https://images.unsplash.com/photo-1616440347437-b1c73416efc2?w=600&auto=format&fit=crop&q=80'
                         ],
                         [
                             'nombre' => 'Auriculares Bluetooth Pro ANC',

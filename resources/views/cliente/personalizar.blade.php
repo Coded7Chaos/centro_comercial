@@ -384,7 +384,7 @@
                                         <option value="">Monograma (Sin Marca)</option>
                                         @foreach($marcas as $m)
                                             <option value="{{ $m->id }}" {{ $currentBrand && $currentBrand->id === $m->id ? 'selected' : '' }}>
-                                                {{ $m->nombre }}
+                                                {{ $m->nombre }} ({{ $m->cliente_id === null ? 'Pública' : 'Privada' }})
                                             </option>
                                         @endforeach
                                     </select>
@@ -587,10 +587,10 @@
 
                         <div class="space-y-2">
                             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">Marca</label>
-                            <select name="marca_id" required class="w-full rounded-2xl border-slate-200 py-3 px-4 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                             <select name="marca_id" required class="w-full rounded-2xl border-slate-200 py-3 px-4 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                                 <option value="">Seleccione una marca</option>
                                 @foreach($marcas as $m)
-                                    <option value="{{ $m->id }}">{{ $m->nombre }}</option>
+                                    <option value="{{ $m->id }}">{{ $m->nombre }} ({{ $m->cliente_id === null ? 'Pública' : 'Privada' }})</option>
                                 @endforeach
                             </select>
                         </div>

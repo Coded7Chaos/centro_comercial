@@ -24,9 +24,13 @@ class ProductosTable
                             ->where('tipo', 'principal')
                             ->first();
 
-                        return $imagen
-                            ? asset('storage/' . $imagen->url)
-                            : null;
+                        if (!$imagen) {
+                            return null;
+                        }
+
+                        return str_starts_with($imagen->url, 'http')
+                            ? $imagen->url
+                            : asset('storage/' . $imagen->url);
                     })
                     ->square()
                     ->size(60),

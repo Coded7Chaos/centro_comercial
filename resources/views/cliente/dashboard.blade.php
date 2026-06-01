@@ -41,6 +41,54 @@
             </div>
         </div>
 
+        <!-- SCRIPT DE CHART.JS -->
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+        <!-- GRÁFICOS DE PRODUCTOS -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- PRODUCTOS POR CATEGORÍA -->
+            <div class="bg-white rounded-[2rem] border border-slate-200/60 p-6 space-y-6">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                    Productos por Categoría
+                </h3>
+                
+                @if($productosPorCategoria->isEmpty())
+                    <div class="flex flex-col items-center justify-center py-12 text-slate-400 italic text-sm">
+                        <svg class="w-8 h-8 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        <span>No hay productos registrados para clasificar por categoría.</span>
+                    </div>
+                @else
+                    <div class="relative h-64 w-full flex justify-center">
+                        <canvas id="canvasCategoria"></canvas>
+                    </div>
+                @endif
+            </div>
+
+            <!-- PRODUCTOS POR MARCA -->
+            <div class="bg-white rounded-[2rem] border border-slate-200/60 p-6 space-y-6">
+                <h3 class="text-lg font-black text-slate-800 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                    Productos por Marca
+                </h3>
+                
+                @if($productosPorMarca->isEmpty())
+                    <div class="flex flex-col items-center justify-center py-12 text-slate-400 italic text-sm">
+                        <svg class="w-8 h-8 text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                        <span>No hay productos registrados para clasificar por marca.</span>
+                    </div>
+                @else
+                    <div class="relative h-64 w-full flex justify-center">
+                        <canvas id="canvasMarca"></canvas>
+                    </div>
+                @endif
+            </div>
+        </div>
+
         <!-- SECCIÓN DE TIENDAS Y DEUDAS -->
         <div class="grid grid-cols-1 gap-8">
             
@@ -133,3 +181,118 @@
     </div>
 
 </x-layouts.client>
+
+    <!-- Script de Renderizado de Gráficos -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const permanentLabelsPlugin = {
+                id: 'permanentLabels',
+                afterDatasetsDraw(chart) {
+                    const { ctx } = chart;
+                    ctx.save();
+                    chart.data.datasets.forEach(function(dataset, i) {
+                        const meta = chart.getDatasetMeta(i);
+                        if (meta.hidden) return;
+                        meta.data.forEach(function(element, index) {
+                            const dataValue = dataset.data[index];
+                            if (dataValue === 0 || dataValue === null || dataValue === undefined) return;
+                            
+                            ctx.font = 'bold 9px Outfit, sans-serif';
+                            let sum = dataset.data.reduce(function(a, b) { return a + Number(b); }, 0);
+                            let percentage = (sum === 0) ? '0%' : (dataValue * 100 / sum).toFixed(1) + '%';
+                            let textLine1 = Number(dataValue).toLocaleString() + ' uds.';
+                            let textLine2 = '(' + percentage + ')';
+                            const center = element.tooltipPosition();
+                            
+                            ctx.save();
+                            let maxW = Math.max(ctx.measureText(textLine1).width, ctx.measureText(textLine2).width);
+                            let w = maxW + 10;
+                            let h = 24;
+                            let r = 4;
+                            ctx.beginPath();
+                            ctx.moveTo(center.x - w/2 + r, center.y - h/2);
+                            ctx.lineTo(center.x + w/2 - r, center.y - h/2);
+                            ctx.quadraticCurveTo(center.x + w/2, center.y - h/2, center.x + w/2, center.y - h/2 + r);
+                            ctx.lineTo(center.x + w/2, center.y + h/2 - r);
+                            ctx.quadraticCurveTo(center.x + w/2, center.y + h/2, center.x + w/2 - r, center.y + h/2);
+                            ctx.lineTo(center.x - w/2 + r, center.y + h/2);
+                            ctx.quadraticCurveTo(center.x - w/2, center.y + h/2, center.x - w/2, center.y + h/2 - r);
+                            ctx.lineTo(center.x - w/2, center.y - h/2 + r);
+                            ctx.quadraticCurveTo(center.x - w/2, center.y - h/2, center.x - w/2 + r, center.y - h/2);
+                            ctx.closePath();
+                            ctx.fillStyle = '#0f172a';
+                            ctx.fill();
+                            ctx.restore();
+                            
+                            ctx.fillStyle = '#ffffff';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(textLine1, center.x, center.y - 5);
+                            ctx.fillText(textLine2, center.x, center.y + 5);
+                        });
+                    });
+                    ctx.restore();
+                }
+            };
+
+            // Render Categoría Chart
+            const ctxCat = document.getElementById('canvasCategoria');
+            if (ctxCat) {
+                const dataCat = @json($productosPorCategoria);
+                const labelsCat = dataCat.map(function(item) { return item.nombre; });
+                const countsCat = dataCat.map(function(item) { return item.total; });
+
+                new Chart(ctxCat, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labelsCat,
+                        datasets: [{
+                            data: countsCat,
+                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#3b82f6', '#14b8a6', '#f43f5e', '#64748b'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#475569', font: { size: 11, family: 'Outfit, sans-serif', weight: '500' } } }
+                        },
+                        cutout: '65%'
+                    },
+                    plugins: [permanentLabelsPlugin]
+                });
+            }
+
+            // Render Marca Chart
+            const ctxMarca = document.getElementById('canvasMarca');
+            if (ctxMarca) {
+                const dataMarca = @json($productosPorMarca);
+                const labelsMarca = dataMarca.map(function(item) { return item.nombre; });
+                const countsMarca = dataMarca.map(function(item) { return item.total; });
+
+                new Chart(ctxMarca, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labelsMarca,
+                        datasets: [{
+                            data: countsMarca,
+                            backgroundColor: ['#3b82f6', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#14b8a6', '#6366f1', '#f43f5e', '#64748b'],
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: '#475569', font: { size: 11, family: 'Outfit, sans-serif', weight: '500' } } }
+                        },
+                        cutout: '65%'
+                    },
+                    plugins: [permanentLabelsPlugin]
+                });
+            }
+        });
+    </script>

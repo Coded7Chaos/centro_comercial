@@ -22,14 +22,17 @@ class IngresosMensualesChart extends ChartWidget
         $labels = [];
 
         for ($i = 5; $i >= 0; $i--) {
-            $month = Carbon::now()->subMonths($i);
+            // Utilizar startOfMonth para evitar desbordamientos de fecha en el cálculo
+            $month = Carbon::now()->subMonths($i)->startOfMonth();
             $labels[] = $month->translatedFormat('M Y');
             
-            $sum = SuscripcionesPagos::whereMonth('fecha_pago', $month->month)
-                ->whereYear('fecha_pago', $month->year)
-                ->sum('monto_pagado');
+            // Sumar los pagos dentro del rango completo del mes (independientemente del formato/timezone)
+            $sum = SuscripcionesPagos::whereBetween('fecha_pago', [
+                $month->copy()->startOfMonth()->toDateString(),
+                $month->copy()->endOfMonth()->toDateString()
+            ])->sum('monto_pagado');
                 
-            $data[] = $sum;
+            $data[] = (float) $sum;
         }
 
         return [
@@ -37,9 +40,9 @@ class IngresosMensualesChart extends ChartWidget
                 [
                     'label' => 'Ingresos (Bs)',
                     'data' => $data,
-                    'fill' => 'start',
-                    'backgroundColor' => 'rgba(59, 130, 246, 0.2)', // blue-500
+                    'backgroundColor' => 'rgba(59, 130, 246, 0.6)', // blue-500 con más opacidad para barras
                     'borderColor' => '#3b82f6',
+                    'borderWidth' => 1,
                 ],
             ],
             'labels' => $labels,
@@ -48,6 +51,6 @@ class IngresosMensualesChart extends ChartWidget
 
     protected function getType(): string
     {
-        return 'line';
+        return 'bar';
     }
 }

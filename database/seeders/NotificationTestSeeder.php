@@ -120,7 +120,7 @@ class NotificationTestSeeder extends Seeder
                         'nombre' => 'Tempura Mixto de Langostinos',
                         'desc' => 'Vegetales y langostinos gigantes fritos en tempura extra crujiente.',
                         'precio' => 48.00,
-                        'img' => 'https://images.unsplash.com/photo-1615361413125-147e4c76f264?w=600&auto=format&fit=crop&q=80'
+                        'img' => 'https://images.unsplash.com/photo-1553621042-f6e147245754?w=600&auto=format&fit=crop&q=80'
                     ]
                 ];
 

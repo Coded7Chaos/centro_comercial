@@ -25,7 +25,11 @@ class OcupacionPorPisoChart extends ChartWidget
         $disponibles = [];
 
         foreach ($pisos as $piso) {
-            $labels[] = $piso->nombre ?? ('Piso #' . $piso->id);
+            $displayNumero = $piso->numero;
+            if ($displayNumero && is_numeric($displayNumero)) {
+                $displayNumero = 'Piso ' . $displayNumero;
+            }
+            $labels[] = ($displayNumero ? $displayNumero . ' - ' . $piso->nombre : $piso->nombre) ?? ('Piso #' . $piso->id);
 
             $totalPiso = InfraestructurasTiendas::where('infraestructura_piso_id', $piso->id)->count();
             $alquiladas = InfraestructurasTiendas::where('infraestructura_piso_id', $piso->id)

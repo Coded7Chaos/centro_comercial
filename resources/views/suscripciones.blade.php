@@ -70,9 +70,9 @@
 
         {{-- INTERACTIVE CALCULATOR --}}
         <div x-data="{
-            tamanos: @json($tamanos),
-            descuentos: @json($descuentos),
-            tamano: 15,
+            tamanos: {{ json_encode($tamanos) }},
+            descuentos: {{ json_encode($descuentos) }},
+            tamano: parseFloat(new URLSearchParams(window.location.search).get('tamano')) || 15,
             duracionValor: 6,
             duracionUnidad: 'meses',
 
@@ -127,6 +127,15 @@
                     precio_total_sin_descuento: precioTotalSinDescuento,
                     precio_total_con_descuento: precioTotalConDescuento,
                 };
+            },
+
+            get whatsappUrl() {
+                let msg = `Hola, estoy interesado en alquilar un local comercial. Usé el simulador con los siguientes detalles:
+- Tamaño: ${this.tamano} m² (${this.calculo.etiqueta})
+- Duración: ${this.duracionValor} ${this.duracionUnidad}
+- Alquiler Mensual Neto: Bs. ${parseFloat(this.calculo.precio_mensual_con_descuento).toFixed(2)}
+- Precio Estimado Total: Bs. ${parseFloat(this.calculo.precio_total_con_descuento).toFixed(2)}`;
+                return `https://wa.me/59178801636?text=${encodeURIComponent(msg)}`;
             }
         }" class="space-y-12">
             
@@ -176,7 +185,7 @@
 
                     {{-- DYNAMIC INFOTEXT --}}
                     <div class="pt-4 border-t border-slate-900/10 text-xs font-semibold text-slate-500 flex items-center gap-2">
-                        <svg class="w-4.5 h-4.5 text-indigo-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <svg class="w-5 h-5 text-indigo-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         <span>El sistema aplica descuentos automáticos según la duración seleccionada.</span>
                     </div>
                 </div>
@@ -220,10 +229,14 @@
                             <div class="text-3xl font-black text-indigo-400 tracking-tight" x-text="'Bs. ' + parseFloat(calculo.precio_total_con_descuento).toFixed(2)"></div>
                         </div>
 
-                        <a href="/login" 
+                        <a :href="whatsappUrl" 
+                            target="_blank"
+                            rel="noopener noreferrer"
                             class="w-full py-4 rounded-2xl bg-white text-slate-900 hover:bg-indigo-600 hover:text-white transition duration-300 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-white/10">
-                            Iniciar Solicitud
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            Consultar oferta
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 01-.321.988l-1.305.98a10.582 10.582 0 004.872 4.872l.98-1.305a1 1 0 01.988-.321l2.2.548a1 1 0 01.725.94V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                            </svg>
                         </a>
                     </div>
                 </div>
@@ -235,7 +248,7 @@
                 {{-- SIZE TIERS --}}
                 <div class="glass-hud rounded-[2rem] p-6 border border-white/20 bg-white/5 space-y-4">
                     <h4 class="font-black text-slate-950 text-sm flex items-center gap-2">
-                        <svg class="w-4.5 h-4.5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                        <svg class="w-5 h-5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
                         Tramos y Categorías de Tamaño
                     </h4>
                     <div class="overflow-hidden rounded-xl border border-slate-900/10">
@@ -263,7 +276,7 @@
                 {{-- TIME DISCOUNTS --}}
                 <div class="glass-hud rounded-[2rem] p-6 border border-white/20 bg-white/5 space-y-4">
                     <h4 class="font-black text-slate-950 text-sm flex items-center gap-2">
-                        <svg class="w-4.5 h-4.5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <svg class="w-5 h-5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                         Descuentos por Permanencia (Meses)
                     </h4>
                     <div class="overflow-hidden rounded-xl border border-slate-900/10">

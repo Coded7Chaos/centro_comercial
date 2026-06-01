@@ -19,18 +19,17 @@ class ProductosInfolist
 
                 ImageEntry::make('imagen_principal')
                     ->label('Imagen principal')
-                    ->getStateUsing(
-                        fn($record) =>
-                        optional(
-                            $record->imagenes
-                                ->where('tipo', 'principal')
-                                ->first()
-                        )?->url
-                            ? asset('storage/' . $record->imagenes
-                                ->where('tipo', 'principal')
-                                ->first()->url)
-                            : null
-                    )
+                    ->getStateUsing(function ($record) {
+                        $imagen = $record->imagenes
+                            ->where('tipo', 'principal')
+                            ->first();
+                        if (!$imagen) {
+                            return null;
+                        }
+                        return str_starts_with($imagen->url, 'http')
+                            ? $imagen->url
+                            : asset('storage/' . $imagen->url);
+                    })
                     ->height(260)
                     ->width(260),
 
@@ -104,7 +103,9 @@ class ProductosInfolist
                                         ImageEntry::make('url')
 
                                             ->state(
-                                                asset('storage/' . $imagen->url)
+                                                str_starts_with($imagen->url, 'http')
+                                                    ? $imagen->url
+                                                    : asset('storage/' . $imagen->url)
                                             )
 
                                             ->height(180)

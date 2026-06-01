@@ -53,7 +53,7 @@
                             <option value="">Seleccionar marca...</option>
                             @foreach($marcas as $m)
                                 <option value="{{ $m->id }}" {{ old('marca_id') == $m->id ? 'selected' : '' }}>
-                                    {{ $m->nombre }}
+                                    {{ $m->nombre }} ({{ $m->cliente_id === null ? 'Pública' : 'Privada' }})
                                 </option>
                             @endforeach
                         </select>

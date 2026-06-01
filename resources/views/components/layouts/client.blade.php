@@ -110,6 +110,12 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                 Mis Marcas
             </a>
+
+            <a href="{{ route('cliente.estado-cuenta') }}" 
+               class="flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-bold {{ request()->routeIs('cliente.estado-cuenta') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Estado de Cuenta
+            </a>
         </nav>
 
         <!-- FOOTER / USER -->
@@ -194,21 +200,6 @@
 
         <!-- CONTENT CONTAINER -->
         <main class="flex-1 overflow-y-auto p-8">
-            <!-- Messages -->
-            @if(session('success'))
-                <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl flex items-center gap-3 font-semibold text-sm">
-                    <svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            @if(session('error'))
-                <div class="mb-6 p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-2xl flex items-center gap-3 font-semibold text-sm">
-                    <svg class="w-5 h-5 text-rose-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                    {{ session('error') }}
-                </div>
-            @endif
-
             {{ $slot }}
         </main>
     </div>
@@ -224,5 +215,70 @@
             }
         });
     </script>
+
+    <!-- Toast Notifications (Alpine.js) -->
+    <div x-data="{
+            show: false,
+            message: '',
+            type: 'success',
+            init() {
+                @if(session('success'))
+                    this.showToast('{{ session('success') }}', 'success');
+                @endif
+                @if(session('error'))
+                    this.showToast('{{ session('error') }}', 'error');
+                @endif
+            },
+            showToast(message, type) {
+                this.message = message;
+                this.type = type;
+                this.show = true;
+                setTimeout(() => {
+                    this.show = false;
+                }, 5000);
+            }
+         }"
+         x-show="show"
+         x-transition:enter="transition ease-out duration-300 transform"
+         x-transition:enter-start="opacity-0 translate-y-8 translate-x-8 scale-90"
+         x-transition:enter-end="opacity-100 translate-y-0 translate-x-0 scale-100"
+         x-transition:leave="transition ease-in duration-200 transform"
+         x-transition:leave-start="opacity-100 translate-y-0 translate-x-0 scale-100"
+         x-transition:leave-end="opacity-0 translate-y-2 translate-x-2 scale-95"
+         class="fixed bottom-6 right-6 z-[9999] max-w-sm w-full bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl border p-4 flex items-start gap-3 pointer-events-auto"
+         :class="type === 'success' ? 'border-emerald-500/30 shadow-emerald-500/5' : 'border-rose-500/30 shadow-rose-500/5'"
+         x-cloak>
+         
+        <!-- Icon -->
+        <div class="flex-shrink-0">
+            <template x-if="type === 'success'">
+                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center border border-emerald-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4"/>
+                    </svg>
+                </div>
+            </template>
+            <template x-if="type === 'error'">
+                <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center border border-rose-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+            </template>
+        </div>
+        
+        <!-- Text Content -->
+        <div class="flex-1 min-w-0 pt-1">
+            <p class="text-sm font-extrabold text-slate-800 tracking-tight" x-text="type === 'success' ? 'Operación Exitosa' : 'Ha ocurrido un error'"></p>
+            <p class="text-xs font-semibold text-slate-500 mt-1 leading-relaxed" x-text="message"></p>
+        </div>
+        
+        <!-- Close Button -->
+        <button @click="show = false" class="text-slate-400 hover:text-slate-600 hover:bg-slate-100 p-1.5 rounded-xl transition flex-shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
 </body>
 </html>

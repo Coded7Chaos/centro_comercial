@@ -72,6 +72,8 @@ class ClientPortalTest extends TestCase
         // GET /cliente/dashboard
         $response = $this->get('/cliente/dashboard');
         $response->assertStatus(200);
+        $response->assertViewHas('productosPorCategoria');
+        $response->assertViewHas('productosPorMarca');
 
         // GET /cliente/tienda
         $response = $this->get('/cliente/tienda');
