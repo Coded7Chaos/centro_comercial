@@ -76,7 +76,7 @@ class SuscripcionesTable
     */
 
                 TextColumn::make('tipo')
-
+                    ->label('Duración del contrato')
                     ->badge()
 
                     ->color(function ($state) {

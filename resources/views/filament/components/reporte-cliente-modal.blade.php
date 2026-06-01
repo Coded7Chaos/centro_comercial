@@ -13,7 +13,7 @@
     <!-- Resumen Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="rounded-xl border border-gray-200 bg-white p-4 dark:border-white/10 dark:bg-gray-900 shadow-sm relative overflow-hidden">
-            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total Facturado</div>
+            <div class="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Monto Total del Contrato</div>
             <div class="text-xl font-bold text-gray-900 dark:text-white mt-1">Bs. {{ number_format($deuda, 2) }}</div>
         </div>
         
@@ -126,7 +126,7 @@
         class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800 rounded-xl p-5 border border-gray-100 dark:border-white/5"
     >
         <div class="border-b border-gray-200 md:border-b-0 md:border-r md:border-gray-200 dark:border-gray-700 pb-4 md:pb-0 md:pr-4">
-            <h3 class="text-sm font-bold text-gray-600 dark:text-gray-300 mb-2 text-center uppercase tracking-widest">Gráfica de Deuda</h3>
+            <h3 class="text-sm font-bold text-gray-600 dark:text-gray-300 mb-2 text-center uppercase tracking-widest">Gráfica de Pagos</h3>
             <div class="relative h-40 w-full flex justify-center">
                 <canvas x-ref="canvas"></canvas>
             </div>
@@ -136,7 +136,7 @@
             <h3 class="text-sm font-bold text-gray-600 dark:text-gray-300 mb-2 text-center uppercase tracking-widest">Rendimiento</h3>
             <div class="flex flex-col items-center justify-center h-full pb-4">
                 <div class="text-5xl font-black {{ $porcentajePagado >= 100 ? 'text-green-500' : 'text-blue-500' }}">{{ $porcentajePagado }}%</div>
-                <div class="text-xs text-gray-500 mt-1 font-medium">Deuda total cancelada</div>
+                <div class="text-xs text-gray-500 mt-1 font-medium">Monto total cancelado</div>
                 
                 <div class="w-full h-3 bg-gray-200 rounded-full mt-4 dark:bg-gray-700 overflow-hidden relative shadow-inner max-w-[150px]">
                     <div class="h-3 rounded-full {{ $barColor }} transition-all" style="width: {{ $porcentajePagado > 100 ? 100 : $porcentajePagado }}%"></div>
@@ -145,34 +145,96 @@
         </div>
     </div>
 
-    <!-- Lista de últimos cobros generados -->
+    <!-- Lista de cobros generados -->
     <div>
-        <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Historial Reciente de Cobros al Inquilino</h3>
+        <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-3">Historial de Cobros al Inquilino</h3>
         <div class="border border-gray-200 dark:border-white/10 rounded-lg overflow-hidden shadow-sm">
             <table class="w-full text-left text-sm text-gray-600 dark:text-gray-300">
                 <thead class="bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white">
                     <tr>
                         <th class="px-4 py-2 font-semibold">Concepto / Mes</th>
                         <th class="px-4 py-2 font-semibold text-right">Monto (Bs)</th>
+                        <th class="px-4 py-2 font-semibold text-center">Fecha Pago</th>
                         <th class="px-4 py-2 font-semibold text-center">Estado de Cobro</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 dark:divide-white/10">
-                    @forelse($record->cobros->sortByDesc('created_at')->take(5) as $cobro)
-                        <tr class="bg-white dark:bg-gray-900">
-                            <td class="px-4 py-3 font-medium">{{ $cobro->concepto ?? 'Cobro de Alquiler' }}</td>
-                            <td class="px-4 py-3 text-right font-bold">Bs. {{ number_format($cobro->monto, 2) }}</td>
+                    @php
+                        $suscripcionesIds = \App\Models\Suscripciones::where('cliente_id', $record->cliente_id)
+                            ->where('infraestructuras_tienda_id', $record->infraestructuras_tienda_id)
+                            ->pluck('id');
+
+                        $cobros = \App\Models\SuscripcionesCobros::whereIn('suscripcion_id', $suscripcionesIds)
+                            ->with(['pagos', 'suscripcion.infraestructurasTienda'])
+                            ->get()
+                            ->sortBy(function ($c) {
+                                return [$c->suscripcion->fecha_inicio, $c->fecha_vencimiento];
+                            });
+
+                        $prevSubId = null;
+                        $monthCounter = 0;
+                    @endphp
+
+                    @forelse($cobros as $cobro)
+                        @php
+                            if ($cobro->suscripcion_id !== $prevSubId) {
+                                $monthCounter = 1;
+                                $prevSubId = $cobro->suscripcion_id;
+                            } else {
+                                $monthCounter++;
+                            }
+
+                            $tiendaNombre = $cobro->suscripcion->infraestructurasTienda->nombre ?? 'Sin tienda';
+                            $hasGuarantee = (str_contains(strtolower($cobro->concepto), 'garantía') || str_contains(strtolower($cobro->concepto), 'garantia'));
+
+                            if ($monthCounter === 1) {
+                                if ($hasGuarantee) {
+                                    $montoAlquiler = $cobro->monto / 2;
+                                    $conceptoFormatted = "Pago inicial (Bs. " . number_format($montoAlquiler, 2) . ") + Garantía (Bs. " . number_format($montoAlquiler, 2) . ") - " . $tiendaNombre;
+                                } else {
+                                    $conceptoFormatted = "Pago inicial - " . $tiendaNombre;
+                                }
+                            } else {
+                                $conceptoFormatted = "Cobro Mensual #" . $monthCounter . " - " . $tiendaNombre;
+                            }
+
+                            // Payment date
+                            $fechaPagoRaw = $cobro->pagos->max('fecha_pago');
+                            $fechaPagoFormatted = $fechaPagoRaw ? \Carbon\Carbon::parse($fechaPagoRaw)->format('d/m/Y') : '—';
+
+                            // Real state
+                            $estadoReal = $cobro->estado;
+                            if ($estadoReal === 'pendiente' && now()->toDateString() > $cobro->fecha_vencimiento) {
+                                $estadoReal = 'vencido';
+                            }
+
+                            if ($estadoReal === 'pagado') {
+                                $labelText = 'PAGADO';
+                                $badgeClass = 'bg-green-100 text-green-700 dark:bg-green-950/40 dark:text-green-400';
+                            } elseif ($estadoReal === 'parcial') {
+                                $labelText = 'PAGO PARCIAL';
+                                $badgeClass = 'bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400';
+                            } elseif ($estadoReal === 'vencido') {
+                                $labelText = 'ATRASADO';
+                                $badgeClass = 'bg-red-100 text-red-700 dark:bg-red-950/40 dark:text-red-400';
+                            } else {
+                                $labelText = 'COBRO PROGRAMADO';
+                                $badgeClass = 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400';
+                            }
+                        @endphp
+                        <tr class="bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                            <td class="px-4 py-3 font-medium text-xs md:text-sm">{{ $conceptoFormatted }}</td>
+                            <td class="px-4 py-3 text-right font-bold text-xs md:text-sm">Bs. {{ number_format($cobro->monto, 2) }}</td>
+                            <td class="px-4 py-3 text-center text-xs md:text-sm text-gray-500 dark:text-gray-400">{{ $fechaPagoFormatted }}</td>
                             <td class="px-4 py-3 text-center">
-                                @if(strtolower($cobro->estado) === 'pagado')
-                                    <span class="inline-flex items-center justify-center rounded-md bg-green-100 px-2 py-1 text-[11px] font-bold text-green-700 w-20">PAGADO</span>
-                                @else
-                                    <span class="inline-flex items-center justify-center rounded-md bg-red-100 px-2 py-1 text-[11px] font-bold text-red-700 w-20">PENDIENTE</span>
-                                @endif
+                                <span class="inline-flex items-center justify-center rounded-md px-2 py-1 text-[10px] md:text-[11px] font-bold {{ $badgeClass }}">
+                                    {{ $labelText }}
+                                </span>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="3" class="px-4 py-6 text-center text-gray-500 text-xs italic">Este inquilino es nuevo y aún no tiene cobros generados.</td>
+                            <td colspan="4" class="px-4 py-6 text-center text-gray-500 text-xs italic">Este inquilino es nuevo y aún no tiene cobros generados.</td>
                         </tr>
                     @endforelse
                 </tbody>

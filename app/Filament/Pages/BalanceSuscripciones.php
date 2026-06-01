@@ -49,19 +49,41 @@ class BalanceSuscripciones extends Page implements HasTable
                     ->label('Local')
                     ->badge()
                     ->color('info'),
-                TextColumn::make('total_facturado')
-                    ->label('Deuda Histórica')
+                TextColumn::make('monto_acumulado_contratos')
+                    ->label('Monto Acumulado de Contratos')
                     ->getStateUsing(function (Suscripciones $record) {
-                        return $record->cobros->sum('monto');
+                        $query = Suscripciones::where('cliente_id', $record->cliente_id);
+                        if ($record->infraestructuras_tienda_id) {
+                            $query->where('infraestructuras_tienda_id', $record->infraestructuras_tienda_id);
+                        } else {
+                            $query->whereNull('infraestructuras_tienda_id');
+                        }
+                        $suscripciones = $query->with('cobros')->get();
+                        
+                        $total = 0;
+                        foreach ($suscripciones as $sub) {
+                            $total += $sub->cobros->sum('monto');
+                        }
+                        return $total;
                     })
                     ->money('BOB')
                     ->color('danger'),
                 TextColumn::make('total_pagado')
                     ->label('Pagado')
                     ->getStateUsing(function (Suscripciones $record) {
+                        $query = Suscripciones::where('cliente_id', $record->cliente_id);
+                        if ($record->infraestructuras_tienda_id) {
+                            $query->where('infraestructuras_tienda_id', $record->infraestructuras_tienda_id);
+                        } else {
+                            $query->whereNull('infraestructuras_tienda_id');
+                        }
+                        $suscripciones = $query->with('cobros.pagos')->get();
+                        
                         $pagado = 0;
-                        foreach($record->cobros as $cobro) {
-                            $pagado += $cobro->pagos->sum('monto_pagado');
+                        foreach ($suscripciones as $sub) {
+                            foreach ($sub->cobros as $cobro) {
+                                $pagado += $cobro->pagos->sum('monto_pagado');
+                            }
                         }
                         return $pagado;
                     })
@@ -70,10 +92,21 @@ class BalanceSuscripciones extends Page implements HasTable
                 TextColumn::make('saldo_pendiente')
                     ->label('Saldo Restante')
                     ->getStateUsing(function (Suscripciones $record) {
-                        $deuda = $record->cobros->sum('monto');
+                        $query = Suscripciones::where('cliente_id', $record->cliente_id);
+                        if ($record->infraestructuras_tienda_id) {
+                            $query->where('infraestructuras_tienda_id', $record->infraestructuras_tienda_id);
+                        } else {
+                            $query->whereNull('infraestructuras_tienda_id');
+                        }
+                        $suscripciones = $query->with('cobros.pagos')->get();
+
+                        $deuda = 0;
                         $pagado = 0;
-                        foreach($record->cobros as $cobro) {
-                            $pagado += $cobro->pagos->sum('monto_pagado');
+                        foreach ($suscripciones as $sub) {
+                            foreach ($sub->cobros as $cobro) {
+                                $deuda += $cobro->monto;
+                                $pagado += $cobro->pagos->sum('monto_pagado');
+                            }
                         }
                         return $deuda - $pagado;
                     })
@@ -91,10 +124,19 @@ class BalanceSuscripciones extends Page implements HasTable
                             : ('Cliente #' . $record->cliente_id)))
                     ->modalContent(fn (Suscripciones $record) => view('filament.components.reporte-cliente-modal', [
                         'record' => $record,
-                        'deuda' => $record->cobros->sum('monto'),
-                        'pagado' => $record->cobros->reduce(function ($carry, $cobro) {
-                            return $carry + $cobro->pagos->sum('monto_pagado');
-                        }, 0)
+                        'deuda' => Suscripciones::where('cliente_id', $record->cliente_id)
+                            ->where('infraestructuras_tienda_id', $record->infraestructuras_tienda_id)
+                            ->with('cobros')
+                            ->get()
+                            ->flatMap->cobros
+                            ->sum('monto'),
+                        'pagado' => \App\Models\SuscripcionesPagos::whereIn('suscripcion_cobro_id', function ($query) use ($record) {
+                            $query->select('id')
+                                ->from('suscripciones_cobros')
+                                ->whereIn('suscripcion_id', Suscripciones::where('cliente_id', $record->cliente_id)
+                                    ->where('infraestructuras_tienda_id', $record->infraestructuras_tienda_id)
+                                    ->pluck('id'));
+                        })->sum('monto_pagado')
                     ]))
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Cerrar Ventana')

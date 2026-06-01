@@ -120,17 +120,25 @@ class SuscripcionesForm
                 */
 
                 Select::make('tipo')
-                    ->label('Tipo de suscripción')
+                    ->label('Duración del contrato')
                     ->options([
-                        'anual' => 'Anual',
-                        'semestral' => 'Semestral',
-                        'trimestral' => 'Trimestral',
-                        'bimestral' => 'Bimestral',
-                        'mensual' => 'Mensual',
-                        'semanal' => 'Semanas',
+                        '1 mes' => '1 mes',
+                        '2 meses' => '2 meses',
+                        '3 meses' => '3 meses',
+                        '4 meses' => '4 meses',
+                        '5 meses' => '5 meses',
+                        '6 meses' => '6 meses',
+                        '7 meses' => '7 meses',
+                        '8 meses' => '8 meses',
+                        '9 meses' => '9 meses',
+                        '10 meses' => '10 meses',
+                        '11 meses' => '11 meses',
+                        '12 meses' => '12 meses',
+                        '1 año' => '1 año',
+                        '2 años' => '2 años',
                         'personalizado' => 'Personalizado',
                     ])
-                    ->default('mensual')
+                    ->default('1 mes')
                     ->live()
                     ->afterStateUpdated(
                         function (
@@ -147,44 +155,30 @@ class SuscripcionesForm
                                 $get('fecha_inicio')
                             );
 
-                            switch ($state) {
-                                case 'semanal':
-                                    $fin = $inicio->copy()->addWeek();
-                                    break;
-                                case 'mensual':
-                                    $fin = $inicio->copy()->addMonth();
-                                    break;
-                                case 'bimestral':
-                                    $fin = $inicio->copy()->addMonths(2);
-                                    break;
-                                case 'trimestral':
-                                    $fin = $inicio->copy()->addMonths(3);
-                                    break;
-                                case 'semestral':
-                                    $fin = $inicio->copy()->addMonths(6);
-                                    break;
-                                case 'anual':
-                                    $fin = $inicio->copy()->addYear();
-                                    break;
-                                default:
-                                    $fin = null;
+                            if (!$state || $state === 'personalizado') {
+                                $fin = null;
+                            } else {
+                                preg_match('/\d+/', strtolower($state), $matches);
+                                $val = isset($matches[0]) ? (int) $matches[0] : 1;
+                                $months = str_contains(strtolower($state), 'año') ? $val * 12 : $val;
+                                $fin = $inicio->copy()->addMonths($months)->subDay();
                             }
 
                             $set('fecha_fin', $fin?->format('Y-m-d'));
 
                             /*
                             |--------------------------------------------------------------------------
-                            | PRECIO AUTOMÁTICO (busca por rango de m²)
+                            | PRECIO AUTOMÁTICO
                             |--------------------------------------------------------------------------
                             */
-                            if ($state !== 'personalizado') {
-                                $tarifa = SuscripcionesTarifas::precioPara(
-                                    (float) $get('tamano'),
-                                    $state
-                                );
-
-                                if ($tarifa) {
-                                    $set('precio', $tarifa->precio);
+                            if ($state && $state !== 'personalizado') {
+                                preg_match('/\d+/', strtolower($state), $matches);
+                                $val = isset($matches[0]) ? (int) $matches[0] : 1;
+                                $months = str_contains(strtolower($state), 'año') ? $val * 12 : $val;
+                                $tamano = (float) $get('tamano');
+                                if ($tamano > 0) {
+                                    $calc = SuscripcionesTarifas::calcularAlquiler($tamano, $months);
+                                    $set('precio', $calc['precio_total_con_descuento']);
                                 }
                             }
                         }
@@ -219,33 +213,15 @@ class SuscripcionesForm
                             Set $set,
                             $state
                         ) {
-                            if ($get('tipo') === 'personalizado' || !$state) {
-                                return;
-                            }
-
-                            $inicio = Carbon::parse($state);
-
-                            switch ($get('tipo')) {
-                                case 'semanal':
-                                    $fin = $inicio->copy()->addWeek();
-                                    break;
-                                case 'mensual':
-                                    $fin = $inicio->copy()->addMonth();
-                                    break;
-                                case 'bimestral':
-                                    $fin = $inicio->copy()->addMonths(2);
-                                    break;
-                                case 'trimestral':
-                                    $fin = $inicio->copy()->addMonths(3);
-                                    break;
-                                case 'semestral':
-                                    $fin = $inicio->copy()->addMonths(6);
-                                    break;
-                                case 'anual':
-                                    $fin = $inicio->copy()->addYear();
-                                    break;
-                                default:
-                                    $fin = null;
+                            $tipoState = $get('tipo');
+                            if (!$tipoState || $tipoState === 'personalizado' || !$state) {
+                                $fin = null;
+                            } else {
+                                $inicio = Carbon::parse($state);
+                                preg_match('/\d+/', strtolower($tipoState), $matches);
+                                $val = isset($matches[0]) ? (int) $matches[0] : 1;
+                                $months = str_contains(strtolower($tipoState), 'año') ? $val * 12 : $val;
+                                $fin = $inicio->copy()->addMonths($months)->subDay();
                             }
 
                             $set('fecha_fin', $fin?->format('Y-m-d'));

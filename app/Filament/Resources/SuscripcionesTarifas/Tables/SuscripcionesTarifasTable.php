@@ -29,7 +29,7 @@ class SuscripcionesTarifasTable
                     ->numeric(2)
                     ->sortable(),
                 TextColumn::make('tipo')
-                    ->label('Tipo')
+                    ->label('Duración del contrato')
                     ->badge()
                     ->formatStateUsing(fn ($state) => ucfirst($state))
                     ->sortable(),

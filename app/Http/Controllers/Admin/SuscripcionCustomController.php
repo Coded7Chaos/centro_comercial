@@ -275,9 +275,9 @@ class SuscripcionCustomController extends Controller
             $table->addCell(2500, $thStyle)->addText("Fecha de Finalización", $thFont);
             $table->addCell(2500)->addText(\Carbon\Carbon::parse($suscripcion->fecha_fin)->format('d/m/Y'), $tdFont);
 
-            // Row 5: Tipo de Suscripción (colspan)
+            // Row 5: Duración del contrato (colspan)
             $table->addRow();
-            $table->addCell(2500, $thStyle)->addText("Tipo de Suscripción", $thFont);
+            $table->addCell(2500, $thStyle)->addText("Duración del contrato", $thFont);
             $table->addCell(7500, array('gridSpan' => 3))->addText(ucfirst($suscripcion->tipo), $tdFont);
 
             $section->addTextBreak(1);
@@ -302,7 +302,7 @@ class SuscripcionCustomController extends Controller
             // TERCERA
             $textRun3 = $section->addTextRun($paraStyle);
             $textRun3->addText("TERCERA: CANON Y FORMA DE PAGO. ", $underlineBoldFont);
-            $textRun3->addText("El canon de arrendamiento acordado es el monto detallado en la tabla superior, el cual deberá ser pagado periódicamente según el tipo de suscripción (", $fontStyle);
+            $textRun3->addText("El canon de arrendamiento acordado es el monto detallado en la tabla superior, el cual deberá ser pagado periódicamente según la duración del contrato (", $fontStyle);
             $textRun3->addText($suscripcion->tipo, $boldFont);
             $textRun3->addText(") dentro de los primeros cinco (5) días hábiles de cada periodo de facturación. Los pagos se realizarán mediante los canales de transferencia, depósito o cajas habilitadas por el ARRENDADOR.", $fontStyle);
 
@@ -394,10 +394,11 @@ class SuscripcionCustomController extends Controller
             ->first();
 
         if (!$cobro) {
-            // Re-create cobro if not exists (fail-safe)
+            $tienda = $suscripcion->infraestructurasTienda;
+            $tiendaNombre = $tienda?->nombre ?: ($tienda ? 'Tienda #' . $tienda->numero : 'Sin nombre');
             $cobro = SuscripcionesCobros::create([
                 'suscripcion_id' => $suscripcion->id,
-                'concepto' => 'Cobro ' . ucfirst($suscripcion->tipo) . ' - ' . ($suscripcion->infraestructurasTienda?->nombre ?? 'Sin nombre'),
+                'concepto' => 'Cobro Mensual #1 - ' . $tiendaNombre,
                 'monto' => $suscripcion->precio,
                 'fecha_inicio' => $suscripcion->fecha_inicio,
                 'fecha_vencimiento' => $suscripcion->fecha_fin,

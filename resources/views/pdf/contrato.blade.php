@@ -141,7 +141,7 @@
             <td>{{ \Carbon\Carbon::parse($suscripcion->fecha_fin)->format('d/m/Y') }}</td>
         </tr>
         <tr>
-            <th>Tipo de Suscripción</th>
+            <th>Duración del contrato</th>
             <td colspan="3">{{ ucfirst($suscripcion->tipo) }}</td>
         </tr>
     </table>
@@ -163,7 +163,7 @@
 
         <div class="clause">
             <div class="clause-title">TERCERA: CANON Y FORMA DE PAGO.</div>
-            El canon de arrendamiento acordado es el monto detallado en la tabla superior, el cual deberá ser pagado periódicamente según el tipo de suscripción (<span class="bold">{{ $suscripcion->tipo }}</span>) dentro de los primeros cinco (5) días hábiles de cada periodo de facturación. Los pagos se realizarán mediante los canales de transferencia, depósito o cajas habilitadas por el ARRENDADOR.
+            El canon de arrendamiento acordado es el monto detallado en la tabla superior, el cual deberá ser pagado periódicamente según la duración del contrato (<span class="bold">{{ $suscripcion->tipo }}</span>) dentro de los primeros cinco (5) días hábiles de cada periodo de facturación. Los pagos se realizarán mediante los canales de transferencia, depósito o cajas habilitadas por el ARRENDADOR.
         </div>
 
         @if($esMayorAMensual)

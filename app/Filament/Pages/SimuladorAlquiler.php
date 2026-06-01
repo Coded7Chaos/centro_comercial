@@ -7,6 +7,7 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use App\Models\SuscripcionesTarifas;
@@ -31,7 +32,10 @@ class SimuladorAlquiler extends Page implements HasForms
 
     public function mount(): void
     {
-        $this->form->fill();
+        $this->form->fill([
+            'duracion_valor' => 1,
+            'duracion_unidad' => 'meses',
+        ]);
     }
 
     public function form(Schema $form): Schema
@@ -39,20 +43,49 @@ class SimuladorAlquiler extends Page implements HasForms
         return $form
             ->schema([
                 Section::make('Calculadora de Alquileres')
-                    ->description('Ingrese los metros cuadrados y el tipo de suscripción para obtener una cotización automática según las tarifas vigentes.')
+                    ->description('Ingrese los metros cuadrados y la duración del contrato para obtener una cotización automática con descuento por tiempo según las tarifas vigentes.')
                     ->schema([
                         TextInput::make('tamano')
                             ->label('Tamaño del Local (m²)')
                             ->numeric()
                             ->minValue(0)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn (Set $set) => $this->calcularCotizacion($set)),
+                            ->afterStateUpdated(fn () => $this->calcularCotizacion()),
 
-                        Select::make('tipo')
-                            ->label('Tipo de Suscripción')
-                            ->options(SuscripcionesTarifas::tipos())
-                            ->live()
-                            ->afterStateUpdated(fn (Set $set) => $this->calcularCotizacion($set)),
+                        Grid::make(2)
+                            ->schema([
+                                TextInput::make('duracion_valor')
+                                    ->label('Duración del contrato')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn () => $this->calcularCotizacion()),
+
+                                Select::make('duracion_unidad')
+                                    ->label('Unidad')
+                                    ->options([
+                                        'meses' => 'Meses',
+                                        'años' => 'Años',
+                                    ])
+                                    ->default('meses')
+                                    ->live()
+                                    ->afterStateUpdated(fn () => $this->calcularCotizacion()),
+                            ]),
+
+                        TextInput::make('precio_mensual_base')
+                            ->label('Alquiler Mensual Base')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->prefix('Bs.')
+                            ->placeholder('—'),
+
+                        TextInput::make('descuento_porcentaje')
+                            ->label('Descuento por Tiempo')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->suffix('%')
+                            ->placeholder('—'),
 
                         TextInput::make('etiqueta')
                             ->label('Categoría detectada')
@@ -60,32 +93,45 @@ class SimuladorAlquiler extends Page implements HasForms
                             ->dehydrated(false)
                             ->placeholder('—'),
 
-                        TextInput::make('cotizacion')
-                            ->label('Precio Estimado')
+                        TextInput::make('pago_mensual_estimado')
+                            ->label('Pago Mensual Estimado')
                             ->disabled()
                             ->dehydrated(false)
-                            ->prefix('Bs.'),
+                            ->prefix('Bs.')
+                            ->placeholder('—'),
+
+                        TextInput::make('cotizacion')
+                            ->label('Precio Estimado Total')
+                            ->disabled()
+                            ->dehydrated(false)
+                            ->prefix('Bs.')
+                            ->columnSpanFull(),
                     ])->columns(2)
             ])
             ->statePath('data');
     }
 
-    public function calcularCotizacion(Set $set): void
+    public function calcularCotizacion(): void
     {
         $tamano = $this->data['tamano'] ?? null;
-        $tipo   = $this->data['tipo'] ?? null;
+        $duracionValor = $this->data['duracion_valor'] ?? null;
+        $duracionUnidad = $this->data['duracion_unidad'] ?? 'meses';
 
-        $tarifa = SuscripcionesTarifas::precioPara(
-            $tamano !== null && $tamano !== '' ? (float) $tamano : null,
-            $tipo
-        );
+        if ($tamano !== null && $tamano !== '' && $duracionValor !== null && $duracionValor !== '') {
+            $meses = $duracionUnidad === 'años' ? (int) $duracionValor * 12 : (int) $duracionValor;
+            $calc = SuscripcionesTarifas::calcularAlquiler((float) $tamano, $meses);
 
-        if ($tarifa) {
-            $set('cotizacion', number_format($tarifa->precio, 2, '.', ''));
-            $set('etiqueta', $tarifa->etiqueta ?? '—');
+            $this->data['etiqueta'] = $calc['etiqueta'];
+            $this->data['precio_mensual_base'] = number_format($calc['precio_mensual_base'], 2, '.', '');
+            $this->data['descuento_porcentaje'] = number_format($calc['descuento_porcentaje'], 2, '.', '');
+            $this->data['pago_mensual_estimado'] = number_format($calc['precio_mensual_con_descuento'], 2, '.', '');
+            $this->data['cotizacion'] = number_format($calc['precio_total_con_descuento'], 2, '.', '');
         } else {
-            $set('cotizacion', null);
-            $set('etiqueta', 'Sin tarifa para esos parámetros');
+            $this->data['etiqueta'] = 'Ingrese tamaño y duración';
+            $this->data['precio_mensual_base'] = null;
+            $this->data['descuento_porcentaje'] = null;
+            $this->data['pago_mensual_estimado'] = null;
+            $this->data['cotizacion'] = null;
         }
     }
     

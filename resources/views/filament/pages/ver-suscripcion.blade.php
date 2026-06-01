@@ -156,5 +156,73 @@
             </div>
 
         </div>
+
+        {{-- LISTADO DE COBROS --}}
+        <div class="bg-white rounded-3xl border border-slate-200 p-6 md:p-10 shadow-sm space-y-6">
+            <h3 class="text-lg font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>
+                Historial Completo de Cobros y Pagos
+            </h3>
+
+            @php
+                $cobros = $record->cobros()->with('pagos')->orderBy('fecha_vencimiento', 'asc')->get();
+            @endphp
+
+            @if($cobros->isEmpty())
+                <p class="text-sm text-slate-500 font-medium bg-slate-50 p-4 rounded-xl border border-slate-100">No hay cobros generados para este contrato.</p>
+            @else
+                <div class="overflow-x-auto rounded-2xl border border-slate-150">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-55 border-b border-slate-150 text-[10px] font-black text-slate-400 uppercase tracking-wider">
+                                <th class="p-4">Concepto</th>
+                                <th class="p-4 text-center">Vencimiento</th>
+                                <th class="p-4 text-right">Monto a Pagar</th>
+                                <th class="p-4 text-right">Pagado</th>
+                                <th class="p-4 text-right">Saldo</th>
+                                <th class="p-4 text-center">Estado</th>
+                                <th class="p-4 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 text-sm">
+                            @foreach($cobros as $cobro)
+                                @php
+                                    $pagado = $cobro->pagos->sum('monto_pagado');
+                                    $saldo = max(0, $cobro->monto - $pagado);
+                                    
+                                    $badgeColor = match($cobro->estado) {
+                                        'pagado' => 'bg-emerald-50 text-emerald-700 border-emerald-100',
+                                        'pendiente' => 'bg-amber-50 text-amber-700 border-amber-100',
+                                        'parcial' => 'bg-sky-50 text-sky-700 border-sky-100',
+                                        'vencido' => 'bg-rose-50 text-rose-700 border-rose-100',
+                                        default => 'bg-slate-50 text-slate-700 border-slate-100',
+                                    };
+                                @endphp
+                                <tr class="hover:bg-slate-50/50 transition">
+                                    <td class="p-4 font-semibold text-slate-700">{{ $cobro->concepto }}</td>
+                                    <td class="p-4 text-center text-slate-500 font-medium">{{ \Carbon\Carbon::parse($cobro->fecha_vencimiento)->format('d/m/Y') }}</td>
+                                    <td class="p-4 text-right font-bold text-slate-900">Bs. {{ number_format($cobro->monto, 2, ',', '.') }}</td>
+                                    <td class="p-4 text-right font-semibold text-emerald-600">Bs. {{ number_format($pagado, 2, ',', '.') }}</td>
+                                    <td class="p-4 text-right font-bold text-rose-600">Bs. {{ number_format($saldo, 2, ',', '.') }}</td>
+                                    <td class="p-4 text-center">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold border {{ $badgeColor }} uppercase tracking-wide">
+                                            {{ $cobro->estado }}
+                                        </span>
+                                    </td>
+                                    <td class="p-4 text-center">
+                                        <a href="{{ route('cobros.pdf', $cobro->id) }}" target="_blank" 
+                                            class="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition uppercase tracking-wider">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            PDF
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+
     </div>
 </div>

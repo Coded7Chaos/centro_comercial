@@ -305,7 +305,7 @@
 
                 <div class="info">
                     <span class="label">Email:</span>
-                    {{ $cliente?->email ?? '---' }}
+                    {{ $cliente?->user?->email ?? $cliente?->correo_secundario ?? '---' }}
                 </div>
 
                 <div class="info">
@@ -430,7 +430,7 @@
 
                 <div class="info">
                     <span class="label">Referencia:</span>
-                    {{ $pago->referencia ?? '---' }}
+                    {{ $pago->numero_transaccion ?? $pago->referencia ?? '---' }}
                 </div>
 
                 <div class="info">
@@ -440,7 +440,7 @@
 
                 <div class="info">
                     <span class="label">Titular:</span>
-                    {{ $pago->nombre_titular ?? '---' }}
+                    {{ $pago->titular_transferencia ?? $pago->nombre_titular ?? '---' }}
                 </div>
 
             @endif
@@ -449,12 +449,12 @@
 
                 <div class="info">
                     <span class="label">Folio QR:</span>
-                    {{ $pago->folio_qr ?? '---' }}
+                    {{ $pago->codigo_qr ?? $pago->folio_qr ?? '---' }}
                 </div>
 
                 <div class="info">
                     <span class="label">Aplicación:</span>
-                    {{ $pago->billetera_origen ?? '---' }}
+                    {{ $pago->billetera_qr ?? $pago->billetera_origen ?? '---' }}
                 </div>
 
             @endif
@@ -468,7 +468,7 @@
 
                 <div class="info">
                     <span class="label">Últimos 4:</span>
-                    **** {{ $pago->ultimos_4 ?? '----' }}
+                    **** {{ $pago->ultimos_4_tarjeta ?? $pago->ultimos_4 ?? '----' }}
                 </div>
 
                 <div class="info">
@@ -533,13 +533,13 @@
 
                     <td>
 
-                        @if($historial->estado_pago === 'pagado')
+                        @if(($historial->estado_snapshot ?? $historial->estado_pago) === 'pagado')
 
                             <span class="badge badge-success">
                                 Pagado
                             </span>
 
-                        @elseif($historial->estado_pago === 'parcial')
+                        @elseif(($historial->estado_snapshot ?? $historial->estado_pago) === 'parcial')
 
                             <span class="badge badge-warning">
                                 Parcial

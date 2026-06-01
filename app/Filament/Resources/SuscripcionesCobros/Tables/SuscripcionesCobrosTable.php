@@ -49,74 +49,97 @@ class SuscripcionesCobrosTable
                 |--------------------------------------------------------------------------
                 */
 
-                TextColumn::make('monto')
+                 TextColumn::make('monto')
 
-                    ->label('Monto a pagar')
+                     ->label('Monto a pagar')
 
-                    ->money('BOB')
+                     ->money('BOB')
 
-                    ->sortable()
+                     ->sortable()
 
-                    ->visible(fn ($livewire) => in_array($livewire->activeTab ?? 'mensuales', ['mensuales', 'parciales'])),
+                     ->visible(fn ($livewire) => in_array($livewire->activeTab ?? 'mensuales', ['mensuales', 'parciales', 'todos'])),
 
-                /*
-                |--------------------------------------------------------------------------
-                | FECHA DE VENCIMIENTO (FECHA PAGO TEÓRICA)
-                |--------------------------------------------------------------------------
-                */
+                 /*
+                 |--------------------------------------------------------------------------
+                 | FECHA DE VENCIMIENTO (FECHA PAGO TEÓRICA)
+                 |--------------------------------------------------------------------------
+                 */
 
-                TextColumn::make('fecha_vencimiento')
+                 TextColumn::make('fecha_vencimiento')
 
-                    ->label('Fecha pago')
+                     ->label('Fecha pago')
 
-                    ->date('d/m/Y')
+                     ->date('d/m/Y')
 
-                    ->sortable()
+                     ->sortable()
 
-                    ->visible(fn ($livewire) => in_array($livewire->activeTab ?? 'mensuales', ['mensuales', 'parciales'])),
+                     ->visible(fn ($livewire) => in_array($livewire->activeTab ?? 'mensuales', ['mensuales', 'parciales', 'todos'])),
 
-                /*
-                |--------------------------------------------------------------------------
-                | MONTO DE DEUDA (MOROSOS)
-                |--------------------------------------------------------------------------
-                */
+                 /*
+                 |--------------------------------------------------------------------------
+                 | MONTO DE DEUDA (MOROSOS)
+                 |--------------------------------------------------------------------------
+                 */
 
-                TextColumn::make('monto_deuda')
+                 TextColumn::make('monto_deuda')
 
-                    ->label('Monto de deuda')
+                     ->label('Monto de deuda')
 
-                    ->money('BOB')
+                     ->money('BOB')
 
-                    ->state(function ($record) {
-                        $pagado = $record->pagos()->sum('monto_pagado');
-                        return max(0, $record->monto - $pagado);
-                    })
+                     ->state(function ($record) {
+                         $pagado = $record->pagos()->sum('monto_pagado');
+                         return max(0, $record->monto - $pagado);
+                     })
 
-                    ->visible(fn ($livewire) => ($livewire->activeTab ?? null) === 'morosos'),
+                     ->visible(fn ($livewire) => ($livewire->activeTab ?? null) === 'morosos'),
 
-                /*
-                |--------------------------------------------------------------------------
-                | DÍAS SIN PAGAR (MOROSOS)
-                |--------------------------------------------------------------------------
-                */
+                 /*
+                 |--------------------------------------------------------------------------
+                 | DÍAS SIN PAGAR (MOROSOS)
+                 |--------------------------------------------------------------------------
+                 */
 
-                TextColumn::make('dias_sin_pagar')
+                 TextColumn::make('dias_sin_pagar')
 
-                    ->label('Días sin pagar')
+                     ->label('Días sin pagar')
 
-                    ->state(function ($record) {
-                        if (!$record->fecha_vencimiento) return '---';
-                        $venc = \Carbon\Carbon::parse($record->fecha_vencimiento)->startOfDay();
-                        $hoy = now()->startOfDay();
-                        return max(0, $venc->diffInDays($hoy, false));
-                    })
+                     ->state(function ($record) {
+                         if (!$record->fecha_vencimiento) return '---';
+                         $venc = \Carbon\Carbon::parse($record->fecha_vencimiento)->startOfDay();
+                         $hoy = now()->startOfDay();
+                         return max(0, $venc->diffInDays($hoy, false));
+                     })
 
-                    ->badge()
+                     ->badge()
 
-                    ->color('danger')
+                     ->color('danger')
 
-                    ->visible(fn ($livewire) => ($livewire->activeTab ?? null) === 'morosos'),
-            ])
+                     ->visible(fn ($livewire) => ($livewire->activeTab ?? null) === 'morosos'),
+
+                 /*
+                 |--------------------------------------------------------------------------
+                 | ESTADO (badge color-coded)
+                 |--------------------------------------------------------------------------
+                 */
+
+                 TextColumn::make('estado')
+
+                     ->label('Estado')
+
+                     ->badge()
+
+                     ->color(fn (string $state): string => match ($state) {
+                         'pagado' => 'success',
+                         'pendiente' => 'warning',
+                         'parcial' => 'info',
+                         'vencido' => 'danger',
+                         'anulado' => 'gray',
+                         default => 'gray',
+                     })
+
+                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
+             ])
 
             ->filters([
                 Filter::make('fecha_filtro')

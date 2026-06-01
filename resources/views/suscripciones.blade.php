@@ -56,84 +56,243 @@
         </div>
 
         {{-- HERO HEADER --}}
-        <div class="flex flex-col items-center text-center space-y-4 mb-16">
+        <div class="flex flex-col items-center text-center space-y-4 mb-12">
             <span class="px-4 py-1.5 rounded-full bg-slate-900/10 border border-slate-900/10 text-slate-800 text-[10px] font-black tracking-widest uppercase">
-                Planes Comerciales
+                Simulador Tarifario
             </span>
             <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 leading-none">
-                Nuestras Suscripciones y <span class="text-indigo-700">Tarifas de Alquiler</span>
+                Calculadora de <span class="text-indigo-700">Alquileres</span>
             </h1>
             <p class="max-w-2xl text-slate-600 font-medium text-sm md:text-base">
-                Ofrecemos opciones de arrendamiento comercial escalables basadas en la dimensión física y requerimientos de tu marca. Encuentra el plan idóneo para ti.
+                Simula en tiempo real el canon de arrendamiento comercial ingresando las dimensiones de tu local y la duración del contrato comercial.
             </p>
         </div>
 
-        {{-- TARIFFS COMPARISON GRID --}}
-        @if(isset($tarifas) && $tarifas->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @foreach($tarifas as $tarifa)
-                    <div class="tariff-card glass-hud rounded-[2.5rem] border border-white/30 bg-white/10 p-8 flex flex-col justify-between h-full relative overflow-hidden">
-                        
-                        {{-- DECORATIVE SHINE OVERLAY --}}
-                        <div class="absolute inset-0 bg-[linear-gradient(110deg,transparent_40%,rgba(255,255,255,0.15)_50%,transparent_60%)] opacity-80 pointer-events-none"></div>
-                        
-                        <div>
-                            {{-- PLAN BADGE --}}
-                            <div class="flex items-center justify-between mb-6">
-                                <span class="px-3 py-1 rounded-full bg-indigo-600 text-white text-[9px] font-black uppercase tracking-wider">
-                                    Plan {{ ucfirst($tarifa->tipo) }}
-                                </span>
-                                <x-heroicon-o-credit-card class="w-5 h-5 text-indigo-700" />
+        {{-- INTERACTIVE CALCULATOR --}}
+        <div x-data="{
+            tamanos: @json($tamanos),
+            descuentos: @json($descuentos),
+            tamano: 15,
+            duracionValor: 6,
+            duracionUnidad: 'meses',
+
+            get meses() {
+                return this.duracionUnidad === 'años' ? parseInt(this.duracionValor || 0) * 12 : parseInt(this.duracionValor || 0);
+            },
+
+            get calculo() {
+                let t = parseFloat(this.tamano || 0);
+                let m = this.meses;
+                
+                if (t <= 0 || m <= 0) {
+                    return {
+                        etiqueta: '—',
+                        precio_mensual_base: 0.00,
+                        descuento_porcentaje: 0.00,
+                        descuento_monto_mensual: 0.00,
+                        precio_mensual_con_descuento: 0.00,
+                        precio_total_sin_descuento: 0.00,
+                        precio_total_con_descuento: 0.00,
+                    };
+                }
+                
+                // 1. Encontrar etiqueta de tamaño
+                let etiqueta = this.tamanos.find(x => t >= x.desde && t <= x.hasta);
+                let etiquetaNombre = etiqueta ? etiqueta.nombre : 'Sin Categoría';
+                
+                // 2. Encontrar precio base mensual
+                let precioMensualBase = etiqueta ? etiqueta.precio_mensual : 0.00;
+                
+                // 3. Encontrar descuento según meses
+                let desc = 0.00;
+                let applicableDesc = [...this.descuentos]
+                    .reverse()
+                    .find(x => m >= x.min_meses);
+                if (applicableDesc) {
+                    desc = applicableDesc.descuento;
+                }
+                
+                // 4. Realizar cálculos
+                let descuentoMontoMensual = (precioMensualBase * desc) / 100;
+                let precioMensualConDescuento = precioMensualBase - descuentoMontoMensual;
+                let precioTotalSinDescuento = precioMensualBase * m;
+                let precioTotalConDescuento = precioMensualConDescuento * m;
+                
+                return {
+                    etiqueta: etiquetaNombre,
+                    precio_mensual_base: precioMensualBase,
+                    descuento_porcentaje: desc,
+                    descuento_monto_mensual: descuentoMontoMensual,
+                    precio_mensual_con_descuento: precioMensualConDescuento,
+                    precio_total_sin_descuento: precioTotalSinDescuento,
+                    precio_total_con_descuento: precioTotalConDescuento,
+                };
+            }
+        }" class="space-y-12">
+            
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-5xl mx-auto items-stretch">
+                {{-- INPUT PANEL --}}
+                <div class="lg:col-span-7 glass-hud rounded-[2.5rem] border border-white/30 bg-white/10 p-8 flex flex-col justify-between space-y-6 shadow-xl">
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-3 pb-4 border-b border-slate-900/10">
+                            <div class="h-10 w-10 rounded-xl bg-slate-900/5 flex items-center justify-center text-slate-800">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
                             </div>
-
-                            {{-- PLAN NAME --}}
-                            <h3 class="text-2xl font-black text-slate-900 tracking-tight leading-tight mb-2">
-                                {{ $tarifa->etiqueta ?: ('Tarifa ' . ucfirst($tarifa->tipo)) }}
-                            </h3>
-
-                            {{-- M2 SIZE RANGE --}}
-                            <div class="flex items-center gap-1.5 text-xs font-bold text-slate-600 mb-6 bg-slate-900/5 dark:bg-white/5 rounded-lg px-3 py-1.5 w-fit">
-                                <svg class="w-4 h-4 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4h6v6H4V4zm10 0h6v6h-6V4zM4 14h6v6H4v-6zm10 0h6v6h-6v-6z"/></svg>
-                                <span>Rango: {{ number_format($tarifa->tamano_min, 1) }}m² a {{ number_format($tarifa->tamano_max, 1) }}m²</span>
+                            <div>
+                                <h3 class="font-black text-slate-950 text-base leading-tight">Parámetros del Espacio</h3>
+                                <p class="text-xs text-slate-500 font-semibold">Configura las dimensiones y periodo temporal.</p>
                             </div>
                         </div>
 
-                        <div>
-                            {{-- PRICE AREA --}}
-                            <div class="border-t border-slate-900/10 pt-6 mb-6">
-                                <span class="text-4xl font-black text-slate-900 tracking-tight">
-                                    Bs. {{ number_format($tarifa->precio, 2) }}
-                                </span>
-                                <span class="text-xs font-bold text-slate-500">
-                                    / {{ $tarifa->tipo }}
-                                </span>
+                        {{-- INPUT: TAMAÑO --}}
+                        <div class="space-y-2">
+                            <label class="block text-xs font-black uppercase tracking-wider text-slate-600">Tamaño del Local (m²)</label>
+                            <div class="relative">
+                                <input type="number" min="1" x-model.number="tamano" 
+                                    class="w-full px-5 py-4 rounded-2xl bg-white/60 border border-white/50 focus:border-indigo-600 focus:bg-white focus:outline-none transition font-bold text-slate-900 shadow-inner" 
+                                    placeholder="Ej. 15">
+                                <span class="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">m²</span>
                             </div>
+                        </div>
 
-                            {{-- INITIATE BUTTON --}}
-                            <a href="/login" 
-                                class="w-full py-4 rounded-2xl bg-slate-900 text-white hover:bg-indigo-700 transition duration-300 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-slate-900/20">
-                                Iniciar Solicitud
-                                <x-heroicon-o-arrow-right class="w-4 h-4" />
-                            </a>
+                        {{-- INPUT: DURACIÓN --}}
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-600">Duración del Contrato</label>
+                                <input type="number" min="1" x-model.number="duracionValor" 
+                                    class="w-full px-5 py-4 rounded-2xl bg-white/60 border border-white/50 focus:border-indigo-600 focus:bg-white focus:outline-none transition font-bold text-slate-900 shadow-inner" 
+                                    placeholder="Ej. 6">
+                            </div>
+                            <div class="space-y-2">
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-600">Unidad de Tiempo</label>
+                                <select x-model="duracionUnidad" 
+                                    class="w-full px-5 py-4 rounded-2xl bg-white/60 border border-white/50 focus:border-indigo-600 focus:bg-white focus:outline-none transition font-bold text-slate-900 shadow-inner appearance-none cursor-pointer">
+                                    <option value="meses">Meses</option>
+                                    <option value="años">Años</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                @endforeach
-            </div>
-        @else
-            {{-- EMPTY STATE --}}
-            <div class="glass-hud rounded-[3rem] p-12 text-center max-w-2xl mx-auto border border-white/30 flex flex-col items-center space-y-6">
-                <div class="w-20 h-20 bg-slate-900/5 rounded-full flex items-center justify-center">
-                    <x-heroicon-o-credit-card class="w-10 h-10 text-slate-500" />
+
+                    {{-- DYNAMIC INFOTEXT --}}
+                    <div class="pt-4 border-t border-slate-900/10 text-xs font-semibold text-slate-500 flex items-center gap-2">
+                        <svg class="w-4.5 h-4.5 text-indigo-700 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <span>El sistema aplica descuentos automáticos según la duración seleccionada.</span>
+                    </div>
                 </div>
-                <div class="space-y-2">
-                    <h3 class="text-xl font-black text-slate-900">Tarifas no disponibles</h3>
-                    <p class="text-slate-600 font-medium text-sm">Actualmente no existen tarifas o planes de alquiler publicados en esta infraestructura. Comunícate con la oficina de administración para más información.</p>
+
+                {{-- RESULTS PANEL --}}
+                <div class="lg:col-span-5 bg-slate-900 text-white rounded-[2.5rem] p-8 flex flex-col justify-between shadow-2xl relative overflow-hidden border border-slate-800">
+                    <div class="absolute top-0 right-0 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                    
+                    <div class="space-y-6 relative z-10">
+                        <div class="flex items-center justify-between pb-4 border-b border-slate-800">
+                            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Detalle de Cotización</span>
+                            <span class="px-2.5 py-1 rounded-md bg-indigo-600 text-white text-[9px] font-black uppercase tracking-widest" x-text="calculo.etiqueta"></span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-400">Precio Mensual Base</span>
+                                <span class="font-bold text-sm" x-text="'Bs. ' + parseFloat(calculo.precio_mensual_base).toFixed(2)"></span>
+                            </div>
+                            
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-400">Descuento Aplicado</span>
+                                <span class="font-bold text-sm text-green-400" x-text="parseFloat(calculo.descuento_porcentaje).toFixed(2) + '%'"></span>
+                            </div>
+
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold text-slate-400">Alquiler Mensual Neto</span>
+                                <span class="font-bold text-sm text-indigo-400" x-text="'Bs. ' + parseFloat(calculo.precio_mensual_con_descuento).toFixed(2)"></span>
+                            </div>
+
+                            <div class="flex items-center justify-between pt-4 border-t border-slate-800">
+                                <span class="text-xs font-bold text-slate-400">Total Sin Descuento</span>
+                                <span class="font-bold text-sm text-slate-500 line-through" x-text="'Bs. ' + parseFloat(calculo.precio_total_sin_descuento).toFixed(2)"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 space-y-6 relative z-10">
+                        <div class="bg-slate-950/50 rounded-2xl p-5 border border-slate-800 shadow-inner">
+                            <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Precio Estimado Total</div>
+                            <div class="text-3xl font-black text-indigo-400 tracking-tight" x-text="'Bs. ' + parseFloat(calculo.precio_total_con_descuento).toFixed(2)"></div>
+                        </div>
+
+                        <a href="/login" 
+                            class="w-full py-4 rounded-2xl bg-white text-slate-900 hover:bg-indigo-600 hover:text-white transition duration-300 font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-white/10">
+                            Iniciar Solicitud
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </a>
+                    </div>
                 </div>
-                <a href="/" class="px-8 py-3.5 bg-slate-900 text-white rounded-2xl font-bold hover:bg-indigo-700 transition duration-300 text-xs uppercase tracking-widest shadow-md">
-                    Volver al Mall
-                </a>
             </div>
-        @endif
+
+            {{-- TIERS INFORMATION AREA --}}
+            <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 pt-8">
+                
+                {{-- SIZE TIERS --}}
+                <div class="glass-hud rounded-[2rem] p-6 border border-white/20 bg-white/5 space-y-4">
+                    <h4 class="font-black text-slate-950 text-sm flex items-center gap-2">
+                        <svg class="w-4.5 h-4.5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
+                        Tramos y Categorías de Tamaño
+                    </h4>
+                    <div class="overflow-hidden rounded-xl border border-slate-900/10">
+                        <table class="w-full text-left text-xs font-semibold text-slate-600 bg-white/40">
+                            <thead class="bg-slate-900 text-white font-black">
+                                <tr>
+                                    <th class="px-4 py-2.5">Categoría</th>
+                                    <th class="px-4 py-2.5">Rango (m²)</th>
+                                    <th class="px-4 py-2.5 text-right">Precio Base / mes</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-900/5">
+                                @foreach($tamanos as $tam)
+                                    <tr>
+                                        <td class="px-4 py-2.5 font-bold text-slate-900">{{ $tam['nombre'] }}</td>
+                                        <td class="px-4 py-2.5">{{ number_format($tam['desde'], 1) }} - {{ number_format($tam['hasta'], 1) }} m²</td>
+                                        <td class="px-4 py-2.5 text-right font-black text-indigo-700">Bs. {{ number_format($tam['precio_mensual'], 2) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                {{-- TIME DISCOUNTS --}}
+                <div class="glass-hud rounded-[2rem] p-6 border border-white/20 bg-white/5 space-y-4">
+                    <h4 class="font-black text-slate-950 text-sm flex items-center gap-2">
+                        <svg class="w-4.5 h-4.5 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Descuentos por Permanencia (Meses)
+                    </h4>
+                    <div class="overflow-hidden rounded-xl border border-slate-900/10">
+                        <table class="w-full text-left text-xs font-semibold text-slate-600 bg-white/40">
+                            <thead class="bg-slate-900 text-white font-black">
+                                <tr>
+                                    <th class="px-4 py-2.5">Duración Mínima</th>
+                                    <th class="px-4 py-2.5 text-right">Descuento (%)</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-900/5">
+                                @forelse($descuentos as $desc)
+                                    <tr>
+                                        <td class="px-4 py-2.5 font-bold text-slate-900">{{ $desc['min_meses'] }} meses</td>
+                                        <td class="px-4 py-2.5 text-right font-black text-green-700">{{ number_format($desc['descuento'], 2) }}%</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="2" class="px-4 py-4 text-center italic text-slate-500">No hay descuentos configurados en este periodo.</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
 
     </main>
 

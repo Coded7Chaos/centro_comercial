@@ -348,7 +348,7 @@
                         </td>
 
                         <td>
-                            {{ $pago->referencia ?? '---' }}
+                            {{ $pago->numero_transaccion ?? $pago->referencia ?? '---' }}
                         </td>
 
                     </tr>

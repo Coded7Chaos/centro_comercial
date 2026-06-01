@@ -11,13 +11,13 @@
     {{-- TOAST / FLASH MESSAGES --}}
     @if (session('success'))
         <div class="p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <x-heroicon-o-check-circle class="w-5 h-5 text-emerald-600" />
             {{ session('success') }}
         </div>
     @endif
     @if (session('error'))
         <div class="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-sm font-semibold flex items-center gap-2">
-            <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <x-heroicon-o-x-circle class="w-5 h-5 text-rose-600" />
             {{ session('error') }}
         </div>
     @endif
@@ -29,7 +29,7 @@
         <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-6">
             <div class="flex items-center gap-2 pb-4 border-b border-slate-100">
                 <div class="p-2 bg-indigo-50 text-indigo-600 rounded-xl">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                    <x-heroicon-o-tag class="w-5 h-5" />
                 </div>
                 <h2 class="text-lg font-black text-slate-900 tracking-tight">Etiquetas de Tamaño</h2>
             </div>
@@ -90,10 +90,10 @@
                                 <td class="px-4 py-3">{{ number_format($e->hasta, 2) }}</td>
                                 <td class="px-4 py-3 text-right flex items-center justify-end gap-1.5">
                                     <button wire:click="editEtiqueta({{ $e->id }})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Editar">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                        <x-heroicon-o-pencil-square class="w-4 h-4" />
                                     </button>
                                     <button wire:click="deleteEtiqueta({{ $e->id }})" wire:confirm="¿Está seguro de eliminar esta etiqueta? Esto también eliminará el precio asociado." class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition" title="Borrar">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        <x-heroicon-o-trash class="w-4 h-4" />
                                     </button>
                                 </td>
                             </tr>
@@ -111,7 +111,7 @@
         <div class="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-6">
             <div class="flex items-center gap-2 pb-4 border-b border-slate-100">
                 <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16v1m-4-6h8"/></svg>
+                    <x-heroicon-o-currency-dollar class="w-5 h-5" />
                 </div>
                 <h2 class="text-lg font-black text-slate-900 tracking-tight">Precios por Tamaño</h2>
             </div>
@@ -125,10 +125,13 @@
                             class="block w-full border border-slate-200 rounded-xl px-3 py-2 text-xs focus:ring-1 focus:ring-indigo-500 bg-white font-semibold cursor-pointer">
                             <option value="">Seleccione una etiqueta...</option>
                             @foreach($etiquetas as $e)
-                                {{-- Permitir la etiqueta seleccionada al editar --}}
-                                @if(!$precios->contains('tamano_etiqueta_id', $e->id) || $precioEtiquetaId == $e->id)
-                                    <option value="{{ $e->id }}">{{ $e->nombre }} ({{ number_format($e->desde, 1) }}-{{ number_format($e->hasta, 1) }} m²)</option>
-                                @endif
+                                @php
+                                    $hasPrice = $precios->contains('tamano_etiqueta_id', $e->id) && $precioEtiquetaId != $e->id;
+                                @endphp
+                                <option value="{{ $e->id }}" {{ $hasPrice ? 'disabled' : '' }}>
+                                    {{ $e->nombre }} ({{ number_format($e->desde, 1) }}-{{ number_format($e->hasta, 1) }} m²) 
+                                    {{ $hasPrice ? ' - (Ya tiene precio asignado)' : '' }}
+                                </option>
                             @endforeach
                         </select>
                         @error('precioEtiquetaId') <p class="text-red-500 text-[10px]">{{ $message }}</p> @enderror
@@ -176,10 +179,10 @@
                                 <td class="px-4 py-3 text-indigo-700 font-black">Bs. {{ number_format($p->precio_mensual, 2, ',', '.') }}</td>
                                 <td class="px-4 py-3 text-right flex items-center justify-end gap-1.5">
                                     <button wire:click="editPrecio({{ $p->id }})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Editar">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                        <x-heroicon-o-pencil-square class="w-4 h-4" />
                                     </button>
                                     <button wire:click="deletePrecio({{ $p->id }})" wire:confirm="¿Está seguro de eliminar este precio?" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition" title="Borrar">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                        <x-heroicon-o-trash class="w-4 h-4" />
                                     </button>
                                 </td>
                             </tr>
@@ -199,7 +202,7 @@
     <div class="bg-white rounded-3xl border border-slate-200 p-6 md:p-8 shadow-sm space-y-6">
         <div class="flex items-center gap-2 pb-4 border-b border-slate-100">
             <div class="p-2 bg-purple-50 text-purple-600 rounded-xl">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5a2 2 0 10-2 2h2zm0 0h4m-4 0h-4m0 0v13m0 13h10a2 2 0 002-2V9a2 2 0 00-2-2h-2m-8 14H5a2 2 0 01-2-2V9a2 2 0 012-2h2"/></svg>
+                <x-heroicon-o-calendar-days class="w-5 h-5" />
             </div>
             <h2 class="text-lg font-black text-slate-900 tracking-tight">Descuentos por Tiempo</h2>
         </div>
@@ -256,10 +259,10 @@
                             </td>
                             <td class="px-4 py-3 text-right flex items-center justify-end gap-1.5">
                                 <button wire:click="editDescuento({{ $d->id }})" class="p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition" title="Editar">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+                                    <x-heroicon-o-pencil-square class="w-4 h-4" />
                                 </button>
                                 <button wire:click="deleteDescuento({{ $d->id }})" wire:confirm="¿Está seguro de eliminar esta regla de descuento?" class="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition" title="Borrar">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                                    <x-heroicon-o-trash class="w-4 h-4" />
                                 </button>
                             </td>
                         </tr>

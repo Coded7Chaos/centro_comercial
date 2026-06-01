@@ -431,7 +431,7 @@
                                          <div class="absolute inset-2 md:inset-4 grid grid-cols-1 gap-2 md:gap-4">
                                              <div class="relative overflow-hidden rounded-lg border border-white/40 bg-black/10 shadow-inner h-full flex items-center justify-center">
                                                  <template x-if="store.vitrina_1">
-                                                     <img :src="store.vitrina_1" class="h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                                     <img :src="store.vitrina_1" class="h-full w-full object-cover">
                                                  </template>
                                                  <template x-if="!store.vitrina_1">
                                                      <div class="text-[8px] md:text-[9px] text-slate-400 font-bold uppercase tracking-wider text-center p-1">Vitrina 1</div>
@@ -439,7 +439,7 @@
                                              </div>
                                              <div class="relative overflow-hidden rounded-lg border border-white/40 bg-black/10 shadow-inner h-full flex items-center justify-center">
                                                  <template x-if="store.vitrina_2">
-                                                     <img :src="store.vitrina_2" class="h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                                     <img :src="store.vitrina_2" class="h-full w-full object-cover">
                                                  </template>
                                                  <template x-if="!store.vitrina_2">
                                                      <div class="text-[8px] md:text-[9px] text-slate-400 font-bold uppercase tracking-wider text-center p-1">Vitrina 2</div>
@@ -478,7 +478,7 @@
                                          <div class="absolute inset-2 md:inset-4">
                                              <div class="h-full relative overflow-hidden rounded-lg border border-white/40 bg-black/10 shadow-inner flex items-center justify-center">
                                                  <template x-if="store.vitrina_3">
-                                                     <img :src="store.vitrina_3" class="h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                                     <img :src="store.vitrina_3" class="h-full w-full object-cover">
                                                  </template>
                                                  <template x-if="!store.vitrina_3">
                                                      <div class="text-[8px] md:text-[9px] text-slate-400 font-bold uppercase tracking-wider text-center p-1">Vitrina 3</div>

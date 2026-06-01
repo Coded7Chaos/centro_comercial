@@ -149,7 +149,7 @@
                             <!-- Slot 1 -->
                             <div class="relative flex-1 group overflow-hidden rounded-xl border border-white/40 bg-black/10 shadow-inner flex items-center justify-center min-h-[110px]">
                                 @if($tienda->vitrina_1)
-                                    <img src="{{ str_starts_with($tienda->vitrina_1, 'http') ? $tienda->vitrina_1 : Storage::url($tienda->vitrina_1) }}" class="absolute inset-0 h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                    <img src="{{ str_starts_with($tienda->vitrina_1, 'http') ? $tienda->vitrina_1 : Storage::url($tienda->vitrina_1) }}" class="absolute inset-0 h-full w-full object-cover">
                                     
                                     <div class="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-150">
                                         <button type="button" onclick="document.getElementById('file-vitrina-slot-1').click()"
@@ -183,7 +183,7 @@
                             <!-- Slot 2 -->
                             <div class="relative flex-1 group overflow-hidden rounded-xl border border-white/40 bg-black/10 shadow-inner flex items-center justify-center min-h-[110px]">
                                 @if($tienda->vitrina_2)
-                                    <img src="{{ str_starts_with($tienda->vitrina_2, 'http') ? $tienda->vitrina_2 : Storage::url($tienda->vitrina_2) }}" class="absolute inset-0 h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                    <img src="{{ str_starts_with($tienda->vitrina_2, 'http') ? $tienda->vitrina_2 : Storage::url($tienda->vitrina_2) }}" class="absolute inset-0 h-full w-full object-cover">
                                     
                                     <div class="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-150">
                                         <button type="button" onclick="document.getElementById('file-vitrina-slot-2').click()"
@@ -233,7 +233,7 @@
                         <div class="relative flex-1 border-l border-white/30 bg-gradient-to-bl from-white/50 via-slate-200/40 to-slate-300/50 p-3 flex flex-col">
                             <div class="relative flex-1 group overflow-hidden rounded-xl border border-white/40 bg-black/10 shadow-inner flex items-center justify-center min-h-[220px]">
                                 @if($tienda->vitrina_3)
-                                    <img src="{{ str_starts_with($tienda->vitrina_3, 'http') ? $tienda->vitrina_3 : Storage::url($tienda->vitrina_3) }}" class="absolute inset-0 h-full w-full object-cover opacity-90 saturate-[0.8] brightness-95">
+                                    <img src="{{ str_starts_with($tienda->vitrina_3, 'http') ? $tienda->vitrina_3 : Storage::url($tienda->vitrina_3) }}" class="absolute inset-0 h-full w-full object-cover">
                                     
                                     <div class="absolute inset-0 bg-black/45 flex items-center justify-center opacity-0 group-hover:opacity-100 transition duration-150">
                                         <button type="button" onclick="document.getElementById('file-vitrina-slot-3').click()"

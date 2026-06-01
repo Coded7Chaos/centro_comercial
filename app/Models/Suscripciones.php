@@ -113,15 +113,16 @@ class Suscripciones extends Model
             $pago_inicial = ($totalMonths > 1 && !$isRenewal) ? $monthlyRent * 2 : $monthlyRent;
 
             $tienda = $suscripcion->infraestructurasTienda;
+            $tiendaNombre = $tienda?->nombre ?: ($tienda ? 'Tienda #' . $tienda->numero : 'Sin nombre');
 
             for ($i = 0; $i < $totalMonths; $i++) {
                 $fechaVencimiento = $start->copy()->addMonths($i)->toDateString();
                 
                 $monto = ($i === 0) ? $pago_inicial : $monthlyRent;
                 
-                $concepto = 'Cobro Mes ' . ($i + 1) . ' - ' . ($suscripcion->tipo) . ' - ' . ($tienda?->nombre ?? 'Sin nombre');
+                $concepto = 'Cobro Mensual #' . ($i + 1) . ' - ' . $tiendaNombre;
                 if ($i === 0 && $totalMonths > 1 && !$isRenewal) {
-                    $concepto = 'Cobro Mes 1 + Garantía - ' . ($suscripcion->tipo) . ' - ' . ($tienda?->nombre ?? 'Sin nombre');
+                    $concepto = 'Cobro Mensual #1 + Garantía - ' . $tiendaNombre;
                 }
 
                 SuscripcionesCobros::create([

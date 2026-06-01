@@ -339,9 +339,14 @@ class SuscripcionesDemoSeeder extends Seeder
 
     private function crearCobro(Suscripciones $sus, string $tipoTexto, float $monto, Carbon $inicio, Carbon $vence, string $estadoInicial = 'pendiente'): SuscripcionesCobros
     {
+        preg_match('/\d+/', $tipoTexto, $matches);
+        $num = isset($matches[0]) ? $matches[0] : '1';
+        $tienda = $sus->infraestructurasTienda;
+        $tiendaNombre = $tienda?->nombre ?: ($tienda ? 'Tienda #' . $tienda->numero : 'Sin nombre');
+
         return SuscripcionesCobros::create([
             'suscripcion_id'    => $sus->id,
-            'concepto'          => "Cobro {$tipoTexto} - " . $sus->infraestructurasTienda?->nombre,
+            'concepto'          => "Cobro Mensual #{$num} - {$tiendaNombre}",
             'monto'             => $monto,
             'fecha_inicio'      => $inicio->toDateString(),
             'fecha_vencimiento' => $vence->toDateString(),
@@ -392,97 +397,131 @@ class SuscripcionesDemoSeeder extends Seeder
     private function contratoMensualTotalmentePagado(array $a): void
     {
         $inicio = now()->subMonths(6)->startOfMonth();
-        $precio = 1500.00;
-        $sus = $this->crearSuscripcionLimpia($a, 'mensual', $precio, $inicio, $inicio->copy()->addMonths(12));
+        $mensual = 1500.00;
+        $total = $mensual * 12;
+        $sus = $this->crearSuscripcionLimpia($a, '12 meses', $total, $inicio, $inicio->copy()->addMonths(12));
 
         // 6 cobros pasados pagados completamente
         for ($i = 0; $i < 6; $i++) {
             $ini = $inicio->copy()->addMonths($i);
             $ven = $ini->copy()->addMonth()->subDay();
-            $cobro = $this->crearCobro($sus, 'Mensual #' . ($i + 1), $precio, $ini, $ven);
-            $this->pagar($cobro, $precio, $ven->copy()->subDays(rand(1, 7)));
+            $cobro = $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven);
+            $this->pagar($cobro, $mensual, $ven->copy()->subDays(rand(1, 7)));
         }
 
         // Cobro del mes actual aún no pagado (pendiente, no vencido)
         $ini = now()->startOfMonth();
         $ven = $ini->copy()->addMonth()->subDay();
-        $this->crearCobro($sus, 'Mensual #7', $precio, $ini, $ven);
+        $this->crearCobro($sus, 'Mensual #7', $mensual, $ini, $ven);
+
+        // Cobros futuros del mes 8 al 12
+        for ($i = 7; $i < 12; $i++) {
+            $ini = $inicio->copy()->addMonths($i);
+            $ven = $ini->copy()->addMonth()->subDay();
+            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven);
+        }
     }
 
     private function contratoMensualConMorosidad(array $a): void
     {
         $inicio = now()->subMonths(4)->startOfMonth();
-        $precio = 800.00;
-        $sus = $this->crearSuscripcionLimpia($a, 'mensual', $precio, $inicio, $inicio->copy()->addMonths(12));
+        $mensual = 800.00;
+        $total = $mensual * 12;
+        $sus = $this->crearSuscripcionLimpia($a, '12 meses', $total, $inicio, $inicio->copy()->addMonths(12));
 
         // Mes 1 y 2: pagados
         for ($i = 0; $i < 2; $i++) {
             $ini = $inicio->copy()->addMonths($i);
             $ven = $ini->copy()->addMonth()->subDay();
-            $cobro = $this->crearCobro($sus, 'Mensual #' . ($i + 1), $precio, $ini, $ven);
-            $this->pagar($cobro, $precio, $ven->copy()->subDays(rand(1, 5)), 'efectivo');
+            $cobro = $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven);
+            $this->pagar($cobro, $mensual, $ven->copy()->subDays(rand(1, 5)), 'efectivo');
         }
 
         // Mes 3 y 4: vencidos sin pago (morosidad)
         for ($i = 2; $i < 4; $i++) {
             $ini = $inicio->copy()->addMonths($i);
             $ven = $ini->copy()->addMonth()->subDay();
-            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $precio, $ini, $ven, 'vencido');
+            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven, 'vencido');
+        }
+
+        // Cobro del mes actual (5) y futuros (6 al 12)
+        for ($i = 4; $i < 12; $i++) {
+            $ini = $inicio->copy()->addMonths($i);
+            $ven = $ini->copy()->addMonth()->subDay();
+            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven);
         }
     }
 
     private function contratoTrimestralVencido(array $a): void
     {
         $inicio = now()->subMonths(7)->startOfMonth();
-        $precio = 2800.00;
-        $sus = $this->crearSuscripcionLimpia($a, 'trimestral', $precio, $inicio, $inicio->copy()->addMonths(12));
+        $mensual = 1000.00;
+        $total = $mensual * 12;
+        $sus = $this->crearSuscripcionLimpia($a, '12 meses', $total, $inicio, $inicio->copy()->addMonths(12));
 
-        // Trimestre 1: pago parcial
+        // Month 1: pago parcial
         $ini1 = $inicio->copy();
-        $ven1 = $ini1->copy()->addMonths(3)->subDay();
-        $cobro1 = $this->crearCobro($sus, 'Trimestral #1', $precio, $ini1, $ven1);
-        $this->pagar($cobro1, $precio * 0.4, $ven1->copy()->subDays(10), 'transferencia');
-        // El observer pone 'parcial' al recibir un pago < monto
+        $ven1 = $ini1->copy()->addMonth()->subDay();
+        $cobro1 = $this->crearCobro($sus, 'Mensual #1', $mensual, $ini1, $ven1);
+        $this->pagar($cobro1, $mensual * 0.4, $ven1->copy()->subDays(10), 'transferencia');
         $cobro1->refresh();
         if ($cobro1->estado === 'parcial') {
-            // Lo marcamos vencido porque ya pasó la fecha
             $cobro1->estado = 'vencido';
             $cobro1->save();
         }
 
-        // Trimestre 2: vencido sin pagos
-        $ini2 = $inicio->copy()->addMonths(3);
-        $ven2 = $ini2->copy()->addMonths(3)->subDay();
-        $this->crearCobro($sus, 'Trimestral #2', $precio, $ini2, $ven2, 'vencido');
+        // Month 2 to 4: vencidos sin pagos
+        for ($i = 1; $i < 4; $i++) {
+            $ini = $inicio->copy()->addMonths($i);
+            $ven = $ini->copy()->addMonth()->subDay();
+            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven, 'vencido');
+        }
+
+        // Cobros para meses 5 a 12 (meses pasados sin pago son vencidos, futuros son pendientes)
+        for ($i = 4; $i < 12; $i++) {
+            $ini = $inicio->copy()->addMonths($i);
+            $ven = $ini->copy()->addMonth()->subDay();
+            $estado = ($ini->isPast() && !$ini->isToday() && !$ini->isCurrentMonth()) ? 'vencido' : 'pendiente';
+            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven, $estado);
+        }
     }
 
     private function contratoAnualNuevo(array $a): void
     {
         $inicio = now()->startOfMonth();
-        $precio = 16800.00;
-        $sus = $this->crearSuscripcionLimpia($a, 'anual', $precio, $inicio, $inicio->copy()->addYear());
+        $mensual = 1400.00;
+        $total = $mensual * 12;
+        $sus = $this->crearSuscripcionLimpia($a, '1 año', $total, $inicio, $inicio->copy()->addYear());
 
-        // Un único cobro anual pendiente
-        $this->crearCobro($sus, 'Anual', $precio, $inicio, $inicio->copy()->addYear()->subDay());
+        // Month 1 cobro programado/pendiente
+        $this->crearCobro($sus, 'Mensual #1', $mensual, $inicio, $inicio->copy()->addMonth()->subDay());
+
+        // Months 2 to 12
+        for ($i = 1; $i < 12; $i++) {
+            $ini = $inicio->copy()->addMonths($i);
+            $ven = $ini->copy()->addMonth()->subDay();
+            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven);
+        }
     }
 
     private function contratoMensualConPagoParcial(array $a): void
     {
         $inicio = now()->subMonths(3)->startOfMonth();
-        $precio = 1200.00;
-        $sus = $this->crearSuscripcionLimpia($a, 'mensual', $precio, $inicio, $inicio->copy()->addMonths(12));
+        $mensual = 1200.00;
+        $total = $mensual * 12;
+        $sus = $this->crearSuscripcionLimpia($a, '12 meses', $total, $inicio, $inicio->copy()->addMonths(12));
 
         // Mes 1: pagado completo con QR
         $ini = $inicio->copy();
         $ven = $ini->copy()->addMonth()->subDay();
-        $cobro = $this->crearCobro($sus, 'Mensual #1', $precio, $ini, $ven);
-        $this->pagar($cobro, $precio, $ven->copy()->subDays(3), 'qr');
+        $cobro = $this->crearCobro($sus, 'Mensual #1', $mensual, $ini, $ven);
+        $this->pagar($cobro, $mensual, $ven->copy()->subDays(3), 'qr');
 
         // Mes 2: pago parcial (60%)
         $ini = $inicio->copy()->addMonth();
         $ven = $ini->copy()->addMonth()->subDay();
-        $cobro = $this->crearCobro($sus, 'Mensual #2', $precio, $ini, $ven);
-        $this->pagar($cobro, $precio * 0.6, $ven->copy()->subDays(2), 'tarjeta');
+        $cobro = $this->crearCobro($sus, 'Mensual #2', $mensual, $ini, $ven);
+        $this->pagar($cobro, $mensual * 0.6, $ven->copy()->subDays(2), 'tarjeta');
         $cobro->refresh();
         if ($cobro->estado === 'parcial' && Carbon::parse($cobro->fecha_vencimiento)->isPast()) {
             $cobro->estado = 'vencido';
@@ -492,24 +531,41 @@ class SuscripcionesDemoSeeder extends Seeder
         // Mes 3: vencido sin pago
         $ini = $inicio->copy()->addMonths(2);
         $ven = $ini->copy()->addMonth()->subDay();
-        $this->crearCobro($sus, 'Mensual #3', $precio, $ini, $ven, 'vencido');
+        $this->crearCobro($sus, 'Mensual #3', $mensual, $ini, $ven, 'vencido');
+
+        // Mes actual (4) y futuros (5 al 12)
+        for ($i = 3; $i < 12; $i++) {
+            $ini = $inicio->copy()->addMonths($i);
+            $ven = $ini->copy()->addMonth()->subDay();
+            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven);
+        }
     }
 
     private function contratoSemestralPagado(array $a): void
     {
         $inicio = now()->subMonths(6)->startOfMonth();
-        $precio = 8250.00;
-        $sus = $this->crearSuscripcionLimpia($a, 'semestral', $precio, $inicio, $inicio->copy()->addYear());
+        $mensual = 1375.00;
+        $total = $mensual * 12;
+        $sus = $this->crearSuscripcionLimpia($a, '1 año', $total, $inicio, $inicio->copy()->addYear());
 
-        // Semestre 1: pagado completo
-        $ini = $inicio->copy();
-        $ven = $ini->copy()->addMonths(6)->subDay();
-        $cobro = $this->crearCobro($sus, 'Semestral #1', $precio, $ini, $ven);
-        $this->pagar($cobro, $precio, $ven->copy()->subDays(15), 'transferencia');
+        // Months 1-5: paid complete
+        for ($i = 0; $i < 5; $i++) {
+            $ini = $inicio->copy()->addMonths($i);
+            $ven = $ini->copy()->addMonth()->subDay();
+            $cobro = $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven);
+            $this->pagar($cobro, $mensual, $ven->copy()->subDays(15), 'transferencia');
+        }
 
-        // Semestre 2: vigente, aún pendiente
-        $ini = $inicio->copy()->addMonths(6);
-        $ven = $ini->copy()->addMonths(6)->subDay();
-        $this->crearCobro($sus, 'Semestral #2', $precio, $ini, $ven);
+        // Month 6: current month, pending
+        $ini = $inicio->copy()->addMonths(5);
+        $ven = $ini->copy()->addMonth()->subDay();
+        $this->crearCobro($sus, 'Mensual #6', $mensual, $ini, $ven);
+
+        // Months 7 to 12
+        for ($i = 6; $i < 12; $i++) {
+            $ini = $inicio->copy()->addMonths($i);
+            $ven = $ini->copy()->addMonth()->subDay();
+            $this->crearCobro($sus, 'Mensual #' . ($i + 1), $mensual, $ini, $ven);
+        }
     }
 }

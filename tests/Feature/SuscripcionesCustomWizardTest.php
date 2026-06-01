@@ -265,7 +265,9 @@ class SuscripcionesCustomWizardTest extends TestCase
             'precio' => 1350.00,
         ]);
 
-        $cobro = SuscripcionesCobros::where('suscripcion_id', $subscription->id)->first();
+        $cobro = SuscripcionesCobros::where('suscripcion_id', $subscription->id)
+            ->orderBy('id', 'asc')
+            ->first();
         $this->assertNotNull($cobro);
         $this->assertEquals(900.00, $cobro->monto);
 

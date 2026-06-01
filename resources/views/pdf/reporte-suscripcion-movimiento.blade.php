@@ -114,6 +114,7 @@
             padding: 4px 10px;
             border-radius: 20px;
             color: white;
+            background: #4f46e5;
             font-size: 11px;
             font-weight: bold;
         }
@@ -334,7 +335,7 @@
         <div class="info">
 
             <span class="label">
-                Tipo de suscripción:
+                Duración del contrato:
             </span>
 
             <span class="badge-tipo {{ $suscripcion->tipo }}">

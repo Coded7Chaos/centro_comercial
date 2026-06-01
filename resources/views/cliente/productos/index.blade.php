@@ -84,10 +84,10 @@
                                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                             </a>
                                             
-                                            <form method="POST" action="{{ route('cliente.productos.destroy', $p->id) }}" onsubmit="return confirm('¿Está seguro de eliminar este producto del catálogo?')">
+                                            <form method="POST" action="{{ route('cliente.productos.destroy', $p->id) }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition">
+                                                <button type="button" onclick="confirmDeleteProduct(this.form)" class="p-2 rounded-xl text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                                 </button>
                                             </form>
@@ -102,5 +102,78 @@
         </div>
 
     </div>
+
+    {{-- MODAL PARA CONFIRMACIÓN DE ELIMINACIÓN --}}
+    <dialog id="deleteConfirmDialog" closedby="any" class="rounded-3xl border border-slate-200/60 p-6 shadow-2xl max-w-md w-full bg-white text-slate-800 focus:outline-none overflow-hidden">
+        <div class="space-y-6">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-500 shrink-0">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </div>
+                <div class="space-y-1">
+                    <h3 class="text-base font-black text-slate-900">¿Eliminar producto del catálogo?</h3>
+                    <p class="text-xs text-slate-500 leading-relaxed">Esta acción es irreversible. El producto y sus imágenes serán removidos permanentemente de la tienda virtual.</p>
+                </div>
+            </div>
+            
+            <div class="flex justify-end gap-3 pt-2">
+                <button id="btnCancelDelete" type="button" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
+                    Cancelar
+                </button>
+                <button id="btnConfirmDelete" type="button" class="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl text-xs uppercase tracking-wider transition shadow-md shadow-rose-600/20 cursor-pointer">
+                    Eliminar
+                </button>
+            </div>
+        </div>
+    </dialog>
+
+    <style>
+        #deleteConfirmDialog::backdrop {
+            background-color: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+
+    <script>
+        let formToSubmit = null;
+        const dialog = document.getElementById('deleteConfirmDialog');
+        const btnCancel = document.getElementById('btnCancelDelete');
+        const btnConfirm = document.getElementById('btnConfirmDelete');
+
+        function confirmDeleteProduct(form) {
+            formToSubmit = form;
+            dialog.showModal();
+        }
+
+        btnCancel.addEventListener('click', () => {
+            dialog.close();
+            formToSubmit = null;
+        });
+
+        btnConfirm.addEventListener('click', () => {
+            if (formToSubmit) {
+                formToSubmit.submit();
+            }
+        });
+
+        // Fallback for browsers without closedby support
+        if (!('closedBy' in HTMLDialogElement.prototype)) {
+            dialog.addEventListener('click', (event) => {
+                if (event.target !== dialog) return;
+                const rect = dialog.getBoundingClientRect();
+                const isDialogContent = (
+                    rect.top <= event.clientY &&
+                    event.clientY <= rect.top + rect.height &&
+                    rect.left <= event.clientX &&
+                    event.clientX <= rect.left + rect.width
+                );
+                if (isDialogContent) return;
+                dialog.close();
+                formToSubmit = null;
+            });
+        }
+    </script>
 
 </x-layouts.client>

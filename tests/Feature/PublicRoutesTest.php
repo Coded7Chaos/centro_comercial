@@ -54,6 +54,8 @@ class PublicRoutesTest extends TestCase
     {
         $response = $this->get('/suscripciones');
         $response->assertStatus(200);
+        $response->assertViewHas('tamanos');
+        $response->assertViewHas('descuentos');
     }
 
     /**

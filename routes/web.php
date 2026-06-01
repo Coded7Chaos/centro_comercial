@@ -118,8 +118,19 @@ Route::get('/directorio', [DirectorioController::class, 'index'])->name('directo
 Route::get('/directorio/{id}/catalogo', [DirectorioController::class, 'catalogo'])->name('directorio.catalogo');
 
 Route::get('/suscripciones', function () {
-    $tarifas = \App\Models\SuscripcionesTarifas::orderBy('precio', 'asc')->get();
-    return view('suscripciones', compact('tarifas'));
+    $tamanos = \App\Models\TamanoEtiqueta::with('precio')->get()->map(fn($t) => [
+        'nombre' => $t->nombre,
+        'desde' => (float)$t->desde,
+        'hasta' => (float)$t->hasta,
+        'precio_mensual' => $t->precio ? (float)$t->precio->precio_mensual : 0.0,
+    ]);
+
+    $descuentos = \App\Models\DescuentoTiempo::orderBy('min_meses', 'asc')->get()->map(fn($d) => [
+        'min_meses' => (int)$d->min_meses,
+        'descuento' => (float)$d->descuento,
+    ]);
+
+    return view('suscripciones', compact('tamanos', 'descuentos'));
 })->name('suscripciones');
 
 Route::get('/productos', function () {

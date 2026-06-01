@@ -43,6 +43,8 @@ class ListSuscripcionesCobros extends ListRecords
                     ->where('es_parcial', true)
                     ->whereNotIn('estado', ['pagado', 'anulado'])
                 ),
+            'todos' => Tab::make('Todos los cobros')
+                ->modifyQueryUsing(fn (Builder $query) => $query),
         ];
     }
 

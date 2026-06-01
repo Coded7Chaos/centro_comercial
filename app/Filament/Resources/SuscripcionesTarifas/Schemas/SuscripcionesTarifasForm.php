@@ -30,7 +30,7 @@ class SuscripcionesTarifasForm
                 ->label('Etiqueta visible (Pequeño, Mediano, Grande...)')
                 ->maxLength(60),
             Select::make('tipo')
-                ->label('Tipo de suscripción')
+                ->label('Duración del contrato')
                 ->options(SuscripcionesTarifas::tipos())
                 ->required(),
             TextInput::make('precio')
