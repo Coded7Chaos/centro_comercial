@@ -109,44 +109,6 @@
             color: #166534;
         }
 
-        .badge-tipo{
-            display: inline-block;
-            padding: 4px 10px;
-            border-radius: 20px;
-            color: white;
-            background: #4f46e5;
-            font-size: 11px;
-            font-weight: bold;
-        }
-
-        .mensual{
-            background: #2563eb;
-        }
-
-        .bimestral{
-            background: #7c3aed;
-        }
-
-        .trimestral{
-            background: #9333ea;
-        }
-
-        .semestral{
-            background: #db2777;
-        }
-
-        .anual{
-            background: #16a34a;
-        }
-
-        .semanal{
-            background: #ea580c;
-        }
-
-        .personalizado{
-            background: #ca8a04;
-        }
-
         /*
         |--------------------------------------------------------------------------
         | TIMELINE
@@ -208,6 +170,18 @@
             margin-bottom: 10px;
         }
 
+        .concepto{
+            font-size: 12px;
+            color: #374151;
+            margin-bottom: 6px;
+        }
+
+        .metodo{
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
         /*
         |--------------------------------------------------------------------------
         | MONTO
@@ -263,124 +237,72 @@
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Cliente:
-            </span>
-
+            <span class="label">Cliente:</span>
             #{{ $cliente?->id }}
             -
             {{ $cliente?->user?->nombres }}
             {{ $cliente?->user?->apellido_paterno }}
             {{ $cliente?->user?->apellido_materno }}
-
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Infraestructura:
-            </span>
-
+            <span class="label">Infraestructura:</span>
             {{ $infraestructura?->nombre ?? '---' }}
-
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Piso:
-            </span>
-
+            <span class="label">Piso:</span>
             @if($piso?->numero)
-                Piso {{ $piso->numero }}
-                @if($piso->nombre && $piso->nombre !== $piso->numero)
+                {{ $piso->numero }}
+                @if($piso->nombre && $piso->nombre !== (string)$piso->numero)
                     - {{ $piso->nombre }}
                 @endif
             @else
                 {{ $piso?->nombre ?? '---' }}
             @endif
-
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Tienda:
-            </span>
-
+            <span class="label">Tienda:</span>
             #{{ $tienda?->numero ?? '---' }}
-
             @if($tienda?->nombre)
-
                 - {{ $tienda->nombre }}
-
             @endif
-
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Marca principal:
-            </span>
-
-            {{ $marca?->nombre ?? '---' }}
-
+            <span class="label">Tamaño:</span>
+            {{ $tienda?->tamano ? $tienda->tamano . ' m²' : '---' }}
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Tamaño:
-            </span>
-
-            {{ ucfirst($tienda?->tamano ?? '---') }}
-
+            <span class="label">Duración del contrato:</span>
+            {{ ucfirst($suscripcion->tipo) }}
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Duración del contrato:
-            </span>
-
-            <span class="badge-tipo {{ $suscripcion->tipo }}">
-
-                {{ ucfirst($suscripcion->tipo) }}
-
-            </span>
-
+            <span class="label">Pago Mensual:</span>
+            Bs. {{ number_format($pago_mensual, 2) }}
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Precio:
-            </span>
-
-            Bs {{ number_format($suscripcion->precio, 2) }}
-
+            <span class="label">Garantía:</span>
+            Bs. {{ number_format($garantia, 2) }}
         </div>
 
         <div class="info">
+            <span class="label">Precio total del contrato:</span>
+            Bs. {{ number_format($precio_total, 2) }}
+        </div>
 
-            <span class="label">
-                Fecha inicio:
-            </span>
-
+        <div class="info">
+            <span class="label">Fecha inicio:</span>
             {{ \Carbon\Carbon::parse($suscripcion->fecha_inicio)->format('d/m/Y') }}
-
         </div>
 
         <div class="info">
-
-            <span class="label">
-                Fecha fin:
-            </span>
-
+            <span class="label">Fecha fin:</span>
             {{ \Carbon\Carbon::parse($suscripcion->fecha_fin)->format('d/m/Y') }}
-
         </div>
 
     </div>
@@ -388,41 +310,50 @@
     {{-- TIMELINE --}}
     <div class="timeline">
 
-        @foreach($movimientos as $m)
+        @forelse($movimientos as $m)
 
-            <div class="event {{ $m['tipo'] == 'COBRO' ? 'event-cobro' : 'event-pago' }}">
+            <div class="event {{ $m['tipo'] === 'COBRO' ? 'event-cobro' : 'event-pago' }}">
 
                 {{-- BADGE --}}
-                <div class="badge {{ $m['tipo'] == 'COBRO' ? 'badge-cobro' : 'badge-pago' }}">
-
-                    {{ $m['tipo'] }}
-
+                <div class="badge {{ $m['tipo'] === 'COBRO' ? 'badge-cobro' : 'badge-pago' }}">
+                    {{ $m['tipo'] === 'COBRO' ? 'COBRO PENDIENTE' : 'PAGO' }}
                 </div>
 
                 {{-- FECHA --}}
                 <div class="fecha">
-
-                    {{ \Carbon\Carbon::parse($m['fecha'])->format('d/m/Y H:i') }}
-
+                    @if($m['tipo'] === 'COBRO')
+                        Vence: {{ \Carbon\Carbon::parse($m['fecha'])->format('d/m/Y') }}
+                    @else
+                        Pagado: {{ \Carbon\Carbon::parse($m['fecha'])->format('d/m/Y H:i') }}
+                    @endif
                 </div>
 
-                {{-- DETALLE --}}
-                <div>
-
+                {{-- CONCEPTO --}}
+                <div class="concepto">
                     {{ $m['detalle'] }}
-
                 </div>
+
+                {{-- MÉTODO (solo pagos) --}}
+                @if($m['tipo'] === 'PAGO' && $m['metodo'])
+                    <div class="metodo">
+                        Método de pago: {{ $m['metodo'] }}
+                    </div>
+                @endif
 
                 {{-- MONTO --}}
                 <div class="monto">
-
-                    Bs {{ number_format($m['monto'], 2) }}
-
+                    Bs. {{ number_format($m['monto'], 2) }}
                 </div>
 
             </div>
 
-        @endforeach
+        @empty
+
+            <div class="event">
+                <p style="color:#6b7280;text-align:center;">No hay movimientos pendientes registrados.</p>
+            </div>
+
+        @endforelse
 
     </div>
 

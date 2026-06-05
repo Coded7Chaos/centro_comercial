@@ -324,6 +324,7 @@ class SuscripcionesDemoSeeder extends Seeder
             'cliente_id'                  => $a['cliente']->id,
             'marca_id'                    => $a['marca']->id,
             'infraestructuras_tienda_id'  => $a['tienda']->id,
+            'infraestructuras_piso_id'    => $a['tienda']->infraestructura_piso_id,
             'tipo'                        => $tipo,
             'precio'                      => $precio,
             'fecha_inicio'                => $inicio->toDateString(),

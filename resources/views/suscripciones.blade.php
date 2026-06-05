@@ -70,11 +70,26 @@
 
         {{-- INTERACTIVE CALCULATOR --}}
         <div x-data="{
-            tamanos: {{ json_encode($tamanos) }},
-            descuentos: {{ json_encode($descuentos) }},
-            tamano: parseFloat(new URLSearchParams(window.location.search).get('tamano')) || 15,
+            tamanos: @js($tamanos),
+            descuentos: @js($descuentos),
+            tiendas: @js($tiendas),
+            selectedTiendaId: {{ $tiendaId ?? 'null' }},
+            adminPhone: @js($adminPhone),
+            tamano: {{ $initialTamano }},
             duracionValor: 6,
             duracionUnidad: 'meses',
+            garantia: null,
+
+            get selectedTienda() {
+                if (! this.selectedTiendaId) return null;
+                return this.tiendas.find(t => t.id === this.selectedTiendaId) || null;
+            },
+
+            selectTienda(id) {
+                this.selectedTiendaId = id ? parseInt(id) : null;
+                let t = this.selectedTienda;
+                if (t && t.tamano > 0) this.tamano = t.tamano;
+            },
 
             get meses() {
                 return this.duracionUnidad === 'años' ? parseInt(this.duracionValor || 0) * 12 : parseInt(this.duracionValor || 0);
@@ -129,13 +144,30 @@
                 };
             },
 
+            get garantiaEfectiva() {
+                return this.garantia !== null && this.garantia !== ''
+                    ? parseFloat(this.garantia)
+                    : parseFloat(this.calculo.precio_mensual_con_descuento);
+            },
+
+            get precioTotalConGarantia() {
+                return parseFloat(this.calculo.precio_mensual_con_descuento) * this.meses
+                    + this.garantiaEfectiva;
+            },
+
             get whatsappUrl() {
-                let msg = `Hola, estoy interesado en alquilar un local comercial. Usé el simulador con los siguientes detalles:
+                let phone = (this.adminPhone || '').replace(/\D/g, '');
+                let tienda = this.selectedTienda;
+                let localInfo = tienda
+                    ? `\n- Local: ${tienda.nombre} (N° ${tienda.numero})`
+                    : '';
+                let msg = `Hola, estoy interesado en alquilar un local comercial. Usé el simulador con los siguientes detalles:${localInfo}
 - Tamaño: ${this.tamano} m² (${this.calculo.etiqueta})
 - Duración: ${this.duracionValor} ${this.duracionUnidad}
-- Alquiler Mensual Neto: Bs. ${parseFloat(this.calculo.precio_mensual_con_descuento).toFixed(2)}
-- Precio Estimado Total: Bs. ${parseFloat(this.calculo.precio_total_con_descuento).toFixed(2)}`;
-                return `https://wa.me/59178801636?text=${encodeURIComponent(msg)}`;
+- Pago Mensual Estimado: Bs. ${parseFloat(this.calculo.precio_mensual_con_descuento).toFixed(2)}
+- Garantía Inicial: Bs. ${parseFloat(this.garantiaEfectiva).toFixed(2)}
+- Precio Estimado Total: Bs. ${parseFloat(this.precioTotalConGarantia).toFixed(2)}`;
+                return `https://wa.me/${phone}?text=${encodeURIComponent(msg)}`;
             }
         }" class="space-y-12">
             
@@ -153,16 +185,40 @@
                             </div>
                         </div>
 
-                        {{-- INPUT: TAMAÑO --}}
-                        <div class="space-y-2">
-                            <label class="block text-xs font-black uppercase tracking-wider text-slate-600">Tamaño del Local (m²)</label>
-                            <div class="relative">
-                                <input type="number" min="1" x-model.number="tamano" 
-                                    class="w-full px-5 py-4 rounded-2xl bg-white/60 border border-white/50 focus:border-indigo-600 focus:bg-white focus:outline-none transition font-bold text-slate-900 shadow-inner" 
-                                    placeholder="Ej. 15">
-                                <span class="absolute right-5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">m²</span>
+                        {{-- DROPDOWN: LOCAL --}}
+                        <template x-if="tiendas.length > 0">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-black uppercase tracking-wider text-slate-600">Local a Cotizar</label>
+                                <div class="relative">
+                                    <select
+                                        :value="selectedTiendaId"
+                                        @change="selectTienda($event.target.value)"
+                                        class="w-full px-5 py-4 rounded-2xl bg-white/60 border border-white/50 focus:border-indigo-600 focus:bg-white focus:outline-none transition font-bold text-slate-900 shadow-inner appearance-none cursor-pointer pr-10"
+                                    >
+                                        <option value="">— Elegir local disponible —</option>
+                                        <template x-for="t in tiendas" :key="t.id">
+                                            <option :value="t.id" :selected="t.id === selectedTiendaId"
+                                                    x-text="`${t.nombre} - ${t.tamano} m²`">
+                                            </option>
+                                        </template>
+                                    </select>
+                                    <div class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <template x-if="selectedTienda">
+                                    <p class="text-[11px] text-slate-500 font-semibold pl-1 flex items-center gap-1">
+                                        <svg class="w-3.5 h-3.5 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <span>El tamaño se actualiza automáticamente al seleccionar un local.</span>
+                                    </p>
+                                </template>
                             </div>
-                        </div>
+                        </template>
+
 
                         {{-- INPUT: DURACIÓN --}}
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -202,23 +258,34 @@
 
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-slate-400">Precio Mensual Base</span>
-                                <span class="font-bold text-sm" x-text="'Bs. ' + parseFloat(calculo.precio_mensual_base).toFixed(2)"></span>
-                            </div>
-                            
-                            <div class="flex items-center justify-between">
                                 <span class="text-xs font-bold text-slate-400">Descuento Aplicado</span>
                                 <span class="font-bold text-sm text-green-400" x-text="parseFloat(calculo.descuento_porcentaje).toFixed(2) + '%'"></span>
                             </div>
 
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold text-slate-400">Alquiler Mensual Neto</span>
+                                <span class="text-xs font-bold text-slate-400">Pago Mensual Estimado</span>
                                 <span class="font-bold text-sm text-indigo-400" x-text="'Bs. ' + parseFloat(calculo.precio_mensual_con_descuento).toFixed(2)"></span>
                             </div>
 
-                            <div class="flex items-center justify-between pt-4 border-t border-slate-800">
-                                <span class="text-xs font-bold text-slate-400">Total Sin Descuento</span>
-                                <span class="font-bold text-sm text-slate-500 line-through" x-text="'Bs. ' + parseFloat(calculo.precio_total_sin_descuento).toFixed(2)"></span>
+                            <div class="pt-4 border-t border-slate-800 space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold text-slate-400">Garantía Inicial</span>
+                                    <span class="text-[10px] text-slate-500 italic">editable</span>
+                                </div>
+                                <div class="relative">
+                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-black text-slate-400">Bs.</span>
+                                    <input
+                                        type="number"
+                                        min="0"
+                                        step="0.01"
+                                        x-model="garantia"
+                                        :placeholder="parseFloat(calculo.precio_mensual_con_descuento).toFixed(2)"
+                                        class="w-full pl-10 pr-3 py-2.5 rounded-xl bg-slate-800 border border-slate-700 focus:border-indigo-500 focus:outline-none text-sm font-bold text-white placeholder-slate-500 transition"
+                                    >
+                                </div>
+                                <p class="text-[10px] text-slate-500 italic">
+                                    Por defecto equivale al pago mensual. Modifica si es necesario.
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -226,7 +293,10 @@
                     <div class="mt-8 space-y-6 relative z-10">
                         <div class="bg-slate-950/50 rounded-2xl p-5 border border-slate-800 shadow-inner">
                             <div class="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-1">Precio Estimado Total</div>
-                            <div class="text-3xl font-black text-indigo-400 tracking-tight" x-text="'Bs. ' + parseFloat(calculo.precio_total_con_descuento).toFixed(2)"></div>
+                            <div class="text-3xl font-black text-indigo-400 tracking-tight" x-text="'Bs. ' + parseFloat(precioTotalConGarantia).toFixed(2)"></div>
+                            <div class="text-[10px] text-slate-500 mt-1.5">
+                                Pago mensual × duración + garantía inicial
+                            </div>
                         </div>
 
                         <a :href="whatsappUrl" 

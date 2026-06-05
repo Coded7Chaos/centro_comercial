@@ -27,6 +27,7 @@ class Categorias extends Model
         'estado',
         'tipo',
         'categoria_padre_id',
+        'infraestructura_id',
     ];
 
     public function productos(): HasMany

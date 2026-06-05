@@ -19,10 +19,14 @@ class InfraestructurasTable
         return $table
             ->columns([
                 TextColumn::make('nombre')
-                    ->searchable()
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereRaw("unaccent(lower(nombre)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    })
                     ->weight('bold'),
                 TextColumn::make('ubicacion')
-                    ->searchable()
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereRaw("unaccent(lower(ubicacion)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    })
                     ->description(function ($record) {
                         $pisos = $record->pisos ?? 0;
                         $totalTiendas = $record->pisosInfraestructura->flatMap->tiendas->count();

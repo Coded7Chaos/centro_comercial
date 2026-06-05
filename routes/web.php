@@ -6,6 +6,7 @@ use App\Http\Controllers\Pdf\ReporteSuscripcionMovimiento;
 use App\Http\Controllers\DirectorioController;
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\Auth\FirstLoginController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
@@ -17,6 +18,12 @@ Route::get('/', WelcomeController::class);
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+// First-login: set password via signed URL (sent by email on user creation)
+Route::get('/first-login/{user}', [FirstLoginController::class, 'show'])
+    ->name('first-login.show');
+Route::post('/first-login/{user}', [FirstLoginController::class, 'store'])
+    ->name('first-login.store');
 
 // Password Reset Routes
 Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
@@ -102,6 +109,16 @@ Route::middleware(['auth'])->group(function () {
             ->name('estado-cuenta');
         Route::post('/estado-cuenta/reportar-pago', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'registrarPago'])
             ->name('reportar-pago');
+        Route::post('/notificaciones/{id}/leer', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'marcarNotificacionLeida'])
+            ->name('notificaciones.leer');
+
+        // Categorías
+        Route::get('/categorias', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'categorias'])
+            ->name('categorias.index');
+        Route::post('/categorias', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'storeCategoria'])
+            ->name('categorias.store');
+        Route::delete('/categorias/{id}', [App\Http\Controllers\Cliente\ClientDashboardController::class, 'destroyCategoria'])
+            ->name('categorias.destroy');
     });
 });
 
@@ -118,19 +135,63 @@ Route::get('/directorio', [DirectorioController::class, 'index'])->name('directo
 Route::get('/directorio/{id}/catalogo', [DirectorioController::class, 'catalogo'])->name('directorio.catalogo');
 
 Route::get('/suscripciones', function () {
+    // ── Contexto de infraestructura ─────────────────────────────
+    $tiendaId = request('tienda_id') ? (int) request('tienda_id') : null;
+    $infraId  = request('infraestructura_id') ? (int) request('infraestructura_id') : null;
+
+    // Tienda seleccionada (si se llegó desde el welcome haciendo click en un local)
+    $selectedTienda = $tiendaId
+        ? \App\Models\InfraestructurasTiendas::with('piso')->find($tiendaId)
+        : null;
+
+    // Inferir infraestructura desde la tienda seleccionada
+    if (! $infraId && $selectedTienda) {
+        $infraId = $selectedTienda->piso?->infraestructura_id;
+    }
+    if (! $infraId) {
+        $infraId = \App\Models\InfraestructurasPisos::value('infraestructura_id');
+    }
+
+    // ── Tarifas y descuentos ────────────────────────────────────
     $tamanos = \App\Models\TamanoEtiqueta::with('precio')->get()->map(fn($t) => [
-        'nombre' => $t->nombre,
-        'desde' => (float)$t->desde,
-        'hasta' => (float)$t->hasta,
-        'precio_mensual' => $t->precio ? (float)$t->precio->precio_mensual : 0.0,
+        'nombre'         => $t->nombre,
+        'desde'          => (float) $t->desde,
+        'hasta'          => (float) $t->hasta,
+        'precio_mensual' => $t->precio ? (float) $t->precio->precio_mensual : 0.0,
     ]);
 
-    $descuentos = \App\Models\DescuentoTiempo::orderBy('min_meses', 'asc')->get()->map(fn($d) => [
-        'min_meses' => (int)$d->min_meses,
-        'descuento' => (float)$d->descuento,
+    $descuentos = \App\Models\DescuentoTiempo::orderBy('min_meses')->get()->map(fn($d) => [
+        'min_meses' => (int) $d->min_meses,
+        'descuento' => (float) $d->descuento,
     ]);
 
-    return view('suscripciones', compact('tamanos', 'descuentos'));
+    // ── Tiendas disponibles para el dropdown ────────────────────
+    $tiendasQuery = \App\Models\InfraestructurasTiendas::whereHas(
+        'estado', fn($q) => $q->where('estado', 'Disponible')
+    );
+    if ($infraId) {
+        $tiendasQuery->whereHas('piso', fn($q) => $q->where('infraestructura_id', $infraId));
+    }
+    $tiendas = $tiendasQuery->get()->map(fn($t) => [
+        'id'       => $t->id,
+        'numero'   => $t->numero,
+        'nombre'   => $t->nombre ?: 'Local ' . $t->numero,
+        'tamano'   => (float) ($t->tamano ?? 0),
+        'telefono' => $t->telefono_referencia,
+    ])->values();
+
+    // tamaño inicial: tienda seleccionada → URL param → 15 m² por defecto
+    $initialTamano = (float) ($selectedTienda?->tamano ?: request('tamano') ?: 15);
+
+    // Teléfono del administrador — mismo que muestra el modal de tienda disponible en el welcome
+    $adminUser  = \App\Models\User::role(['super_admin', 'admin'])
+        ->with('cliente')->orderBy('id')->first();
+    $adminPhone = $adminUser?->cliente?->numero_celular ?? '+591 7000 0000';
+
+    return view('suscripciones', compact(
+        'tamanos', 'descuentos', 'tiendas',
+        'tiendaId', 'initialTamano', 'adminPhone'
+    ));
 })->name('suscripciones');
 
 Route::get('/productos', function () {

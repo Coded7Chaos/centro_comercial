@@ -7,6 +7,8 @@ use App\Models\InfraestructurasTiendas;
 use App\Models\Suscripciones;
 use App\Models\SuscripcionesCobros;
 use App\Models\SuscripcionesTarifas;
+use App\Models\SuscripcionesPagos;
+use App\Models\ClientNotification;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
@@ -87,35 +89,12 @@ class ClientPaymentsTest extends TestCase
         $this->charge = $this->subscription->cobros()->first();
     }
 
-    public function test_report_payment_success_via_cash(): void
-    {
-        $comprobante = UploadedFile::fake()->image('recibo.jpg');
-
-        $response = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
-            'suscripcion_cobro_id' => $this->charge->id,
-            'monto_pagado' => 1000,
-            'metodo_pago' => 'efectivo',
-            'nombre_pagador' => 'John Doe',
-            'comprobante' => $comprobante,
-        ]);
-
-        $response->assertRedirect(route('cliente.estado-cuenta'));
-        
-        $this->assertDatabaseHas('suscripciones_pagos', [
-            'suscripcion_cobro_id' => $this->charge->id,
-            'monto_pagado' => 1000,
-            'metodo_pago' => 'efectivo',
-            'nombre_pagador' => 'John Doe',
-        ]);
-    }
-
     public function test_report_payment_success_via_transfer(): void
     {
         $comprobante = UploadedFile::fake()->create('comprobante.pdf', 500, 'application/pdf');
 
         $response = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
             'suscripcion_cobro_id' => $this->charge->id,
-            'monto_pagado' => 500,
             'metodo_pago' => 'transferencia',
             'numero_transaccion' => 'TX-9999',
             'banco_origen' => 'Banco de Crédito',
@@ -126,21 +105,68 @@ class ClientPaymentsTest extends TestCase
 
         $this->assertDatabaseHas('suscripciones_pagos', [
             'suscripcion_cobro_id' => $this->charge->id,
-            'monto_pagado' => 500,
+            'monto_pagado' => 1000,
             'metodo_pago' => 'transferencia',
             'numero_transaccion' => 'TX-9999',
             'banco_origen' => 'Banco de Crédito',
+            'estado_verificacion' => 'pendiente',
         ]);
+
+        $this->charge->refresh();
+        $this->assertEquals('pendiente_confirmacion', $this->charge->estado);
+    }
+
+    public function test_report_payment_success_via_qr(): void
+    {
+        $comprobante = UploadedFile::fake()->image('comprobante.jpg');
+
+        $response = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
+            'suscripcion_cobro_id' => $this->charge->id,
+            'metodo_pago' => 'qr',
+            'comprobante' => $comprobante,
+        ]);
+
+        $response->assertRedirect(route('cliente.estado-cuenta'));
+
+        $this->assertDatabaseHas('suscripciones_pagos', [
+            'suscripcion_cobro_id' => $this->charge->id,
+            'monto_pagado' => 1000,
+            'metodo_pago' => 'qr',
+            'estado_verificacion' => 'pendiente',
+        ]);
+
+        $this->charge->refresh();
+        $this->assertEquals('pendiente_confirmacion', $this->charge->estado);
+    }
+
+    public function test_report_payment_validation_fails_for_disallowed_methods(): void
+    {
+        $comprobante = UploadedFile::fake()->image('recibo.jpg');
+
+        // Efectivo and Tarjeta are disallowed for client reporting
+        $response = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
+            'suscripcion_cobro_id' => $this->charge->id,
+            'metodo_pago' => 'efectivo',
+            'comprobante' => $comprobante,
+        ]);
+
+        $response->assertSessionHasErrors(['metodo_pago']);
+
+        $response2 = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
+            'suscripcion_cobro_id' => $this->charge->id,
+            'metodo_pago' => 'tarjeta',
+            'comprobante' => $comprobante,
+        ]);
+
+        $response2->assertSessionHasErrors(['metodo_pago']);
     }
 
     public function test_report_payment_validation_fails_for_missing_transfer_fields(): void
     {
         $comprobante = UploadedFile::fake()->image('recibo.jpg');
 
-        // When metodo_pago is 'transferencia', 'numero_transaccion' and 'banco_origen' are required
         $response = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
             'suscripcion_cobro_id' => $this->charge->id,
-            'monto_pagado' => 1000,
             'metodo_pago' => 'transferencia',
             'comprobante' => $comprobante,
         ]);
@@ -148,58 +174,98 @@ class ClientPaymentsTest extends TestCase
         $response->assertSessionHasErrors(['numero_transaccion', 'banco_origen']);
     }
 
-    public function test_report_payment_validation_fails_for_missing_cash_fields(): void
+    public function test_admin_approves_payment_request(): void
     {
-        $comprobante = UploadedFile::fake()->image('recibo.jpg');
-
-        // When metodo_pago is 'efectivo', 'nombre_pagador' is required
-        $response = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
+        // 1. Report payment first
+        $pago = SuscripcionesPagos::create([
             'suscripcion_cobro_id' => $this->charge->id,
             'monto_pagado' => 1000,
-            'metodo_pago' => 'efectivo',
-            'comprobante' => $comprobante,
+            'pago_pendiente' => 0,
+            'fecha_pago' => now()->toDateString(),
+            'metodo_pago' => 'qr',
+            'estado_verificacion' => 'pendiente',
+            'estado_snapshot' => 'pendiente',
+            'creado_por_admin' => false,
+        ]);
+        $this->charge->recalcularEstado();
+        $this->assertEquals('pendiente_confirmacion', $this->charge->estado);
+
+        // 2. Simulate admin approval (same action as the table action callback)
+        $pago->update(['estado_verificacion' => 'verificado']);
+        
+        $this->charge->update([
+            'saldo_pendiente' => 0,
+            'estado' => 'pagado',
+            'estado_snapshot' => 'pagado',
         ]);
 
-        $response->assertSessionHasErrors(['nombre_pagador']);
+        // Send success notification to client
+        ClientNotification::create([
+            'cliente_id' => $this->client->id,
+            'tipo' => 'success',
+            'titulo' => 'Pago Aprobado',
+            'mensaje' => 'Su pago ha sido aprobado.',
+        ]);
+
+        // Verify status changes and notification creation
+        $this->charge->refresh();
+        $this->assertEquals('pagado', $this->charge->estado);
+        $this->assertEquals('verificado', $pago->estado_verificacion);
+
+        $this->assertDatabaseHas('client_notifications', [
+            'cliente_id' => $this->client->id,
+            'tipo' => 'success',
+            'titulo' => 'Pago Aprobado',
+        ]);
     }
 
-    public function test_report_payment_partial_splits_charge(): void
+    public function test_admin_rejects_payment_request(): void
     {
-        $comprobante = UploadedFile::fake()->create('comprobante.pdf', 500, 'application/pdf');
-
-        // We make a partial payment of 400 for a 1000 charge.
-        $response = $this->actingAs($this->user)->post('/cliente/estado-cuenta/reportar-pago', [
+        // 1. Report payment first
+        $pago = SuscripcionesPagos::create([
             'suscripcion_cobro_id' => $this->charge->id,
-            'monto_pagado' => 400,
-            'metodo_pago' => 'transferencia',
-            'numero_transaccion' => 'TX-12345',
-            'banco_origen' => 'BNB',
-            'comprobante' => $comprobante,
+            'monto_pagado' => 1000,
+            'pago_pendiente' => 0,
+            'fecha_pago' => now()->toDateString(),
+            'metodo_pago' => 'qr',
+            'estado_verificacion' => 'pendiente',
+            'estado_snapshot' => 'pendiente',
+            'creado_por_admin' => false,
+        ]);
+        $this->charge->recalcularEstado();
+        $this->assertEquals('pendiente_confirmacion', $this->charge->estado);
+
+        // 2. Simulate admin rejection
+        $pago->update([
+            'estado_verificacion' => 'rechazado',
+            'motivo_rechazo' => 'Comprobante borroso',
         ]);
 
-        $response->assertRedirect(route('cliente.estado-cuenta'));
+        $originalEstado = now()->toDateString() > $this->charge->fecha_vencimiento ? 'vencido' : 'pendiente';
+        $this->charge->update([
+            'estado' => $originalEstado,
+            'estado_snapshot' => $originalEstado,
+        ]);
 
-        // The original charge should have its amount adjusted to 400 (what was paid) and marked as pagado.
+        // Send rejection notification to client
+        ClientNotification::create([
+            'cliente_id' => $this->client->id,
+            'tipo' => 'danger',
+            'titulo' => 'Pago Rechazado',
+            'mensaje' => 'Su pago ha sido rechazado. Razón: Comprobante borroso',
+        ]);
+
+        // Verify status changes and notification creation
         $this->charge->refresh();
-        $this->assertEquals(400, $this->charge->monto);
-        $this->assertEquals('pagado', $this->charge->estado);
+        $this->assertEquals($originalEstado, $this->charge->estado);
+        $this->assertEquals('rechazado', $pago->estado_verificacion);
+        $this->assertEquals('Comprobante borroso', $pago->motivo_rechazo);
 
-        // A new charge (cobro) of 600 should be created.
-        $newCharge = SuscripcionesCobros::where('suscripcion_id', $this->subscription->id)
-            ->where('id', '!=', $this->charge->id)
-            ->first();
-
-        $this->assertNotNull($newCharge);
-        $this->assertEquals(600, $newCharge->monto);
-        $this->assertEquals('pendiente', $newCharge->estado);
-        $this->assertStringContainsString('Saldo pendiente de:', $newCharge->concepto);
-
-        // The payment record should be created with pago_pendiente = 0 because the balance was transferred.
-        $this->assertDatabaseHas('suscripciones_pagos', [
-            'suscripcion_cobro_id' => $this->charge->id,
-            'monto_pagado' => 400,
-            'pago_pendiente' => 0,
-            'estado_snapshot' => 'pagado',
+        $this->assertDatabaseHas('client_notifications', [
+            'cliente_id' => $this->client->id,
+            'tipo' => 'danger',
+            'titulo' => 'Pago Rechazado',
+            'mensaje' => 'Su pago ha sido rechazado. Razón: Comprobante borroso',
         ]);
     }
 }

@@ -27,7 +27,10 @@ class MapaOcupacion extends Page
 
     protected function getViewData(): array
     {
-        $pisos = InfraestructurasPisos::all();
+        $infraId = \App\Support\ActiveInfraestructura::getId();
+        $pisos = $infraId
+            ? InfraestructurasPisos::where('infraestructura_id', $infraId)->get()
+            : InfraestructurasPisos::all();
         $estadisticas = [];
 
         foreach ($pisos as $piso) {
@@ -41,6 +44,7 @@ class MapaOcupacion extends Page
 
             $estadisticas[] = [
                 'id' => $piso->id,
+                'numero' => $piso->numero,
                 'piso' => $piso->nombre,
                 'total' => $totalTiendas,
                 'ocupadas' => $ocupadas,

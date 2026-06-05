@@ -27,10 +27,14 @@ class ReporteMorosidad extends Page implements HasTable
 
     protected static function baseQuery()
     {
-        return SuscripcionesCobros::query()
+        $query = SuscripcionesCobros::query()
             ->with(['pagos', 'suscripcion.cliente.user'])
             ->whereIn('estado', ['pendiente', 'parcial', 'vencido'])
             ->whereDate('fecha_vencimiento', '<', now()->toDateString());
+
+        return \App\Support\ActiveInfraestructura::scopeQuery(
+            $query, 'suscripcion.infraestructurasTienda.piso'
+        );
     }
 
     protected function getViewData(): array
@@ -63,7 +67,15 @@ class ReporteMorosidad extends Page implements HasTable
                 TextColumn::make('suscripcion.cliente.user.nombres')
                     ->label('Nombres')
                     ->placeholder('—')
-                    ->searchable(['users.nombres'])
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('suscripcion.cliente.user', function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
+                                $sq->whereRaw("unaccent(lower(nombres)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_paterno)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_materno)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                            });
+                        });
+                    })
                     ->sortable(query: function ($query, string $direction) {
                         $query
                             ->leftJoin('suscripciones', 'suscripciones.id', '=', 'suscripciones_cobros.suscripcion_id')
@@ -80,7 +92,15 @@ class ReporteMorosidad extends Page implements HasTable
                         if (! $u) return '—';
                         return trim(($u->apellido_paterno ?? '') . ' ' . ($u->apellido_materno ?? '')) ?: '—';
                     })
-                    ->searchable(['users.apellido_paterno', 'users.apellido_materno']),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('suscripcion.cliente.user', function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
+                                $sq->whereRaw("unaccent(lower(nombres)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_paterno)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_materno)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                            });
+                        });
+                    }),
                 TextColumn::make('concepto')
                     ->label('Concepto')
                     ->wrap(),

@@ -30,6 +30,7 @@
                                 <th class="px-6 py-4">Producto</th>
                                 <th class="px-6 py-4">Tienda / Local</th>
                                 <th class="px-6 py-4">Categoría</th>
+                                <th class="px-6 py-4">Subcategoría</th>
                                 <th class="px-6 py-4">Marca</th>
                                 <th class="px-6 py-4">Precio</th>
                                 <th class="px-6 py-4 text-center">Acciones</th>
@@ -62,9 +63,20 @@
                                         {{ $p->tienda->nombre ?: 'Local '.$p->tienda->numero }}
                                     </td>
 
-                                    <!-- Categoría -->
+                                    <!-- Categoría (padre de lo almacenado en categoria_id) -->
                                     <td class="px-6 py-4 text-slate-500 text-xs">
-                                        {{ $p->categoria->nombre ?? 'General' }}
+                                        {{ $p->categoria?->padre?->nombre ?? $p->categoria?->nombre ?? 'General' }}
+                                    </td>
+
+                                    <!-- Subcategoría (lo almacenado en categoria_id, si tiene padre) -->
+                                    <td class="px-6 py-4 text-xs">
+                                        @if($p->categoria?->categoria_padre_id)
+                                            <span class="px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full font-semibold">
+                                                {{ $p->categoria->nombre }}
+                                            </span>
+                                        @else
+                                            <span class="text-slate-300">—</span>
+                                        @endif
                                     </td>
 
                                     <!-- Marca -->

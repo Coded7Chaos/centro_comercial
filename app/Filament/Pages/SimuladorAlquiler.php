@@ -73,12 +73,21 @@ class SimuladorAlquiler extends Page implements HasForms
                                     ->afterStateUpdated(fn () => $this->calcularCotizacion()),
                             ]),
 
-                        TextInput::make('precio_mensual_base')
-                            ->label('Alquiler Mensual Base')
+                        TextInput::make('pago_mensual_estimado')
+                            ->label('Pago Mensual Estimado')
                             ->disabled()
                             ->dehydrated(false)
                             ->prefix('Bs.')
                             ->placeholder('—'),
+
+                        TextInput::make('garantia')
+                            ->label('Garantía Inicial')
+                            ->numeric()
+                            ->prefix('Bs.')
+                            ->placeholder('Se calcula igual al pago mensual')
+                            ->helperText('Por defecto equivale al pago mensual. Puedes modificarla.')
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn () => $this->recalcularTotal()),
 
                         TextInput::make('descuento_porcentaje')
                             ->label('Descuento por Tiempo')
@@ -93,15 +102,8 @@ class SimuladorAlquiler extends Page implements HasForms
                             ->dehydrated(false)
                             ->placeholder('—'),
 
-                        TextInput::make('pago_mensual_estimado')
-                            ->label('Pago Mensual Estimado')
-                            ->disabled()
-                            ->dehydrated(false)
-                            ->prefix('Bs.')
-                            ->placeholder('—'),
-
                         TextInput::make('cotizacion')
-                            ->label('Precio Estimado Total')
+                            ->label('Precio Estimado Total  (pago mensual × meses + garantía)')
                             ->disabled()
                             ->dehydrated(false)
                             ->prefix('Bs.')
@@ -113,26 +115,48 @@ class SimuladorAlquiler extends Page implements HasForms
 
     public function calcularCotizacion(): void
     {
-        $tamano = $this->data['tamano'] ?? null;
+        $tamano        = $this->data['tamano'] ?? null;
         $duracionValor = $this->data['duracion_valor'] ?? null;
         $duracionUnidad = $this->data['duracion_unidad'] ?? 'meses';
 
         if ($tamano !== null && $tamano !== '' && $duracionValor !== null && $duracionValor !== '') {
             $meses = $duracionUnidad === 'años' ? (int) $duracionValor * 12 : (int) $duracionValor;
-            $calc = SuscripcionesTarifas::calcularAlquiler((float) $tamano, $meses);
+            $calc  = SuscripcionesTarifas::calcularAlquiler((float) $tamano, $meses);
 
-            $this->data['etiqueta'] = $calc['etiqueta'];
-            $this->data['precio_mensual_base'] = number_format($calc['precio_mensual_base'], 2, '.', '');
+            $pagoMensual = $calc['precio_mensual_con_descuento'];
+
+            $this->data['etiqueta']             = $calc['etiqueta'];
             $this->data['descuento_porcentaje'] = number_format($calc['descuento_porcentaje'], 2, '.', '');
-            $this->data['pago_mensual_estimado'] = number_format($calc['precio_mensual_con_descuento'], 2, '.', '');
-            $this->data['cotizacion'] = number_format($calc['precio_total_con_descuento'], 2, '.', '');
+            $this->data['pago_mensual_estimado'] = number_format($pagoMensual, 2, '.', '');
+
+            // Auto-fill/update warranty to equal the new estimated monthly payment
+            $this->data['garantia'] = number_format($pagoMensual, 2, '.', '');
+
+            $garantia = (float) ($this->data['garantia'] ?? $pagoMensual);
+            $this->data['cotizacion'] = number_format($pagoMensual * $meses + $garantia, 2, '.', '');
         } else {
-            $this->data['etiqueta'] = 'Ingrese tamaño y duración';
-            $this->data['precio_mensual_base'] = null;
-            $this->data['descuento_porcentaje'] = null;
+            $this->data['etiqueta']              = 'Ingrese tamaño y duración';
+            $this->data['descuento_porcentaje']  = null;
             $this->data['pago_mensual_estimado'] = null;
-            $this->data['cotizacion'] = null;
+            $this->data['garantia']              = null;
+            $this->data['cotizacion']            = null;
         }
+    }
+
+    public function recalcularTotal(): void
+    {
+        $pagoMensual   = (float) ($this->data['pago_mensual_estimado'] ?? 0);
+        $duracionValor = $this->data['duracion_valor'] ?? null;
+        $duracionUnidad = $this->data['duracion_unidad'] ?? 'meses';
+
+        if ($pagoMensual <= 0 || empty($duracionValor)) {
+            return;
+        }
+
+        $meses    = $duracionUnidad === 'años' ? (int) $duracionValor * 12 : (int) $duracionValor;
+        $garantia = (float) ($this->data['garantia'] ?? $pagoMensual);
+
+        $this->data['cotizacion'] = number_format($pagoMensual * $meses + $garantia, 2, '.', '');
     }
     
     public function getTitle(): string | \Illuminate\Contracts\Support\Htmlable

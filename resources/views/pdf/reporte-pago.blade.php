@@ -55,7 +55,7 @@
 
         .header-item{
             display: inline-block;
-            width: 32%;
+            width: 49%;
             vertical-align: top;
         }
 
@@ -238,18 +238,6 @@
             <div class="header-item">
 
                 <div class="header-label">
-                    Recibo
-                </div>
-
-                <div class="header-value">
-                    #{{ $pago->id }}
-                </div>
-
-            </div>
-
-            <div class="header-item">
-
-                <div class="header-label">
                     Fecha
                 </div>
 
@@ -266,7 +254,7 @@
                 </div>
 
                 <div class="header-value">
-                    {{ $pago->hora_pago }}
+                    {{ $pago->hora_pago ? \Carbon\Carbon::parse($pago->hora_pago)->format('H:i:s') : \Carbon\Carbon::parse($pago->created_at)->format('H:i:s') }}
                 </div>
 
             </div>
@@ -308,11 +296,6 @@
                     {{ $cliente?->user?->email ?? $cliente?->correo_secundario ?? '---' }}
                 </div>
 
-                <div class="info">
-                    <span class="label">Marca:</span>
-                    {{ $marca?->nombre ?? '---' }}
-                </div>
-
             </div>
 
         </div>
@@ -332,7 +315,7 @@
 
                 <div class="info">
                     <span class="label">Piso:</span>
-                    {{ $piso?->nombre ?? '---' }}
+                    {{ $piso?->nombre ?? '---' }} (Nº {{ $piso?->numero ?? '---' }})
                 </div>
 
                 <div class="info">
@@ -343,7 +326,7 @@
                 </div>
 
                 <div class="info">
-                    <span class="label">Tipo:</span>
+                    <span class="label">Duración del contrato:</span>
                     {{ ucfirst($suscripcion?->tipo ?? '---') }}
                 </div>
 
@@ -370,23 +353,13 @@
             <tbody>
 
                 <tr>
-                    <td><strong>Monto total</strong></td>
-                    <td>Bs {{ number_format($montoTotal, 2) }}</td>
+                    <td><strong>Concepto de cobro</strong></td>
+                    <td>{{ $cobro->concepto ?? '---' }}</td>
                 </tr>
 
                 <tr>
-                    <td><strong>Total pagado antes de este pago</strong></td>
-                    <td>Bs {{ number_format($totalAntesPago, 2) }}</td>
-                </tr>
-
-                <tr>
-                    <td><strong>Nuevo pago realizado</strong></td>
+                    <td><strong>Monto pagado</strong></td>
                     <td>Bs {{ number_format($pago->monto_pagado, 2) }}</td>
-                </tr>
-
-                <tr>
-                    <td><strong>Total pagado acumulado</strong></td>
-                    <td>Bs {{ number_format($totalPagado, 2) }}</td>
                 </tr>
 
                 <tr>

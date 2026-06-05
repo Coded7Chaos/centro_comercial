@@ -228,10 +228,13 @@
                 </div>
             </div>
 
-            {{-- FILE COMPROBANTE --}}
-            <div class="space-y-2 border-t border-slate-100 pt-6">
-                <label for="comprobante" class="block text-xs font-black uppercase tracking-wider text-slate-500">Comprobante de Pago (Opcional)</label>
+            {{-- FILE COMPROBANTE (oculto para efectivo, requerido para los demás) --}}
+            <div class="space-y-2 border-t border-slate-100 pt-6" x-show="metodoPago !== 'efectivo'">
+                <label for="comprobante" class="block text-xs font-black uppercase tracking-wider text-slate-500">
+                    Comprobante de Pago <span class="text-red-500">*</span>
+                </label>
                 <input type="file" name="comprobante" id="comprobante" accept="image/*,application/pdf"
+                    :required="metodoPago !== 'efectivo'"
                     class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:uppercase file:bg-slate-900 file:text-white hover:file:bg-indigo-700 transition cursor-pointer">
                 <p class="text-[10px] text-slate-400 mt-1">Formatos admitidos: JPG, PNG, PDF. Tamaño máximo: 4MB.</p>
                 @error('comprobante') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror

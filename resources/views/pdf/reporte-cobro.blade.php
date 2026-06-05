@@ -203,17 +203,12 @@
                 </div>
 
                 <div class="info">
-                    <span class="label">Código:</span>
-                    #{{ $cobro->id }}
-                </div>
-
-                <div class="info">
                     <span class="label">Concepto:</span>
                     {{ $cobro->concepto ?? 'Sin concepto' }}
                 </div>
 
                 <div class="info">
-                    <span class="label">Fecha vencimiento:</span>
+                    <span class="label">Fecha de pago:</span>
                     {{ $cobro->fecha_vencimiento }}
                 </div>
 
@@ -272,11 +267,6 @@
                     {{ $cliente?->numero_celular ?? '---' }}
                 </div>
 
-                <div class="info">
-                    <span class="label">Marca:</span>
-                    {{ $marca?->nombre ?? '---' }}
-                </div>
-
             </div>
 
         </div>
@@ -302,7 +292,7 @@
 
         <div class="info">
             <span class="label">Tienda:</span>
-            #{{ $tienda?->numero ?? '---' }}
+            #{{ $tienda?->numero ?? '---' }} - {{ $tienda?->nombre ?? 'Sin nombre' }}
         </div>
 
     </div>

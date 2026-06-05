@@ -14,7 +14,6 @@ class ReporteCobrosController extends Controller
             'suscripcion.cliente.user',
             'suscripcion.marca',
             'suscripcion.infraestructurasTienda.piso.infraestructura',
-            'pagos'
         ])->findOrFail($id);
 
         $suscripcion = $cobro->suscripcion;
@@ -24,6 +23,19 @@ class ReporteCobrosController extends Controller
         $piso = $tienda?->piso;
         $infraestructura = $piso?->infraestructura;
 
+        // Historial: todos los pagos verificados de cobros de esta suscripción
+        // cuya fecha_vencimiento sea ANTERIOR a la del cobro actual.
+        // Cobro #1 → ningún cobro previo → historial vacío.
+        // Cobro #6 → muestra pagos de cobros #1..#5.
+        $pagos = \App\Models\SuscripcionesPagos::where('estado_verificacion', 'verificado')
+            ->whereHas('cobro', fn ($q) => $q
+                ->where('suscripcion_id', $suscripcion->id)
+                ->where('fecha_vencimiento', '<', $cobro->fecha_vencimiento)
+            )
+            ->orderBy('fecha_pago', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
         $pdf = Pdf::loadView('pdf.reporte-cobro', [
             'cobro' => $cobro,
             'suscripcion' => $suscripcion,
@@ -32,7 +44,7 @@ class ReporteCobrosController extends Controller
             'tienda' => $tienda,
             'piso' => $piso,
             'infraestructura' => $infraestructura,
-            'pagos' => $cobro->pagos ?? [],
+            'pagos' => $pagos,
         ]);
 
         return $pdf->stream("cobro-{$cobro->id}.pdf");

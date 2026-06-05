@@ -200,7 +200,9 @@
 
                             // Payment date
                             $fechaPagoRaw = $cobro->pagos->max('fecha_pago');
-                            $fechaPagoFormatted = $fechaPagoRaw ? \Carbon\Carbon::parse($fechaPagoRaw)->format('d/m/Y') : '—';
+                            $fechaPagoFormatted = $fechaPagoRaw 
+                                ? \Carbon\Carbon::parse($fechaPagoRaw)->format('d/m/Y') 
+                                : ($cobro->fecha_vencimiento ? \Carbon\Carbon::parse($cobro->fecha_vencimiento)->format('d/m/Y') : '—');
 
                             // Real state
                             $estadoReal = $cobro->estado;

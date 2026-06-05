@@ -4,12 +4,27 @@ namespace App\Filament\Widgets;
 
 use App\Models\InfraestructurasPisos;
 use App\Models\InfraestructurasTiendas;
+use App\Support\ActiveInfraestructura;
 use Filament\Widgets\ChartWidget;
+use Livewire\Attributes\On;
 
 class OcupacionPorPisoChart extends ChartWidget
 {
     protected ?string $heading = 'Ocupación por Piso';
     protected static ?int $sort = 4;
+
+    public ?int $activeInfraId = null;
+
+    public function mount(): void
+    {
+        $this->activeInfraId = ActiveInfraestructura::getDashboardId();
+    }
+
+    #[On('dashboardInfraChanged')]
+    public function updateInfraFilter(?int $infraId = null): void
+    {
+        $this->activeInfraId = $infraId ?: null;
+    }
 
     public static function canView(): bool
     {
@@ -18,7 +33,10 @@ class OcupacionPorPisoChart extends ChartWidget
 
     protected function getData(): array
     {
-        $pisos = InfraestructurasPisos::orderBy('id')->get();
+        $pisosQuery = $this->activeInfraId
+            ? InfraestructurasPisos::where('infraestructura_id', $this->activeInfraId)
+            : InfraestructurasPisos::query();
+        $pisos = $pisosQuery->orderBy('id')->get();
 
         $labels = [];
         $ocupadas = [];

@@ -23,6 +23,7 @@ class SuscripcionesTarifas extends Model
         'suscripciones_tarifas';
 
     protected $fillable = [
+        'infraestructura_id',
         'tamano_min',
         'tamano_max',
         'etiqueta',

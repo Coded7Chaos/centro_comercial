@@ -33,9 +33,11 @@ class SuscripcionesPagosTable
                     })
                     ->searchable(query: function ($query, $search) {
                         $query->whereHas('cobro.suscripcion.cliente.user', function ($q) use ($search) {
-                            $q->where('nombres', 'like', "%{$search}%")
-                                ->orWhere('apellido_paterno', 'like', "%{$search}%")
-                                ->orWhere('apellido_materno', 'like', "%{$search}%");
+                            $q->where(function ($sq) use ($search) {
+                                $sq->whereRaw("unaccent(lower(nombres)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_paterno)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_materno)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                            });
                         });
                     })
                     ->sortable()
@@ -63,8 +65,32 @@ class SuscripcionesPagosTable
                             . ' - Piso '
                             . ($piso?->nombre ?? '---');
                     })
-                    ->searchable()
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('cobro.suscripcion.infraestructurasTienda', function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
+                                $sq->whereRaw("unaccent(lower(nombre)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(numero)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                            });
+                        });
+                    })
                     ->sortable(),
+
+                /*
+                |------------------------------------------------------------------
+                | CONCEPTO (heredado del cobro asociado)
+                |------------------------------------------------------------------
+                */
+
+                TextColumn::make('cobro.concepto')
+                    ->label('Concepto')
+                    ->wrap()
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('cobro', function ($q) use ($search) {
+                            $q->whereRaw("unaccent(lower(concepto)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                        });
+                    })
+                    ->limit(50)
+                    ->tooltip(fn ($record) => $record->cobro?->concepto),
 
                 /*
                 |------------------------------------------------------------------
@@ -146,6 +172,17 @@ class SuscripcionesPagosTable
                         };
                     }),
 
+                TextColumn::make('estado_verificacion')
+                    ->label('Verificación')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'pendiente' => 'warning',
+                        'verificado' => 'success',
+                        'rechazado' => 'danger',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => ucfirst($state)),
+
                 /*
                 |------------------------------------------------------------------
                 | FECHA
@@ -191,15 +228,14 @@ class SuscripcionesPagosTable
                     }),
             ])
 
-            ->filters([
-                //
-            ])
+            ->filters([])
 
             ->recordActions([
 
                 ViewAction::make(),
 
-                EditAction::make(),
+                EditAction::make()
+                    ->visible(fn ($record) => $record->estado_verificacion === 'verificado'),
 
                 Action::make('pdf')
 
@@ -209,16 +245,82 @@ class SuscripcionesPagosTable
 
                     ->color('danger')
 
+                    ->visible(fn ($record) => $record->estado_verificacion === 'verificado')
+
                     ->url(
+
                         fn($record) =>
 
                         route(
+
                             'pdf.pago',
+
                             $record->id
+
                         )
+
                     )
 
                     ->openUrlInNewTab(),
+
+                Action::make('aprobar')
+                    ->label('Aprobar')
+                    ->icon('heroicon-o-check-circle')
+                    ->color('success')
+                    ->visible(fn ($record) => $record->estado_verificacion === 'pendiente')
+                    ->requiresConfirmation()
+                    ->action(function ($record) {
+                        $record->update(['estado_verificacion' => 'verificado']);
+                        $cobro = $record->cobro;
+                        
+                        // Recalculate status of the cobro (it will become pagado since amount is fully paid)
+                        $cobro->update([
+                            'saldo_pendiente' => 0,
+                            'estado' => 'pagado',
+                            'estado_snapshot' => 'pagado',
+                        ]);
+
+                        // Send success notification to client
+                        \App\Models\ClientNotification::create([
+                            'cliente_id' => $cobro->suscripcion->cliente_id,
+                            'tipo' => 'success',
+                            'titulo' => 'Pago Aprobado',
+                            'mensaje' => 'Su pago para el cobro "' . $cobro->concepto . '" por Bs. ' . number_format($record->monto_pagado, 2) . ' ha sido aprobado.',
+                        ]);
+                    }),
+
+                Action::make('rechazar')
+                    ->label('Rechazar')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn ($record) => $record->estado_verificacion === 'pendiente')
+                    ->form([
+                        \Filament\Forms\Components\Textarea::make('motivo_rechazo')
+                            ->label('Razón del Rechazo')
+                            ->required(),
+                    ])
+                    ->action(function ($record, array $data) {
+                        $record->update([
+                            'estado_verificacion' => 'rechazado',
+                            'motivo_rechazo' => $data['motivo_rechazo'],
+                        ]);
+                        $cobro = $record->cobro;
+                        
+                        // Revert cobro status to original (either vencido if date is past, or pendiente)
+                        $originalEstado = now()->toDateString() > $cobro->fecha_vencimiento ? 'vencido' : 'pendiente';
+                        $cobro->update([
+                            'estado' => $originalEstado,
+                            'estado_snapshot' => $originalEstado,
+                        ]);
+
+                        // Send rejection notification to client
+                        \App\Models\ClientNotification::create([
+                            'cliente_id' => $cobro->suscripcion->cliente_id,
+                            'tipo' => 'danger',
+                            'titulo' => 'Pago Rechazado',
+                            'mensaje' => 'Su pago para el cobro "' . $cobro->concepto . '" por Bs. ' . number_format($record->monto_pagado, 2) . ' ha sido rechazado. Razón: ' . $data['motivo_rechazo'],
+                        ]);
+                    }),
             ])
 
             ->toolbarActions([

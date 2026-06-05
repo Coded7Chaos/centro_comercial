@@ -63,13 +63,16 @@
                                             {{ $estado === 'pendiente' ? 'bg-slate-50 border-slate-200 text-slate-600' : '' }}
                                             {{ $estado === 'vencido' ? 'bg-rose-50 border-rose-100 text-rose-700' : '' }}
                                             {{ $estado === 'anulado' ? 'bg-gray-100 border-gray-200 text-gray-400' : '' }}
+                                            {{ $estado === 'pendiente_confirmacion' ? 'bg-indigo-50 border-indigo-100 text-indigo-700' : '' }}
                                         ">
-                                            {{ $cobro->estado }}
+                                            {{ $estado === 'pendiente_confirmacion' ? 'pendiente de confirmación' : $cobro->estado }}
                                         </span>
                                     </td>
 
                                     <td class="px-6 py-4 text-center">
-                                        @if($restante > 0 && $estado !== 'anulado')
+                                        @if($estado === 'pendiente_confirmacion')
+                                            <span class="text-xs text-indigo-600 font-bold uppercase tracking-wider">En Verificación</span>
+                                        @elseif($restante > 0 && $estado !== 'anulado')
                                             <button type="button" 
                                                     onclick="openPaymentModal({{ $cobro->id }}, '{{ $cobro->concepto }}', {{ $restante }})"
                                                     class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-xl shadow transition active:scale-95">
@@ -118,8 +121,8 @@
                 <!-- Monto a pagar -->
                 <div class="space-y-1">
                     <label for="modal-monto-input" class="block text-xs font-bold text-slate-600">Monto del Pago (Bs.)</label>
-                    <input type="number" step="0.01" min="0.10" name="monto_pagado" id="modal-monto-input" required 
-                           class="w-full rounded-xl border-slate-200 py-2.5 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
+                    <input type="number" step="0.01" name="monto_pagado" id="modal-monto-input" readonly required
+                           class="w-full bg-slate-100 rounded-xl border-slate-200 py-2.5 px-3 focus:ring-slate-500 focus:border-slate-500 text-sm font-bold text-slate-700 cursor-not-allowed">
                 </div>
 
                 <!-- Método de Pago -->
@@ -129,15 +132,30 @@
                             class="w-full rounded-xl border-slate-200 py-2.5 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                         <option value="transferencia">Transferencia Bancaria</option>
                         <option value="qr">Pago Simple QR</option>
-                        <option value="efectivo">Depósito / Efectivo</option>
-                        <option value="tarjeta">Tarjeta de Crédito/Débito</option>
                     </select>
+                </div>
+
+                <!-- Detalles de pago según método -->
+                <div id="bank-info" class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-1 hidden">
+                    <p class="font-bold text-slate-700">Datos para Transferencia Bancaria:</p>
+                    <p><span class="text-slate-500 font-medium">Banco:</span> <span class="font-bold text-slate-800">{{ $settings?->banco_nombre ?? '---' }}</span></p>
+                    <p><span class="text-slate-500 font-medium">Nro. de Cuenta:</span> <span class="font-bold text-slate-800">{{ $settings?->banco_nro_cuenta ?? '---' }}</span></p>
+                    <p><span class="text-slate-500 font-medium">Titular:</span> <span class="font-bold text-slate-800">{{ $settings?->banco_titular ?? '---' }}</span></p>
+                </div>
+
+                <div id="qr-info" class="p-4 bg-slate-50 border border-slate-200 rounded-2xl flex flex-col items-center gap-2 hidden">
+                    <p class="text-xs font-bold text-slate-700 w-full text-left">Escanee el código QR para pagar:</p>
+                    @if($settings?->qr_imagen)
+                        <img src="{{ asset('storage/' . $settings->qr_imagen) }}" alt="QR de Pago" class="max-w-[160px] h-auto rounded-xl border shadow-sm">
+                    @else
+                        <p class="text-xs text-rose-600 font-bold italic">Código QR no configurado por el administrador.</p>
+                    @endif
                 </div>
 
                 <!-- Campos dinámicos según el método -->
                 <div id="method-fields" class="space-y-4">
                     <!-- Transferencia -->
-                    <div id="field-transferencia" class="grid grid-cols-2 gap-4">
+                    <div id="field-transferencia" class="grid grid-cols-2 gap-4 hidden">
                         <div class="space-y-1">
                             <label for="numero_transaccion" class="block text-xs font-bold text-slate-600">Código de Operación</label>
                             <input type="text" name="numero_transaccion" id="numero_transaccion" placeholder="Ej: 125487" 
@@ -148,13 +166,6 @@
                             <input type="text" name="banco_origen" id="banco_origen" placeholder="Ej: Banco Unión" 
                                    class="w-full rounded-xl border-slate-200 py-2.5 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                         </div>
-                    </div>
-
-                    <!-- Efectivo -->
-                    <div id="field-efectivo" class="space-y-1 hidden">
-                        <label for="nombre_pagador" class="block text-xs font-bold text-slate-600">Nombre del Depositante</label>
-                        <input type="text" name="nombre_pagador" id="nombre_pagador" placeholder="Ej: Juan Pérez" 
-                               class="w-full rounded-xl border-slate-200 py-2.5 px-3 focus:ring-indigo-500 focus:border-indigo-500 text-sm">
                     </div>
                 </div>
 
@@ -197,23 +208,24 @@
         function toggleMethodFields() {
             const method = document.getElementById('metodo_pago').value;
             const fieldTransferencia = document.getElementById('field-transferencia');
-            const fieldEfectivo = document.getElementById('field-efectivo');
+            const bankInfo = document.getElementById('bank-info');
+            const qrInfo = document.getElementById('qr-info');
 
             // Reset
             fieldTransferencia.classList.add('hidden');
-            fieldEfectivo.classList.add('hidden');
+            bankInfo.classList.add('hidden');
+            qrInfo.classList.add('hidden');
 
             document.getElementById('numero_transaccion').required = false;
             document.getElementById('banco_origen').required = false;
-            document.getElementById('nombre_pagador').required = false;
 
             if (method === 'transferencia') {
                 fieldTransferencia.classList.remove('hidden');
+                bankInfo.classList.remove('hidden');
                 document.getElementById('numero_transaccion').required = true;
                 document.getElementById('banco_origen').required = true;
-            } else if (method === 'efectivo') {
-                fieldEfectivo.classList.remove('hidden');
-                document.getElementById('nombre_pagador').required = true;
+            } else if (method === 'qr') {
+                qrInfo.classList.remove('hidden');
             }
         }
     </script>

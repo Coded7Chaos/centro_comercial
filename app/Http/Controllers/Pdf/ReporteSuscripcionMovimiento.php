@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Pdf;
 use App\Http\Controllers\Controller;
 use App\Models\Suscripciones;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class ReporteSuscripcionMovimiento extends Controller
 {
@@ -18,111 +19,84 @@ class ReporteSuscripcionMovimiento extends Controller
             'cobros.pagos',
         ])->findOrFail($id);
 
-        $cliente = $suscripcion->cliente;
-        $tienda  = $suscripcion->infraestructurasTienda;
-
-        // La suscripción ya tiene su propia marca; si no, caemos a la primera marca de la tienda.
-        $marca = $suscripcion->marca ?? $tienda?->marcas->first();
-
-        $piso = $tienda?->piso;
+        $cliente         = $suscripcion->cliente;
+        $tienda          = $suscripcion->infraestructurasTienda;
+        $piso            = $tienda?->piso;
         $infraestructura = $piso?->infraestructura;
 
-        /*
-        |--------------------------------------------------------------------------
-        | TIMELINE DE MOVIMIENTOS
-        |--------------------------------------------------------------------------
-        */
+        // Calcular pago mensual y garantía
+        $totalMeses  = max(1, (int) round(
+            Carbon::parse($suscripcion->fecha_inicio)
+                ->diffInMonths(Carbon::parse($suscripcion->fecha_fin)->addDay())
+        ));
+        $pagoMensual = (float) $suscripcion->precio / $totalMeses;
+        $garantia    = $pagoMensual;
+        $precioTotal = (float) $suscripcion->precio + $garantia;
 
+        // ── COBROS PENDIENTES (pendiente / vencido / parcial) ──────────
+        $cobrosPendientes = $suscripcion->cobros
+            ->whereIn('estado', ['pendiente', 'vencido', 'parcial'])
+            ->sortBy('fecha_vencimiento');
+
+        // ── PAGOS REALIZADOS (todos los pagos de todos los cobros) ─────
+        $pagosRealizados = $suscripcion->cobros
+            ->flatMap(function ($cobro) {
+                return $cobro->pagos->map(fn ($pago) => [
+                    'cobro_concepto' => $cobro->concepto,
+                    'pago'           => $pago,
+                ]);
+            })
+            ->sortBy(fn ($item) => $item['pago']->fecha_pago);
+
+        // ── ARMAR MOVIMIENTOS ──────────────────────────────────────────
         $movimientos = [];
 
-        foreach ($suscripcion->cobros as $cobro) {
-
+        foreach ($cobrosPendientes as $cobro) {
             $movimientos[] = [
-
-                'tipo' => 'COBRO',
-
-                'fecha' => $cobro->created_at,
-
-                'detalle' =>
-                    'Cobro generado: ' .
-                    $cobro->concepto,
-
-                'monto' => $cobro->monto,
-
-                'estado' =>
-                    $cobro->estado ?? 'pendiente',
+                'tipo'    => 'COBRO',
+                'fecha'   => $cobro->fecha_vencimiento,
+                'id'      => $cobro->id,
+                'detalle' => $cobro->concepto,
+                'monto'   => $cobro->monto,
+                'estado'  => $cobro->estado,
+                'metodo'  => null,
             ];
-
-            foreach ($cobro->pagos as $pago) {
-
-                $movimientos[] = [
-
-                    'tipo' => 'PAGO',
-
-                    'fecha' => $pago->fecha_pago,
-
-                    'detalle' =>
-                        'Pago realizado (' .
-                        ucfirst($pago->metodo_pago) .
-                        ')',
-
-                    'monto' => $pago->monto_pagado,
-
-                    'estado' => 'pagado',
-                ];
-            }
         }
 
-        /*
-        |--------------------------------------------------------------------------
-        | ORDENAR TIMELINE
-        |--------------------------------------------------------------------------
-        */
+        foreach ($pagosRealizados as $item) {
+            $pago = $item['pago'];
+            $movimientos[] = [
+                'tipo'    => 'PAGO',
+                'fecha'   => $pago->fecha_pago,
+                'id'      => $pago->id,
+                'detalle' => $item['cobro_concepto'],
+                'monto'   => $pago->monto_pagado,
+                'estado'  => 'pagado',
+                'metodo'  => $pago->metodo_pago ? ucfirst($pago->metodo_pago) : null,
+            ];
+        }
 
-        usort(
+        // Ordenar: cobros por fecha_vencimiento, pagos por fecha_pago.
+        // Cuando dos movimientos tienen la misma fecha, el de menor id (creado antes) va primero.
+        usort($movimientos, function ($a, $b) {
+            $diff = strtotime($a['fecha']) <=> strtotime($b['fecha']);
+            if ($diff !== 0) return $diff;
+            return ($a['id'] ?? 0) <=> ($b['id'] ?? 0);
+        });
 
-            $movimientos,
+        $pdf = Pdf::loadView('pdf.reporte-suscripcion-movimiento', [
+            'suscripcion'    => $suscripcion,
+            'cliente'        => $cliente,
+            'tienda'         => $tienda,
+            'piso'           => $piso,
+            'infraestructura' => $infraestructura,
+            'movimientos'    => $movimientos,
+            'pago_mensual'   => $pagoMensual,
+            'garantia'       => $garantia,
+            'precio_total'   => $precioTotal,
+            'total_meses'    => $totalMeses,
+        ]);
 
-            fn($a, $b) =>
-
-            strtotime($a['fecha']) <=>
-            strtotime($b['fecha'])
-
-        );
-
-        /*
-        |--------------------------------------------------------------------------
-        | GENERAR PDF
-        |--------------------------------------------------------------------------
-        */
-
-        $pdf = Pdf::loadView(
-
-            'pdf.reporte-suscripcion-movimiento',
-
-            [
-
-                'suscripcion' => $suscripcion,
-
-                'cliente' => $cliente,
-
-                'marca' => $marca,
-
-                'tienda' => $tienda,
-
-                'piso' => $piso,
-
-                'infraestructura' => $infraestructura,
-
-                'movimientos' => $movimientos,
-            ]
-
-        );
-
-        return $pdf->stream(
-
-            "suscripcion-movimiento-{$suscripcion->id}.pdf"
-
-        );
+        return $pdf->stream("suscripcion-movimiento-{$suscripcion->id}.pdf");
     }
 }

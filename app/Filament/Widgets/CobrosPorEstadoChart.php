@@ -3,14 +3,29 @@
 namespace App\Filament\Widgets;
 
 use App\Models\SuscripcionesCobros;
+use App\Support\ActiveInfraestructura;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 
 class CobrosPorEstadoChart extends ChartWidget
 {
     protected ?string $heading = 'Cobros por Estado (últimos 6 meses)';
     protected static ?int $sort = 3;
+
+    public ?int $activeInfraId = null;
+
+    public function mount(): void
+    {
+        $this->activeInfraId = ActiveInfraestructura::getDashboardId();
+    }
+
+    #[On('dashboardInfraChanged')]
+    public function updateInfraFilter(?int $infraId = null): void
+    {
+        $this->activeInfraId = $infraId ?: null;
+    }
 
     public static function canView(): bool
     {
@@ -30,7 +45,8 @@ class CobrosPorEstadoChart extends ChartWidget
         $labels = [];
         $months = [];
         for ($i = 5; $i >= 0; $i--) {
-            $m = Carbon::now()->subMonths($i);
+            // Utilizar startOfMonth antes de subMonths para evitar desbordamientos de fecha
+            $m = Carbon::now()->startOfMonth()->subMonths($i);
             $labels[] = $m->translatedFormat('M Y');
             $months[] = [$m->year, $m->month];
         }
@@ -39,10 +55,15 @@ class CobrosPorEstadoChart extends ChartWidget
         foreach ($estados as $estado => $color) {
             $data = [];
             foreach ($months as [$year, $month]) {
-                $data[] = (int) SuscripcionesCobros::where('estado', $estado)
+                $query = SuscripcionesCobros::where('estado', $estado)
                     ->whereYear('fecha_vencimiento', $year)
-                    ->whereMonth('fecha_vencimiento', $month)
-                    ->count();
+                    ->whereMonth('fecha_vencimiento', $month);
+                if ($this->activeInfraId) {
+                    $query->whereHas('suscripcion.infraestructurasTienda.piso',
+                        fn ($q) => $q->where('infraestructura_id', $this->activeInfraId)
+                    );
+                }
+                $data[] = (int) $query->count();
             }
             $datasets[] = [
                 'label' => ucfirst($estado),

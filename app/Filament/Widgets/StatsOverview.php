@@ -6,47 +6,74 @@ use App\Models\SuscripcionesPagos;
 use App\Models\SuscripcionesCobros;
 use App\Models\InfraestructurasTiendas;
 use App\Models\Suscripciones;
+use App\Support\ActiveInfraestructura;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
+use Livewire\Attributes\On;
 
 class StatsOverview extends BaseWidget
 {
+    public ?int $activeInfraId = null;
+
+    public function mount(): void
+    {
+        $this->activeInfraId = ActiveInfraestructura::getDashboardId();
+    }
+
+    #[On('dashboardInfraChanged')]
+    public function updateInfraFilter(?int $infraId = null): void
+    {
+        $this->activeInfraId = $infraId ?: null;
+    }
+
     public static function canView(): bool
     {
         return auth()->user()?->can('View:StatsOverview') ?? false;
+    }
+
+    private function infraScope(\Illuminate\Database\Eloquent\Builder $query, string $chain): \Illuminate\Database\Eloquent\Builder
+    {
+        if (!$this->activeInfraId) return $query;
+        return $query->whereHas($chain, fn ($q) => $q->where('infraestructura_id', $this->activeInfraId));
     }
 
     protected function getStats(): array
     {
         $now = Carbon::now();
         $inicioMes = $now->copy()->startOfMonth();
-        $inicioMesPasado = $now->copy()->subMonth()->startOfMonth();
-        $finMesPasado = $now->copy()->subMonth()->endOfMonth();
+        $inicioMesPasado = $now->copy()->startOfMonth()->subMonth();
+        $finMesPasado = $now->copy()->startOfMonth()->subMonth()->endOfMonth();
 
-        $ingresosMes = (float) SuscripcionesPagos::whereBetween('fecha_pago', [$inicioMes, $now])->sum('monto_pagado');
-        $ingresosMesAnterior = (float) SuscripcionesPagos::whereBetween('fecha_pago', [$inicioMesPasado, $finMesPasado])->sum('monto_pagado');
+        $pagosBase = fn() => $this->infraScope(SuscripcionesPagos::where('estado_verificacion', 'verificado'), 'cobro.suscripcion.infraestructurasTienda.piso');
+
+        $ingresosMes = (float) $pagosBase()->whereBetween('fecha_pago', [$inicioMes, $now])->sum('monto_pagado');
+        $ingresosMesAnterior = (float) $pagosBase()->whereBetween('fecha_pago', [$inicioMesPasado, $finMesPasado])->sum('monto_pagado');
 
         $variacion = $ingresosMesAnterior > 0
             ? round((($ingresosMes - $ingresosMesAnterior) / $ingresosMesAnterior) * 100, 1)
             : null;
 
-        $deudaVencida = (float) SuscripcionesCobros::whereIn('estado', ['vencido', 'parcial'])
-            ->whereDate('fecha_vencimiento', '<', $now->toDateString())
-            ->with('pagos')
-            ->get()
-            ->sum(fn ($c) => max(0, (float) $c->monto - (float) $c->pagos->sum('monto_pagado')));
+        $cobrosQuery = $this->infraScope(
+            SuscripcionesCobros::whereIn('estado', ['vencido', 'parcial'])
+                ->whereDate('fecha_vencimiento', '<', $now->toDateString()),
+            'suscripcion.infraestructurasTienda.piso'
+        );
+        $deudaVencida = (float) $cobrosQuery->with('pagos')->get()
+            ->sum(fn ($c) => max(0, (float) $c->monto - (float) $c->pagos->where('estado_verificacion', 'verificado')->sum('monto_pagado')));
 
-        $tiendasTotal = InfraestructurasTiendas::count();
-        $tiendasOcupadas = InfraestructurasTiendas::whereHas('estado', function ($q) {
-            $q->where('estado', 'Alquilada');
-        })->count();
+        $tiendasQuery   = $this->activeInfraId
+            ? InfraestructurasTiendas::whereHas('piso', fn ($q) => $q->where('infraestructura_id', $this->activeInfraId))
+            : InfraestructurasTiendas::query();
+        $tiendasTotal   = (clone $tiendasQuery)->count();
+        $tiendasOcupadas = (clone $tiendasQuery)->whereHas('estado', fn ($q) => $q->where('estado', 'Alquilada'))->count();
         $ocupacion = $tiendasTotal > 0 ? round(($tiendasOcupadas / $tiendasTotal) * 100, 1) : 0;
 
-        $contratosPorVencer = Suscripciones::whereBetween('fecha_fin', [
-            $now->toDateString(),
-            $now->copy()->addDays(30)->toDateString(),
-        ])->count();
+        $contratosQuery = $this->infraScope(
+            Suscripciones::whereBetween('fecha_fin', [$now->toDateString(), $now->copy()->addDays(30)->toDateString()]),
+            'infraestructurasTienda.piso'
+        );
+        $contratosPorVencer = $contratosQuery->count();
 
         $stats = [
             Stat::make('Ingresos del mes', 'Bs. ' . number_format($ingresosMes, 2))

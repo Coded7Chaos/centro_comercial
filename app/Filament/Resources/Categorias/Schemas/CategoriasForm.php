@@ -85,8 +85,21 @@ class CategoriasForm
                         titleAttribute: 'nombre',
 
                         // SOLO MUESTRA CATEGORÍAS
-                        modifyQueryUsing: fn($query) =>
-                        $query->where('tipo', 'categoria')
+                        modifyQueryUsing: function ($query) {
+                            $query->where('tipo', 'categoria');
+                            $id = \App\Support\ActiveInfraestructura::getId();
+                            if ($id) {
+                                $query->where(function ($q) use ($id) {
+                                    $q->where('infraestructura_id', $id)
+                                      ->orWhereHas('productos.tienda.piso', function ($qp) use ($id) {
+                                          $qp->where('infraestructura_id', $id);
+                                      })
+                                      ->orWhereHas('subcategorias.productos.tienda.piso', function ($qp) use ($id) {
+                                          $qp->where('infraestructura_id', $id);
+                                      });
+                                });
+                            }
+                        }
                     )
 
                     ->searchable()

@@ -45,7 +45,6 @@ class SuscripcionesPagos extends Model
         |------------------------------------------------------------------
         */
         'fecha_pago',
-        'fecha_vencimiento',
         'fecha_hora_operacion',
 
         /*
@@ -119,6 +118,12 @@ class SuscripcionesPagos extends Model
         */
         'observaciones',
         'estado_snapshot',
+        'motivo_rechazo',
+        'creado_por_admin',
+    ];
+
+    protected $casts = [
+        'creado_por_admin' => 'boolean',
     ];
 
     /*
@@ -181,13 +186,25 @@ class SuscripcionesPagos extends Model
                 return;
             }
 
+            if (empty($pago->estado_verificacion)) {
+                $pago->estado_verificacion = 'verificado';
+            }
+
+            if (empty($pago->hora_pago)) {
+                $pago->hora_pago = now()->format('H:i:s');
+            }
+
             if ($pago->pago_pendiente === null) {
-                $totalPagadoHastaAhora = self::where('suscripcion_cobro_id', $pago->suscripcion_cobro_id)->sum('monto_pagado');
+                $totalPagadoHastaAhora = self::where('suscripcion_cobro_id', $pago->suscripcion_cobro_id)
+                    ->where('estado_verificacion', 'verificado')
+                    ->sum('monto_pagado');
                 $pago->pago_pendiente = max(0, $cobro->monto - ($totalPagadoHastaAhora + $pago->monto_pagado));
             }
 
             if ($pago->estado_snapshot === null) {
-                $totalPagadoHastaAhora = self::where('suscripcion_cobro_id', $pago->suscripcion_cobro_id)->sum('monto_pagado');
+                $totalPagadoHastaAhora = self::where('suscripcion_cobro_id', $pago->suscripcion_cobro_id)
+                    ->where('estado_verificacion', 'verificado')
+                    ->sum('monto_pagado');
                 $totalConEste = $totalPagadoHastaAhora + $pago->monto_pagado;
                 if ($totalConEste >= $cobro->monto) {
                     $pago->estado_snapshot = 'pagado';
@@ -198,55 +215,17 @@ class SuscripcionesPagos extends Model
         });
 
         static::created(function ($pago) {
+            $pago->cobro?->recalcularEstado();
+        });
 
-            $cobro = $pago->cobro;
-
-            if (!$cobro) {
-                return;
+        static::updated(function ($pago) {
+            if ($pago->wasChanged('monto_pagado') || $pago->wasChanged('estado_verificacion')) {
+                $pago->cobro?->recalcularEstado();
             }
+        });
 
-            /*
-        |--------------------------------------------------------------------------
-        | TOTAL PAGADO
-        |--------------------------------------------------------------------------
-        */
-
-            $totalPagado = self::where(
-                'suscripcion_cobro_id',
-                $cobro->id
-            )->sum('monto_pagado');
-
-            /*
-        |--------------------------------------------------------------------------
-        | ESTADO
-        |--------------------------------------------------------------------------
-        */
-
-            if ($totalPagado >= $cobro->monto) {
-
-                $estado = 'pagado';
-            } elseif ($totalPagado > 0) {
-
-                $estado = 'parcial';
-            } else {
-
-                $estado = now()->toDateString()
-                    > $cobro->fecha_vencimiento
-
-                    ? 'vencido'
-
-                    : 'pendiente';
-            }
-
-            /*
-        |--------------------------------------------------------------------------
-        | ACTUALIZAR COBRO
-        |--------------------------------------------------------------------------
-        */
-
-            $cobro->update([
-                'estado' => $estado,
-            ]);
+        static::deleted(function ($pago) {
+            $pago->cobro?->recalcularEstado();
         });
     }
 }

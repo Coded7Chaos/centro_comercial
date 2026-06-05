@@ -161,4 +161,17 @@ class InfraestructurasTiendas extends Model
         $mensual = $this->getPrecioMensualReferencial();
         return round(($mensual / 30.0) * $dias, 2);
     }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (InfraestructurasTiendas $tienda) {
+            // Detach brands
+            $tienda->marcas()->detach();
+
+            // Nullify related subscriptions
+            \App\Models\Suscripciones::where('infraestructuras_tienda_id', $tienda->id)
+                ->update(['infraestructuras_tienda_id' => null]);
+        });
+    }
 }
+

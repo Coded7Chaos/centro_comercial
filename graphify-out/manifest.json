@@ -1,0 +1,1272 @@
+{
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Console/Commands/MarcarCobrosVencidos.php": {
+    "mtime": 1779639031.0607238,
+    "ast_hash": "f8ab7124ef0648f76d5df9278f13960e",
+    "semantic_hash": "f8ab7124ef0648f76d5df9278f13960e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Console/Commands/ReleaseExpiredSubscriptions.php": {
+    "mtime": 1780014118.3958383,
+    "ast_hash": "830a7d5829affbf1a2de7d12e50cd903",
+    "semantic_hash": "830a7d5829affbf1a2de7d12e50cd903"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Pages/Auditoria.php": {
+    "mtime": 1779639425.551929,
+    "ast_hash": "6ab27524538bf1ac1dec9a96a6229c8a",
+    "semantic_hash": "6ab27524538bf1ac1dec9a96a6229c8a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Pages/BalanceSuscripciones.php": {
+    "mtime": 1780604523.9586036,
+    "ast_hash": "14df377c870c32c58ade6d997a57fd9c",
+    "semantic_hash": "14df377c870c32c58ade6d997a57fd9c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Pages/MapaOcupacion.php": {
+    "mtime": 1780604513.5921686,
+    "ast_hash": "3feb697216d24cf10ebae19d71bce08b",
+    "semantic_hash": "3feb697216d24cf10ebae19d71bce08b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Pages/MiEstadoDeCuenta.php": {
+    "mtime": 1779148416.0,
+    "ast_hash": "4776d8eafa7be42b9ac6e123e03d55cf",
+    "semantic_hash": "4776d8eafa7be42b9ac6e123e03d55cf"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Pages/ReporteMorosidad.php": {
+    "mtime": 1780604519.6125247,
+    "ast_hash": "447922c278de6d7b08b392e6193422a2",
+    "semantic_hash": "447922c278de6d7b08b392e6193422a2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Pages/SimuladorAlquiler.php": {
+    "mtime": 1780609045.3176007,
+    "ast_hash": "ceb88830eaf436682af956ef9f03241b",
+    "semantic_hash": "ceb88830eaf436682af956ef9f03241b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Categorias/CategoriasResource.php": {
+    "mtime": 1780604494.8095376,
+    "ast_hash": "e331b7a1ec6003d446ce6562344c760c",
+    "semantic_hash": "e331b7a1ec6003d446ce6562344c760c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Categorias/Pages/CreateCategorias.php": {
+    "mtime": 1780604466.9436421,
+    "ast_hash": "4e4a47c01be4b44d9723cf4ed06d0463",
+    "semantic_hash": "4e4a47c01be4b44d9723cf4ed06d0463"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Categorias/Pages/EditCategorias.php": {
+    "mtime": 1778438346.0,
+    "ast_hash": "0e78b1efa5f45d7b5f38d672cdcf0b49",
+    "semantic_hash": "0e78b1efa5f45d7b5f38d672cdcf0b49"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Categorias/Pages/ListCategorias.php": {
+    "mtime": 1778438346.0,
+    "ast_hash": "6e242a7ab818b6f31fbafae9e0350b02",
+    "semantic_hash": "6e242a7ab818b6f31fbafae9e0350b02"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Categorias/Pages/ViewCategorias.php": {
+    "mtime": 1778438346.0,
+    "ast_hash": "63330e03a61789d1a070ce3a491a710d",
+    "semantic_hash": "63330e03a61789d1a070ce3a491a710d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Categorias/Schemas/CategoriasForm.php": {
+    "mtime": 1778610779.0,
+    "ast_hash": "a728bd67a5256c19896ca4a5ae7488aa",
+    "semantic_hash": "a728bd67a5256c19896ca4a5ae7488aa"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Categorias/Schemas/CategoriasInfolist.php": {
+    "mtime": 1778606457.0,
+    "ast_hash": "c894066081967cb0d1fda7bd691382f2",
+    "semantic_hash": "c894066081967cb0d1fda7bd691382f2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Categorias/Tables/CategoriasTable.php": {
+    "mtime": 1778606733.0,
+    "ast_hash": "10a0166e9b47249bee04dc0457497d7d",
+    "semantic_hash": "10a0166e9b47249bee04dc0457497d7d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/ClientesResource.php": {
+    "mtime": 1779638950.1536198,
+    "ast_hash": "87b649a2bafcfd94694e794607b68ebb",
+    "semantic_hash": "87b649a2bafcfd94694e794607b68ebb"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/Pages/CreateClientes.php": {
+    "mtime": 1779468016.3783562,
+    "ast_hash": "6eb5939c1e88099be829a63ab58298f3",
+    "semantic_hash": "6eb5939c1e88099be829a63ab58298f3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/Pages/EditClientes.php": {
+    "mtime": 1779468006.9983118,
+    "ast_hash": "d764d6ada5df1f5fb31136b4dab662aa",
+    "semantic_hash": "d764d6ada5df1f5fb31136b4dab662aa"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/Pages/ListClientes.php": {
+    "mtime": 1778440910.0,
+    "ast_hash": "3c5d1c1f263e6066c6faf17d36f56e05",
+    "semantic_hash": "3c5d1c1f263e6066c6faf17d36f56e05"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/Pages/ViewClienteCustom.php": {
+    "mtime": 1779422085.7274146,
+    "ast_hash": "48246afeccacaec1fb730c66947bd384",
+    "semantic_hash": "48246afeccacaec1fb730c66947bd384"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/Pages/ViewClientes.php": {
+    "mtime": 1778440910.0,
+    "ast_hash": "600162e69508d323cf5785fdc0c9c199",
+    "semantic_hash": "600162e69508d323cf5785fdc0c9c199"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/Schemas/ClientesForm.php": {
+    "mtime": 1779427446.4703858,
+    "ast_hash": "9fe205df743ea74198f08f85a6eabf74",
+    "semantic_hash": "9fe205df743ea74198f08f85a6eabf74"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/Schemas/ClientesInfolist.php": {
+    "mtime": 1779421352.0920315,
+    "ast_hash": "4c2934fc3807770c208ce1034f8c5acb",
+    "semantic_hash": "4c2934fc3807770c208ce1034f8c5acb"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Clientes/Tables/ClientesTable.php": {
+    "mtime": 1779577317.1237547,
+    "ast_hash": "890cac395a2e336bf8d7df4d36a8d3ec",
+    "semantic_hash": "890cac395a2e336bf8d7df4d36a8d3ec"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/InfraestructurasResource.php": {
+    "mtime": 1779638898.4120612,
+    "ast_hash": "72c02e112d21e6ec0f02bdcbb2deb09c",
+    "semantic_hash": "72c02e112d21e6ec0f02bdcbb2deb09c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/CreateInfraestructuras.php": {
+    "mtime": 1778444199.0,
+    "ast_hash": "9874bb3fee8c88b6867b3b7952f7252f",
+    "semantic_hash": "9874bb3fee8c88b6867b3b7952f7252f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/CreateInfraestructurasCustom.php": {
+    "mtime": 1780604966.8938003,
+    "ast_hash": "e97b64529b2e5bbb1ad0e0676177b300",
+    "semantic_hash": "e97b64529b2e5bbb1ad0e0676177b300"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/EditInfraestructuras.php": {
+    "mtime": 1778444199.0,
+    "ast_hash": "d08375a6213cbbd5e2c78a57557e09af",
+    "semantic_hash": "d08375a6213cbbd5e2c78a57557e09af"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/EditInfraestructurasCustom.php": {
+    "mtime": 1780604966.8952198,
+    "ast_hash": "c3803b8da66f14cb219cb76067bf0a48",
+    "semantic_hash": "c3803b8da66f14cb219cb76067bf0a48"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/InfraestructurasPisosDiseno.php": {
+    "mtime": 1780239743.089692,
+    "ast_hash": "a7886cc0d31c2b98d17ffe62df704625",
+    "semantic_hash": "a7886cc0d31c2b98d17ffe62df704625"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/ListInfraestructuras.php": {
+    "mtime": 1779557615.3306816,
+    "ast_hash": "9a36b5e0d0b6fc968614e60ccf206266",
+    "semantic_hash": "9a36b5e0d0b6fc968614e60ccf206266"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/ListInfraestructurasCustom.php": {
+    "mtime": 1779638598.344188,
+    "ast_hash": "d111746ef7836d2296245c2ea0a27a54",
+    "semantic_hash": "d111746ef7836d2296245c2ea0a27a54"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/TiendasPropietarios.php": {
+    "mtime": 1779642508.7708836,
+    "ast_hash": "4520c6a5b5c3c3c071ff890201999abe",
+    "semantic_hash": "4520c6a5b5c3c3c071ff890201999abe"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Pages/ViewInfraestructuras.php": {
+    "mtime": 1778444199.0,
+    "ast_hash": "53bfb3a1344933a0ce396b85da39822f",
+    "semantic_hash": "53bfb3a1344933a0ce396b85da39822f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Schemas/InfraestructurasForm.php": {
+    "mtime": 1778696201.0,
+    "ast_hash": "1166da2cbac8576b443b868d5c1615ed",
+    "semantic_hash": "1166da2cbac8576b443b868d5c1615ed"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Schemas/InfraestructurasInfolist.php": {
+    "mtime": 1778716281.0,
+    "ast_hash": "b679d7b854de6112608637e2394d155a",
+    "semantic_hash": "b679d7b854de6112608637e2394d155a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Infraestructuras/Tables/InfraestructurasTable.php": {
+    "mtime": 1779575411.1497095,
+    "ast_hash": "32ccead04ea4933b6a52aba838d9b850",
+    "semantic_hash": "32ccead04ea4933b6a52aba838d9b850"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Marcas/MarcasResource.php": {
+    "mtime": 1779638958.7774274,
+    "ast_hash": "cdfa77fb88c18641eb06669b532923af",
+    "semantic_hash": "cdfa77fb88c18641eb06669b532923af"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Marcas/Pages/CreateMarcas.php": {
+    "mtime": 1778448184.0,
+    "ast_hash": "07d328d453077caee55de7b4718c6790",
+    "semantic_hash": "07d328d453077caee55de7b4718c6790"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Marcas/Pages/EditMarcas.php": {
+    "mtime": 1778448184.0,
+    "ast_hash": "7f2259133ecd3e6f37c543f817cc1d26",
+    "semantic_hash": "7f2259133ecd3e6f37c543f817cc1d26"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Marcas/Pages/ListMarcas.php": {
+    "mtime": 1778448184.0,
+    "ast_hash": "1ba49094ec2558a4bed8449cadd329fa",
+    "semantic_hash": "1ba49094ec2558a4bed8449cadd329fa"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Marcas/Pages/ViewMarcas.php": {
+    "mtime": 1778448184.0,
+    "ast_hash": "2e3ba62718d68a93708c919c1331bd9e",
+    "semantic_hash": "2e3ba62718d68a93708c919c1331bd9e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Marcas/Schemas/MarcasForm.php": {
+    "mtime": 1780016971.3300855,
+    "ast_hash": "03a7b9fb7c71c07e6373098b71e82cd8",
+    "semantic_hash": "03a7b9fb7c71c07e6373098b71e82cd8"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Marcas/Schemas/MarcasInfolist.php": {
+    "mtime": 1778786551.0,
+    "ast_hash": "5f3910d16757de0846d16bbb92d42cfb",
+    "semantic_hash": "5f3910d16757de0846d16bbb92d42cfb"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Marcas/Tables/MarcasTable.php": {
+    "mtime": 1780016976.5132575,
+    "ast_hash": "371d209ff60d49b484cdb07538d51eff",
+    "semantic_hash": "371d209ff60d49b484cdb07538d51eff"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Productos/Pages/CreateProductos.php": {
+    "mtime": 1778877239.0,
+    "ast_hash": "900d38a5718425168c2014ebbf1daf6d",
+    "semantic_hash": "900d38a5718425168c2014ebbf1daf6d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Productos/Pages/EditProductos.php": {
+    "mtime": 1778877247.0,
+    "ast_hash": "cafd7c43113915c2a973344683f079a4",
+    "semantic_hash": "cafd7c43113915c2a973344683f079a4"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Productos/Pages/ListProductos.php": {
+    "mtime": 1778449165.0,
+    "ast_hash": "77c3d5a3893f20fa9093e5be50e75d0f",
+    "semantic_hash": "77c3d5a3893f20fa9093e5be50e75d0f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Productos/Pages/ViewProductos.php": {
+    "mtime": 1778449165.0,
+    "ast_hash": "3793ba02a8fcae5d56b69d8a0d06ae82",
+    "semantic_hash": "3793ba02a8fcae5d56b69d8a0d06ae82"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Productos/ProductosResource.php": {
+    "mtime": 1780604505.6443098,
+    "ast_hash": "3aabc9885c6983331c5146cb680fd888",
+    "semantic_hash": "3aabc9885c6983331c5146cb680fd888"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Productos/Schemas/ProductosForm.php": {
+    "mtime": 1780016992.6116545,
+    "ast_hash": "06fe118a7d21e1f84f32487e1b709261",
+    "semantic_hash": "06fe118a7d21e1f84f32487e1b709261"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Productos/Schemas/ProductosInfolist.php": {
+    "mtime": 1780349491.7524571,
+    "ast_hash": "6f02a3378f5e6f470e142b466b6cf4af",
+    "semantic_hash": "6f02a3378f5e6f470e142b466b6cf4af"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Productos/Tables/ProductosTable.php": {
+    "mtime": 1780349488.0016413,
+    "ast_hash": "92059c7364b3734d172c81d7c85a6335",
+    "semantic_hash": "92059c7364b3734d172c81d7c85a6335"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Suscripciones/Pages/CreateSuscripciones.php": {
+    "mtime": 1780011796.8339028,
+    "ast_hash": "22a28ad218ca954bf3c64ff7970e43a2",
+    "semantic_hash": "22a28ad218ca954bf3c64ff7970e43a2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Suscripciones/Pages/EditSuscripciones.php": {
+    "mtime": 1778453121.0,
+    "ast_hash": "f7b71fdb777678fc8c88b0bc80f56860",
+    "semantic_hash": "f7b71fdb777678fc8c88b0bc80f56860"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Suscripciones/Pages/ListSuscripciones.php": {
+    "mtime": 1780193734.3816328,
+    "ast_hash": "4f7600c7e8b0fe612957283d58917711",
+    "semantic_hash": "4f7600c7e8b0fe612957283d58917711"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Suscripciones/Pages/ViewSuscripciones.php": {
+    "mtime": 1780235568.8216875,
+    "ast_hash": "f3eba152e1d9a3816fd9022b00e5f5db",
+    "semantic_hash": "f3eba152e1d9a3816fd9022b00e5f5db"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Suscripciones/Schemas/SuscripcionesForm.php": {
+    "mtime": 1780610654.9152787,
+    "ast_hash": "1032facc1058f48aa0e596112fe74154",
+    "semantic_hash": "1032facc1058f48aa0e596112fe74154"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Suscripciones/SuscripcionesResource.php": {
+    "mtime": 1780604486.9136496,
+    "ast_hash": "61c882243dfaabc6bc112f3aa53902a3",
+    "semantic_hash": "61c882243dfaabc6bc112f3aa53902a3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Suscripciones/Tables/SuscripcionesTable.php": {
+    "mtime": 1780610145.3057926,
+    "ast_hash": "33fd767030b47d1cb62bf61a4ec57957",
+    "semantic_hash": "33fd767030b47d1cb62bf61a4ec57957"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesCobros/Pages/CreateSuscripcionesCobros.php": {
+    "mtime": 1778455407.0,
+    "ast_hash": "c355be5a8a520250eb34e8e6e4b57dab",
+    "semantic_hash": "c355be5a8a520250eb34e8e6e4b57dab"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesCobros/Pages/EditSuscripcionesCobros.php": {
+    "mtime": 1778455407.0,
+    "ast_hash": "6cfa7f1f2a134b44d6cea61fe97c7249",
+    "semantic_hash": "6cfa7f1f2a134b44d6cea61fe97c7249"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesCobros/Pages/ListSuscripcionesCobros.php": {
+    "mtime": 1780611375.1128414,
+    "ast_hash": "d56478c95fc347c96a9129563abc61e8",
+    "semantic_hash": "d56478c95fc347c96a9129563abc61e8"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesCobros/Pages/ViewSuscripcionesCobros.php": {
+    "mtime": 1778455408.0,
+    "ast_hash": "6225dc1f26ad2338576901483b3c47d5",
+    "semantic_hash": "6225dc1f26ad2338576901483b3c47d5"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesCobros/Schemas/SuscripcionesCobrosForm.php": {
+    "mtime": 1779305490.0,
+    "ast_hash": "a653f976867f2800394be9d6b07dd5b7",
+    "semantic_hash": "a653f976867f2800394be9d6b07dd5b7"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesCobros/Schemas/SuscripcionesCobrosInfolist.php": {
+    "mtime": 1778455407.0,
+    "ast_hash": "5f5805f5e5f50d556d2a53160f6dc730",
+    "semantic_hash": "5f5805f5e5f50d556d2a53160f6dc730"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesCobros/SuscripcionesCobrosResource.php": {
+    "mtime": 1780604489.8678827,
+    "ast_hash": "2857712b391b95e85087b002c9c943f3",
+    "semantic_hash": "2857712b391b95e85087b002c9c943f3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesCobros/Tables/SuscripcionesCobrosTable.php": {
+    "mtime": 1780611380.708564,
+    "ast_hash": "50cb24b0c8f2eab270f9987c1a4ce3c8",
+    "semantic_hash": "50cb24b0c8f2eab270f9987c1a4ce3c8"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesPagos/Pages/CreateSuscripcionesPagos.php": {
+    "mtime": 1780611986.8479724,
+    "ast_hash": "27677901dd8149f366059d01a6460e96",
+    "semantic_hash": "27677901dd8149f366059d01a6460e96"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesPagos/Pages/EditSuscripcionesPagos.php": {
+    "mtime": 1778455417.0,
+    "ast_hash": "442b99573610b320a362eba60a4097f7",
+    "semantic_hash": "442b99573610b320a362eba60a4097f7"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesPagos/Pages/ListSuscripcionesPagos.php": {
+    "mtime": 1780614168.9795887,
+    "ast_hash": "78c98fd4e09a5d1dc2eb4873b590ca67",
+    "semantic_hash": "78c98fd4e09a5d1dc2eb4873b590ca67"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesPagos/Pages/ViewSuscripcionesPagos.php": {
+    "mtime": 1778455417.0,
+    "ast_hash": "9b6754bd4870a7e5ee8467e04999db67",
+    "semantic_hash": "9b6754bd4870a7e5ee8467e04999db67"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesPagos/Schemas/SuscripcionesPagosForm.php": {
+    "mtime": 1780420004.9130404,
+    "ast_hash": "4986f4a8778a9b9d49b6baaf9390ba97",
+    "semantic_hash": "4986f4a8778a9b9d49b6baaf9390ba97"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesPagos/Schemas/SuscripcionesPagosInfolist.php": {
+    "mtime": 1778455417.0,
+    "ast_hash": "1e3744c504a44bd96adc1ee1461a55da",
+    "semantic_hash": "1e3744c504a44bd96adc1ee1461a55da"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesPagos/SuscripcionesPagosResource.php": {
+    "mtime": 1780604492.6437109,
+    "ast_hash": "9fa92686bf273f517f2f3eb4b87d701a",
+    "semantic_hash": "9fa92686bf273f517f2f3eb4b87d701a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesPagos/Tables/SuscripcionesPagosTable.php": {
+    "mtime": 1780612874.374573,
+    "ast_hash": "df95a1a97c84665a8cca8cb375cc30c6",
+    "semantic_hash": "df95a1a97c84665a8cca8cb375cc30c6"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesTarifas/Pages/CreateSuscripcionesTarifas.php": {
+    "mtime": 1780604469.0508213,
+    "ast_hash": "0ef89667fac7c506e6733a3e2c8d169c",
+    "semantic_hash": "0ef89667fac7c506e6733a3e2c8d169c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesTarifas/Pages/EditSuscripcionesTarifas.php": {
+    "mtime": 1779638804.2471154,
+    "ast_hash": "9fd50451aa6ea81e5cc60144a0cfeb46",
+    "semantic_hash": "9fd50451aa6ea81e5cc60144a0cfeb46"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesTarifas/Pages/ListSuscripcionesTarifas.php": {
+    "mtime": 1780237559.5605896,
+    "ast_hash": "5ea697af4460fac78def73aaebe7eab3",
+    "semantic_hash": "5ea697af4460fac78def73aaebe7eab3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesTarifas/Schemas/SuscripcionesTarifasForm.php": {
+    "mtime": 1780272153.2964919,
+    "ast_hash": "f72e549833175cc7bf35bda1197dd079",
+    "semantic_hash": "f72e549833175cc7bf35bda1197dd079"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesTarifas/SuscripcionesTarifasResource.php": {
+    "mtime": 1780604497.2834716,
+    "ast_hash": "a7b673efdbb59bf76197511efe80ad54",
+    "semantic_hash": "a7b673efdbb59bf76197511efe80ad54"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/SuscripcionesTarifas/Tables/SuscripcionesTarifasTable.php": {
+    "mtime": 1780272157.2650788,
+    "ast_hash": "367294a9b862f8b24d911d7694d5762d",
+    "semantic_hash": "367294a9b862f8b24d911d7694d5762d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Pages/CreateUsuarios.php": {
+    "mtime": 1778433473.0,
+    "ast_hash": "6b9d835bfddcf9c7208843b9fe136795",
+    "semantic_hash": "6b9d835bfddcf9c7208843b9fe136795"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Pages/CreateUsuariosCustom.php": {
+    "mtime": 1779638441.6927176,
+    "ast_hash": "c55974460454ebb624a12948724aa12e",
+    "semantic_hash": "c55974460454ebb624a12948724aa12e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Pages/EditUsuarios.php": {
+    "mtime": 1778433473.0,
+    "ast_hash": "740f5bf7aaffc56a4f8e236715010d0b",
+    "semantic_hash": "740f5bf7aaffc56a4f8e236715010d0b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Pages/EditUsuariosCustom.php": {
+    "mtime": 1779638456.8359041,
+    "ast_hash": "575e47435b5ccab13ed3dfd1bf24762a",
+    "semantic_hash": "575e47435b5ccab13ed3dfd1bf24762a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Pages/ListUsuarios.php": {
+    "mtime": 1778433473.0,
+    "ast_hash": "9badd50d527d0aa8275191dc0efcba8b",
+    "semantic_hash": "9badd50d527d0aa8275191dc0efcba8b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Pages/ViewUsuarios.php": {
+    "mtime": 1778433473.0,
+    "ast_hash": "45afd80f759139f501fb3279e9941809",
+    "semantic_hash": "45afd80f759139f501fb3279e9941809"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Schemas/UsuariosForm.php": {
+    "mtime": 1779576304.0710666,
+    "ast_hash": "8c23c121e6281eaf312c99ae33c8ca8d",
+    "semantic_hash": "8c23c121e6281eaf312c99ae33c8ca8d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Schemas/UsuariosInfolist.php": {
+    "mtime": 1778433473.0,
+    "ast_hash": "aa7f9cd99b7f26128bf171ce22ef0baf",
+    "semantic_hash": "aa7f9cd99b7f26128bf171ce22ef0baf"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/Tables/UsuariosTable.php": {
+    "mtime": 1779576429.7351568,
+    "ast_hash": "c0ac692f70722cb723cb7fe25dc0328c",
+    "semantic_hash": "c0ac692f70722cb723cb7fe25dc0328c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Resources/Usuarios/UsuariosResource.php": {
+    "mtime": 1780020627.208687,
+    "ast_hash": "28d9881e6fc01b49822f1ebc34394b2b",
+    "semantic_hash": "28d9881e6fc01b49822f1ebc34394b2b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/CobrosPorEstadoChart.php": {
+    "mtime": 1780604650.39605,
+    "ast_hash": "e11f9599c9c26da6ba0e7e29d07d3ea0",
+    "semantic_hash": "e11f9599c9c26da6ba0e7e29d07d3ea0"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/CostoOportunidadVacanciaChart.php": {
+    "mtime": 1780604650.4068465,
+    "ast_hash": "da7b2948647f99ce9f0b8dde6e260d2d",
+    "semantic_hash": "da7b2948647f99ce9f0b8dde6e260d2d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/IngresosMensualesChart.php": {
+    "mtime": 1780604650.3914874,
+    "ast_hash": "f8df9faf4cccb6e2eccdd57e101dc97a",
+    "semantic_hash": "f8df9faf4cccb6e2eccdd57e101dc97a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/MetodoPagoChart.php": {
+    "mtime": 1780604650.4032152,
+    "ast_hash": "5316b5a06741f5981f967584613bf724",
+    "semantic_hash": "5316b5a06741f5981f967584613bf724"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/OcupacionPorPisoChart.php": {
+    "mtime": 1780604650.3997958,
+    "ast_hash": "bf005db47a9d30adeb72f2a7f9142d7f",
+    "semantic_hash": "bf005db47a9d30adeb72f2a7f9142d7f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/StatsOverview.php": {
+    "mtime": 1780604650.386917,
+    "ast_hash": "4fda70ba571dbcab21f69aba3a7442d1",
+    "semantic_hash": "4fda70ba571dbcab21f69aba3a7442d1"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/TopMorososWidget.php": {
+    "mtime": 1780604650.4102142,
+    "ast_hash": "62183069edc57f94e62949dc74182b26",
+    "semantic_hash": "62183069edc57f94e62949dc74182b26"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Admin/SuscripcionCustomController.php": {
+    "mtime": 1780611985.3598294,
+    "ast_hash": "1bce12d1b2ec9b21f1bbc1a82a8f41a2",
+    "semantic_hash": "1bce12d1b2ec9b21f1bbc1a82a8f41a2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Auth/ForgotPasswordController.php": {
+    "mtime": 1779606466.3169224,
+    "ast_hash": "53783a056296ae1bc1b7c479f6b8c3f3",
+    "semantic_hash": "53783a056296ae1bc1b7c479f6b8c3f3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Auth/LoginController.php": {
+    "mtime": 1779643824.2956085,
+    "ast_hash": "bc2e216d006bf60f13c92cf090492b58",
+    "semantic_hash": "bc2e216d006bf60f13c92cf090492b58"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Auth/ResetPasswordController.php": {
+    "mtime": 1779606491.171894,
+    "ast_hash": "acd7521c60f8401e33879fce65b3e0e9",
+    "semantic_hash": "acd7521c60f8401e33879fce65b3e0e9"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Cliente/ClientDashboardController.php": {
+    "mtime": 1780611988.0163171,
+    "ast_hash": "c2ac9b9e1d704b8cc4f69c5546f6a40c",
+    "semantic_hash": "c2ac9b9e1d704b8cc4f69c5546f6a40c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Controller.php": {
+    "mtime": 1740318580.0,
+    "ast_hash": "25a307335c0719bc9a91b3f7babd186d",
+    "semantic_hash": "25a307335c0719bc9a91b3f7babd186d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/DirectorioController.php": {
+    "mtime": 1780023634.0284126,
+    "ast_hash": "360ebc45dee95300c1aaa718336cf0d5",
+    "semantic_hash": "360ebc45dee95300c1aaa718336cf0d5"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Pdf/ReporteCobrosController.php": {
+    "mtime": 1779642724.7823708,
+    "ast_hash": "64d9950f01211d0df89e70a400595956",
+    "semantic_hash": "64d9950f01211d0df89e70a400595956"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Pdf/ReporteContratoController.php": {
+    "mtime": 1780011860.0450935,
+    "ast_hash": "65fedaa03b000703ad6b99003c5109e7",
+    "semantic_hash": "65fedaa03b000703ad6b99003c5109e7"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Pdf/ReportePagosController.php": {
+    "mtime": 1780613699.9866233,
+    "ast_hash": "86fbf20ac4a35f62fd56bd5c1dfb4cbe",
+    "semantic_hash": "86fbf20ac4a35f62fd56bd5c1dfb4cbe"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/Pdf/ReporteSuscripcionMovimiento.php": {
+    "mtime": 1780611316.0279973,
+    "ast_hash": "d27eae47b06f251f3eee7186337e75d0",
+    "semantic_hash": "d27eae47b06f251f3eee7186337e75d0"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Controllers/WelcomeController.php": {
+    "mtime": 1780601458.223022,
+    "ast_hash": "da94f6e0554b78097a93649f88a054de",
+    "semantic_hash": "da94f6e0554b78097a93649f88a054de"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/Categorias.php": {
+    "mtime": 1780604331.1887639,
+    "ast_hash": "5ba68f886c7309b418275ef0451496b0",
+    "semantic_hash": "5ba68f886c7309b418275ef0451496b0"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/Clientes.php": {
+    "mtime": 1779639728.4167726,
+    "ast_hash": "0364096cdaebc1bdca898c5518725f25",
+    "semantic_hash": "0364096cdaebc1bdca898c5518725f25"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/ClientesDocumentos.php": {
+    "mtime": 1778441367.0,
+    "ast_hash": "270b142faeccfcfd409f69b989a511c6",
+    "semantic_hash": "270b142faeccfcfd409f69b989a511c6"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/DescuentoTiempo.php": {
+    "mtime": 1780237358.5971522,
+    "ast_hash": "28840c4ee424583b875ab29cd3272fe5",
+    "semantic_hash": "28840c4ee424583b875ab29cd3272fe5"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/EstadoTienda.php": {
+    "mtime": 1779632393.305736,
+    "ast_hash": "43eae6f99e658bd161c5deaf88eda450",
+    "semantic_hash": "43eae6f99e658bd161c5deaf88eda450"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/Infraestructuras.php": {
+    "mtime": 1780419782.2101717,
+    "ast_hash": "2ebad30c27761f7b875553bdaa9d5f3b",
+    "semantic_hash": "2ebad30c27761f7b875553bdaa9d5f3b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/InfraestructurasPisos.php": {
+    "mtime": 1780419777.1435213,
+    "ast_hash": "64043e3da528442245ad51c62ba0505d",
+    "semantic_hash": "64043e3da528442245ad51c62ba0505d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/InfraestructurasTiendas.php": {
+    "mtime": 1780419772.7701309,
+    "ast_hash": "a6067d4163fdb60b17a825f76f7a1160",
+    "semantic_hash": "a6067d4163fdb60b17a825f76f7a1160"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/Marcas.php": {
+    "mtime": 1779639728.4177744,
+    "ast_hash": "35babac5a675ffd892addb7d2a126fb8",
+    "semantic_hash": "35babac5a675ffd892addb7d2a126fb8"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/Productos.php": {
+    "mtime": 1779639728.414869,
+    "ast_hash": "b41487b41dfa30ed64d3395181bb90d2",
+    "semantic_hash": "b41487b41dfa30ed64d3395181bb90d2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/ProductosImagenes.php": {
+    "mtime": 1778449583.0,
+    "ast_hash": "7030910548238de339640241bbbd7eca",
+    "semantic_hash": "7030910548238de339640241bbbd7eca"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/Suscripciones.php": {
+    "mtime": 1780610654.662324,
+    "ast_hash": "e9ab92648891ff6cec102356437dd92f",
+    "semantic_hash": "e9ab92648891ff6cec102356437dd92f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/SuscripcionesCobros.php": {
+    "mtime": 1780614415.2781336,
+    "ast_hash": "27c163be956676039783ea4dd0a7500c",
+    "semantic_hash": "27c163be956676039783ea4dd0a7500c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/SuscripcionesPagos.php": {
+    "mtime": 1780613697.185805,
+    "ast_hash": "194e14ffccef30a9f93923c1c3b3939b",
+    "semantic_hash": "194e14ffccef30a9f93923c1c3b3939b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/SuscripcionesTarifas.php": {
+    "mtime": 1780604332.6447732,
+    "ast_hash": "6ba72175a747708abc2b25703ebb3c61",
+    "semantic_hash": "6ba72175a747708abc2b25703ebb3c61"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/TamanoEtiqueta.php": {
+    "mtime": 1780237348.4857955,
+    "ast_hash": "551efd5f4cbce673928e37d89ec5e939",
+    "semantic_hash": "551efd5f4cbce673928e37d89ec5e939"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/TamanoPrecio.php": {
+    "mtime": 1780237353.5234156,
+    "ast_hash": "6e9e0df40dc2a4de64a914c4900ebc14",
+    "semantic_hash": "6e9e0df40dc2a4de64a914c4900ebc14"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Models/User.php": {
+    "mtime": 1779639728.4160407,
+    "ast_hash": "7c1043d75b5ab75c337f6e950d6adc23",
+    "semantic_hash": "7c1043d75b5ab75c337f6e950d6adc23"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Observers/SuscripcionObserver.php": {
+    "mtime": 1780070625.1892493,
+    "ast_hash": "094026bcaaa485d275373e8a5fedadba",
+    "semantic_hash": "094026bcaaa485d275373e8a5fedadba"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/CategoriasPolicy.php": {
+    "mtime": 1778458143.0,
+    "ast_hash": "0c94439ac2e62016d63fe8585a119372",
+    "semantic_hash": "0c94439ac2e62016d63fe8585a119372"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/ClientesPolicy.php": {
+    "mtime": 1779638383.6055293,
+    "ast_hash": "b6ee70b9f9f5dd4a31a6ce5f9cea6264",
+    "semantic_hash": "b6ee70b9f9f5dd4a31a6ce5f9cea6264"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/InfraestructurasPolicy.php": {
+    "mtime": 1779557775.4108536,
+    "ast_hash": "612958ffbaf2dd6a99185045a5081116",
+    "semantic_hash": "612958ffbaf2dd6a99185045a5081116"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/MarcasPolicy.php": {
+    "mtime": 1778458143.0,
+    "ast_hash": "dab04860493b1fc24cf70fe6e2e753a5",
+    "semantic_hash": "dab04860493b1fc24cf70fe6e2e753a5"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/ProductosPolicy.php": {
+    "mtime": 1778458143.0,
+    "ast_hash": "30fe12e30753dfb5549c97906062ed21",
+    "semantic_hash": "30fe12e30753dfb5549c97906062ed21"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/RolePolicy.php": {
+    "mtime": 1778458144.0,
+    "ast_hash": "2f9760438712573e77119c0328647742",
+    "semantic_hash": "2f9760438712573e77119c0328647742"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/SuscripcionesCobrosPolicy.php": {
+    "mtime": 1778458143.0,
+    "ast_hash": "cd11e181cf5039f82b7bcdfeb6031993",
+    "semantic_hash": "cd11e181cf5039f82b7bcdfeb6031993"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/SuscripcionesPagosPolicy.php": {
+    "mtime": 1778458143.0,
+    "ast_hash": "25bc4ca7b752d235b77e78d23275d6a9",
+    "semantic_hash": "25bc4ca7b752d235b77e78d23275d6a9"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/SuscripcionesPolicy.php": {
+    "mtime": 1778458144.0,
+    "ast_hash": "d30de9a530755ee48bf9e9e2b9985684",
+    "semantic_hash": "d30de9a530755ee48bf9e9e2b9985684"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/SuscripcionesTarifasPolicy.php": {
+    "mtime": 1779638814.3931313,
+    "ast_hash": "d5e3a650178e20ddfe59d794ea98ce34",
+    "semantic_hash": "d5e3a650178e20ddfe59d794ea98ce34"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Policies/UserPolicy.php": {
+    "mtime": 1780065279.0577512,
+    "ast_hash": "84663dd928aa291028a1e5ba33baeb77",
+    "semantic_hash": "84663dd928aa291028a1e5ba33baeb77"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Providers/AppServiceProvider.php": {
+    "mtime": 1780614099.342947,
+    "ast_hash": "29417292979ac6de34d0b2a38fbae27a",
+    "semantic_hash": "29417292979ac6de34d0b2a38fbae27a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Providers/Filament/AdminPanelProvider.php": {
+    "mtime": 1780605638.0445113,
+    "ast_hash": "344ae67795bfd8f4622b0a41507707b3",
+    "semantic_hash": "344ae67795bfd8f4622b0a41507707b3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/factories/UserFactory.php": {
+    "mtime": 1779412976.8995366,
+    "ast_hash": "1e24f73a74ef7cbeab20904b56bbfba3",
+    "semantic_hash": "1e24f73a74ef7cbeab20904b56bbfba3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/0001_01_01_000000_create_users_table.php": {
+    "mtime": 1779412963.3732128,
+    "ast_hash": "bd75aaad579473cf774f24f2f0742ad2",
+    "semantic_hash": "bd75aaad579473cf774f24f2f0742ad2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/0001_01_01_000001_create_cache_table.php": {
+    "mtime": 1740318580.0,
+    "ast_hash": "6803c10a1aa695d40633ec8bea5576d5",
+    "semantic_hash": "6803c10a1aa695d40633ec8bea5576d5"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/0001_01_01_000002_create_jobs_table.php": {
+    "mtime": 1740318580.0,
+    "ast_hash": "ead9cce2650b36345454f85e8c0214a0",
+    "semantic_hash": "ead9cce2650b36345454f85e8c0214a0"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_135044_create_categorias_table.php": {
+    "mtime": 1779412058.0326357,
+    "ast_hash": "492b2d353ba6a5a14d2f41aae231624e",
+    "semantic_hash": "492b2d353ba6a5a14d2f41aae231624e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_145522_create_clientes_table.php": {
+    "mtime": 1779671117.3244565,
+    "ast_hash": "a7901af9ff5a9d02486e6a6704024e59",
+    "semantic_hash": "a7901af9ff5a9d02486e6a6704024e59"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_151017_create_table_documentos.php": {
+    "mtime": 1779412004.6651073,
+    "ast_hash": "6b13a263d60ba9e3e5b4a267ab29e6b6",
+    "semantic_hash": "6b13a263d60ba9e3e5b4a267ab29e6b6"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_160050_create_infraestructuras_table.php": {
+    "mtime": 1778443476.0,
+    "ast_hash": "139b8fc81feb89b92b11facf240be440",
+    "semantic_hash": "139b8fc81feb89b92b11facf240be440"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_160511_create_infraestructuras_pisos_table.php": {
+    "mtime": 1778451222.0,
+    "ast_hash": "1ff0ebdf8628ffa7c70c7aeba2cb817e",
+    "semantic_hash": "1ff0ebdf8628ffa7c70c7aeba2cb817e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_171505_create_marcas_table.php": {
+    "mtime": 1778448087.0,
+    "ast_hash": "b0e07a242164385c7c5c0dfa7c5b03b4",
+    "semantic_hash": "b0e07a242164385c7c5c0dfa7c5b03b4"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_173354_create_productos_table.php": {
+    "mtime": 1778449050.0,
+    "ast_hash": "9093cf5d34f54f31a17c89d004eecad6",
+    "semantic_hash": "9093cf5d34f54f31a17c89d004eecad6"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_173750_create_productos_imagenes_table.php": {
+    "mtime": 1778449139.0,
+    "ast_hash": "4ac1f0ebb07463b3bf0eef8b49ab2051",
+    "semantic_hash": "4ac1f0ebb07463b3bf0eef8b49ab2051"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_174000_create_infraestructuras_tiendas_table.php": {
+    "mtime": 1779631106.700595,
+    "ast_hash": "adb3e5a5b2500cf11b0dc33bf72e96cf",
+    "semantic_hash": "adb3e5a5b2500cf11b0dc33bf72e96cf"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_175311_create_suscripciones_table.php": {
+    "mtime": 1779412089.5800862,
+    "ast_hash": "15b36cb839aae2973aabe0a75aa72764",
+    "semantic_hash": "15b36cb839aae2973aabe0a75aa72764"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_192049_create_suscripciones_cobros_table.php": {
+    "mtime": 1778455267.0,
+    "ast_hash": "4fdef033d9fc069323f1088fafc95df8",
+    "semantic_hash": "4fdef033d9fc069323f1088fafc95df8"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_192133_create_suscripciones_pagos_table.php": {
+    "mtime": 1778455302.0,
+    "ast_hash": "f3ff09e54b08b28f7a08374d319357e9",
+    "semantic_hash": "f3ff09e54b08b28f7a08374d319357e9"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_10_200751_create_permission_tables.php": {
+    "mtime": 1778458071.0,
+    "ast_hash": "c9b8b3ba6640c0bba30065bcc92387bf",
+    "semantic_hash": "c9b8b3ba6640c0bba30065bcc92387bf"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_15_200523_add_tienda_id_to_productos_table.php": {
+    "mtime": 1779412159.8653605,
+    "ast_hash": "56389dd9e9b2d33f04da3a96c649c52f",
+    "semantic_hash": "56389dd9e9b2d33f04da3a96c649c52f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_17_192801_create_suscripciones_tarifas_table.php": {
+    "mtime": 1779630890.0744267,
+    "ast_hash": "4de4805fabc08bf021980a1f957a7745",
+    "semantic_hash": "4de4805fabc08bf021980a1f957a7745"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_17_214500_add_fecha_inicio_to_suscripciones_cobros_table.php": {
+    "mtime": 1779068710.0,
+    "ast_hash": "284e351511589da5630557b140f2a6c9",
+    "semantic_hash": "284e351511589da5630557b140f2a6c9"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_19_152130_update_suscripciones_pagos_add_metodos_pago_fields.php": {
+    "mtime": 1779218506.0,
+    "ast_hash": "efb9b307ce7333bbe69cafda6e73c6ea",
+    "semantic_hash": "efb9b307ce7333bbe69cafda6e73c6ea"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_19_165257_remove_fecha_pago_from_suscripciones_cobros.php": {
+    "mtime": 1779224006.0,
+    "ast_hash": "b85bb6b8e9794e017b2926d03eeaa006",
+    "semantic_hash": "b85bb6b8e9794e017b2926d03eeaa006"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_23_140717_increase_ubicacion_length_in_infraestructuras_table.php": {
+    "mtime": 1779559729.2906103,
+    "ast_hash": "3342e705135888cb3d25b07ae12ce2e2",
+    "semantic_hash": "3342e705135888cb3d25b07ae12ce2e2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_23_194345_create_infraestructuras_tiendas_marcas_table.php": {
+    "mtime": 1779630219.2059338,
+    "ast_hash": "ded827f11c948db6f4c4bf35ddac677b",
+    "semantic_hash": "ded827f11c948db6f4c4bf35ddac677b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_24_093628_create_estados_tiendas_table.php": {
+    "mtime": 1779631270.2502398,
+    "ast_hash": "60d239b4664d2645a50b8e1b1780636b",
+    "semantic_hash": "60d239b4664d2645a50b8e1b1780636b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_24_095140_update_infraestructuras_tiendas_change_estado_column.php": {
+    "mtime": 1779630957.1461847,
+    "ast_hash": "a92be653fca6b7f651acf4bb66793ec7",
+    "semantic_hash": "a92be653fca6b7f651acf4bb66793ec7"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_24_110132_fix_productos_imagenes_cascade_delete.php": {
+    "mtime": 1779634951.36346,
+    "ast_hash": "6acd17829b1b4c0324ea1464c7c590a1",
+    "semantic_hash": "6acd17829b1b4c0324ea1464c7c590a1"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_24_120000_update_suscripciones_tarifas_use_size_range.php": {
+    "mtime": 1779638718.883922,
+    "ast_hash": "7d04ba9608088cac43f03c987a4800f4",
+    "semantic_hash": "7d04ba9608088cac43f03c987a4800f4"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_24_121433_create_activity_log_table.php": {
+    "mtime": 1779639272.63648,
+    "ast_hash": "970d1ddcfbfd98a0d4d2b9a20077554d",
+    "semantic_hash": "970d1ddcfbfd98a0d4d2b9a20077554d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_24_130000_add_parcial_to_suscripciones_cobros_estado_check.php": {
+    "mtime": 1779641033.630976,
+    "ast_hash": "72eca35e88ded9e1fb0fbfb7e24dadad",
+    "semantic_hash": "72eca35e88ded9e1fb0fbfb7e24dadad"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_24_142458_add_pago_pendiente_and_estado_snapshot_to_suscripciones_pagos_table.php": {
+    "mtime": 1779647105.3190544,
+    "ast_hash": "4fd366fae7f6c10a1454ea524795fc68",
+    "semantic_hash": "4fd366fae7f6c10a1454ea524795fc68"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_28_194253_add_contrato_firmado_to_suscripciones_table.php": {
+    "mtime": 1780011777.0386546,
+    "ast_hash": "16c2fa093780af894c69d8230137bf3a",
+    "semantic_hash": "16c2fa093780af894c69d8230137bf3a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_28_205542_add_logo_to_marcas_table.php": {
+    "mtime": 1780016150.075914,
+    "ast_hash": "bd79d2ddd93c27bf9d29f8d7a11c1d10",
+    "semantic_hash": "bd79d2ddd93c27bf9d29f8d7a11c1d10"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_28_210747_make_cliente_id_nullable_in_marcas_table.php": {
+    "mtime": 1780016876.0904317,
+    "ast_hash": "ecbc85f2aac0b81b9ecef7a3ea8d2bef",
+    "semantic_hash": "ecbc85f2aac0b81b9ecef7a3ea8d2bef"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_30_094638_add_imagen_fondo_to_infraestructuras_pisos_table.php": {
+    "mtime": 1780148819.8201396,
+    "ast_hash": "df7ff55b1eb3c2a58142836a90473f81",
+    "semantic_hash": "df7ff55b1eb3c2a58142836a90473f81"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_30_223857_add_foto_referencial_to_infraestructuras_tiendas_table.php": {
+    "mtime": 1780195141.9460366,
+    "ast_hash": "155d0ac5bfcf8e1976b4df35653231fe",
+    "semantic_hash": "155d0ac5bfcf8e1976b4df35653231fe"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_31_000000_add_vitrina_images_to_infraestructuras_tiendas_table.php": {
+    "mtime": 1780199745.002799,
+    "ast_hash": "549ba6436598c0d353033baa2e5e810b",
+    "semantic_hash": "549ba6436598c0d353033baa2e5e810b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_31_031416_populate_missing_payment_and_cobro_snapshot_fields.php": {
+    "mtime": 1780211664.3440092,
+    "ast_hash": "ee2362b8f30d7402102574b86ea1b3b1",
+    "semantic_hash": "ee2362b8f30d7402102574b86ea1b3b1"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_31_102207_create_tarifas_y_descuentos_tables.php": {
+    "mtime": 1780237337.161745,
+    "ast_hash": "d8d23d5e66bd73b66303862521bcf29a",
+    "semantic_hash": "d8d23d5e66bd73b66303862521bcf29a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_31_103319_add_renovacion_de_id_to_suscripciones_table.php": {
+    "mtime": 1780238005.086984,
+    "ast_hash": "3b209d5b50032ae5057033368d3fb8b8",
+    "semantic_hash": "3b209d5b50032ae5057033368d3fb8b8"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_31_104800_add_numero_to_infraestructuras_pisos_table.php": {
+    "mtime": 1780239027.3112316,
+    "ast_hash": "961a8580e0e05b4c5ec43a9b47d27b7e",
+    "semantic_hash": "961a8580e0e05b4c5ec43a9b47d27b7e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_05_31_121500_add_es_parcial_to_suscripciones_cobros_table.php": {
+    "mtime": 1780244108.147484,
+    "ast_hash": "2d271aed6790c4699ff9dc8dc0401451",
+    "semantic_hash": "2d271aed6790c4699ff9dc8dc0401451"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/AdministradoresSeeder.php": {
+    "mtime": 1780196023.0467083,
+    "ast_hash": "7e68c3b0c1642c1c10ef3ef74b8d5d5b",
+    "semantic_hash": "7e68c3b0c1642c1c10ef3ef74b8d5d5b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/ClientesSeeder.php": {
+    "mtime": 1780196028.4314988,
+    "ast_hash": "75e165ffbd298496c8d19fbf75d25f26",
+    "semantic_hash": "75e165ffbd298496c8d19fbf75d25f26"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/DatabaseSeeder.php": {
+    "mtime": 1780196073.1978292,
+    "ast_hash": "f1f3830ffe5a1649bf8c2467818d324a",
+    "semantic_hash": "f1f3830ffe5a1649bf8c2467818d324a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/EstadosTiendasSeeder.php": {
+    "mtime": 1779640876.4363194,
+    "ast_hash": "d875125fed55b14d3046812acac9befa",
+    "semantic_hash": "d875125fed55b14d3046812acac9befa"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/MallDataSeeder.php": {
+    "mtime": 1780349495.439289,
+    "ast_hash": "c2a86848b4559b862c0eace6bd48c740",
+    "semantic_hash": "c2a86848b4559b862c0eace6bd48c740"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/NotificationTestSeeder.php": {
+    "mtime": 1780349502.6734693,
+    "ast_hash": "0b99ffe72c803b297e66c6ce2ccc5ea0",
+    "semantic_hash": "0b99ffe72c803b297e66c6ce2ccc5ea0"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/RetroactiveVacancySeeder.php": {
+    "mtime": 1780247179.1647897,
+    "ast_hash": "341e990f2895db440c0e3e5bfb9e22b2",
+    "semantic_hash": "341e990f2895db440c0e3e5bfb9e22b2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/RolesAndPermissionsSeeder.php": {
+    "mtime": 1780063854.228814,
+    "ast_hash": "24dde4e077480ec03a95b0644c255f1f",
+    "semantic_hash": "24dde4e077480ec03a95b0644c255f1f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/SuscripcionesDemoSeeder.php": {
+    "mtime": 1780349499.6607778,
+    "ast_hash": "18e65383944040d9969313848ed464a4",
+    "semantic_hash": "18e65383944040d9969313848ed464a4"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/seeders/SuscripcionesTarifasSeeder.php": {
+    "mtime": 1780237368.9548955,
+    "ast_hash": "0f3ed14b92b0971afe424b7af4cf8452",
+    "semantic_hash": "0f3ed14b92b0971afe424b7af4cf8452"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/js/app.js": {
+    "mtime": 1778446709.0,
+    "ast_hash": "e8128092bc574a04fc1d33ae7596ae85",
+    "semantic_hash": "e8128092bc574a04fc1d33ae7596ae85"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/js/bootstrap.js": {
+    "mtime": 1740318580.0,
+    "ast_hash": "78f909acc19aea4717eddca5a87c1ba3",
+    "semantic_hash": "78f909acc19aea4717eddca5a87c1ba3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/js/leaflet-field.js": {
+    "mtime": 1778445879.0,
+    "ast_hash": "4de2bb35af6d398e42c73446ffbc678d",
+    "semantic_hash": "4de2bb35af6d398e42c73446ffbc678d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/admin/suscripciones/crear-custom.blade.php": {
+    "mtime": 1780237644.268936,
+    "ast_hash": "757a828ec8989cca29a3b12e00e35635",
+    "semantic_hash": "757a828ec8989cca29a3b12e00e35635"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/admin/suscripciones/pago-custom.blade.php": {
+    "mtime": 1780238237.4248338,
+    "ast_hash": "4d24c224c4063bef909d5b20b5d67d18",
+    "semantic_hash": "4d24c224c4063bef909d5b20b5d67d18"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/admin/suscripciones/renovar-custom.blade.php": {
+    "mtime": 1780238154.0446498,
+    "ast_hash": "cbc721f7a971cc38c0f202ad0d7aa7a5",
+    "semantic_hash": "cbc721f7a971cc38c0f202ad0d7aa7a5"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/auth/login.blade.php": {
+    "mtime": 1779606682.4839516,
+    "ast_hash": "b02cebb3c86da7de47e46d948e2e23b7",
+    "semantic_hash": "b02cebb3c86da7de47e46d948e2e23b7"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/auth/verify-email.blade.php": {
+    "mtime": 1780195073.429738,
+    "ast_hash": "90e164286fffd9f9f9734bbb81e28427",
+    "semantic_hash": "90e164286fffd9f9f9734bbb81e28427"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/dashboard.blade.php": {
+    "mtime": 1780350298.2057583,
+    "ast_hash": "81d93675298ad1e659bf8c91c341211a",
+    "semantic_hash": "81d93675298ad1e659bf8c91c341211a"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/estado-cuenta.blade.php": {
+    "mtime": 1780012895.6062295,
+    "ast_hash": "b2b6f066467b3f3768c3be63225f7bb6",
+    "semantic_hash": "b2b6f066467b3f3768c3be63225f7bb6"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/marcas/form.blade.php": {
+    "mtime": 1780017034.1244323,
+    "ast_hash": "76a9669e877b302194c720f4a04e067d",
+    "semantic_hash": "76a9669e877b302194c720f4a04e067d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/marcas/index.blade.php": {
+    "mtime": 1780349286.5759342,
+    "ast_hash": "9697d54451cf5bb721811c11f39f2f1c",
+    "semantic_hash": "9697d54451cf5bb721811c11f39f2f1c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/personalizar.blade.php": {
+    "mtime": 1780349364.7178504,
+    "ast_hash": "0b647d97ab15887fd6abc29d1b94987f",
+    "semantic_hash": "0b647d97ab15887fd6abc29d1b94987f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/productos/create.blade.php": {
+    "mtime": 1780349271.1302338,
+    "ast_hash": "ca623430abb863039d42b83b8b666027",
+    "semantic_hash": "ca623430abb863039d42b83b8b666027"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/productos/edit.blade.php": {
+    "mtime": 1780349273.190184,
+    "ast_hash": "f51a2244222e6df77a8c4afbda465c3d",
+    "semantic_hash": "f51a2244222e6df77a8c4afbda465c3d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/productos/index.blade.php": {
+    "mtime": 1780274116.8090498,
+    "ast_hash": "1e57495c67a9d339eb5bad7759c8e048",
+    "semantic_hash": "1e57495c67a9d339eb5bad7759c8e048"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/cliente/tienda.blade.php": {
+    "mtime": 1780350249.6109595,
+    "ast_hash": "972f0a43feae8505bfe01179073aeb3b",
+    "semantic_hash": "972f0a43feae8505bfe01179073aeb3b"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/components/layouts/app.blade.php": {
+    "mtime": 1779606399.0996141,
+    "ast_hash": "da5c94a71e089218813fa86cd187749d",
+    "semantic_hash": "da5c94a71e089218813fa86cd187749d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/components/layouts/client.blade.php": {
+    "mtime": 1780350196.7581081,
+    "ast_hash": "c88ec020c44e342408d60db84a9f8474",
+    "semantic_hash": "c88ec020c44e342408d60db84a9f8474"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/components/public-navbar.blade.php": {
+    "mtime": 1780601400.0070965,
+    "ast_hash": "57d409dcf112be1e1562c6a3338b02f2",
+    "semantic_hash": "57d409dcf112be1e1562c6a3338b02f2"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/directorio/catalogo.blade.php": {
+    "mtime": 1780011643.9970045,
+    "ast_hash": "f0b58ce776b5e55394ce262338238eee",
+    "semantic_hash": "f0b58ce776b5e55394ce262338238eee"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/directorio/index.blade.php": {
+    "mtime": 1779146539.0,
+    "ast_hash": "593a5566a54539d6eec7a808f7d5f36e",
+    "semantic_hash": "593a5566a54539d6eec7a808f7d5f36e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/components/auditoria-detalle.blade.php": {
+    "mtime": 1779639834.7346833,
+    "ast_hash": "8aaeb7ed4b370af052d76db9527f538f",
+    "semantic_hash": "8aaeb7ed4b370af052d76db9527f538f"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/components/reporte-cliente-modal.blade.php": {
+    "mtime": 1780265684.0425322,
+    "ast_hash": "8860259f407f741a593746910ce47ff5",
+    "semantic_hash": "8860259f407f741a593746910ce47ff5"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/components/verify-email-banner.blade.php": {
+    "mtime": 1779416956.7409465,
+    "ast_hash": "4d6620c5e876e3ab562e45b8b7e80486",
+    "semantic_hash": "4d6620c5e876e3ab562e45b8b7e80486"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/forms/components/leaflet-map.blade.php": {
+    "mtime": 1778716495.0,
+    "ast_hash": "88a0aec940962e4f2e0cb8755204e596",
+    "semantic_hash": "88a0aec940962e4f2e0cb8755204e596"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/auditoria.blade.php": {
+    "mtime": 1779639431.833581,
+    "ast_hash": "0abc278ec35ac83cd266f4448fed6b84",
+    "semantic_hash": "0abc278ec35ac83cd266f4448fed6b84"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/balance-suscripciones.blade.php": {
+    "mtime": 1779147541.0,
+    "ast_hash": "44d8c034277d3e0989ecf040b2afeccf",
+    "semantic_hash": "44d8c034277d3e0989ecf040b2afeccf"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/custom-tarifas.blade.php": {
+    "mtime": 1780248043.306895,
+    "ast_hash": "59f0b849849fd1a65025940217b07545",
+    "semantic_hash": "59f0b849849fd1a65025940217b07545"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/form-cliente.blade.php": {
+    "mtime": 1779511170.7824671,
+    "ast_hash": "401f5986aa18c14b2694ad752c80b470",
+    "semantic_hash": "401f5986aa18c14b2694ad752c80b470"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/mapa-ocupacion.blade.php": {
+    "mtime": 1780063872.0709584,
+    "ast_hash": "99094ab2e9de691f701ffc93900494f7",
+    "semantic_hash": "99094ab2e9de691f701ffc93900494f7"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/mi-estado-cuenta.blade.php": {
+    "mtime": 1779146525.0,
+    "ast_hash": "2520469c9c3d91027e6986d1ab4da8b8",
+    "semantic_hash": "2520469c9c3d91027e6986d1ab4da8b8"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/reporte-morosidad.blade.php": {
+    "mtime": 1779639092.865295,
+    "ast_hash": "a19628c2ef1b7ff1633bff1bca769205",
+    "semantic_hash": "a19628c2ef1b7ff1633bff1bca769205"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/simulador-alquiler.blade.php": {
+    "mtime": 1779147527.0,
+    "ast_hash": "1aecbffc12180a552d390159ec4caa52",
+    "semantic_hash": "1aecbffc12180a552d390159ec4caa52"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/ver-cliente.blade.php": {
+    "mtime": 1779509615.6486607,
+    "ast_hash": "31ee35041f41a4c861fcf072d84c52ca",
+    "semantic_hash": "31ee35041f41a4c861fcf072d84c52ca"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/ver-suscripcion.blade.php": {
+    "mtime": 1780272957.8475597,
+    "ast_hash": "95a5095d3515bb1f05048af66d46ca80",
+    "semantic_hash": "95a5095d3515bb1f05048af66d46ca80"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/resources/infraestructuras/pages/create-infraestructura-custom.blade.php": {
+    "mtime": 1780605153.7835686,
+    "ast_hash": "1d91c20c83ef6ac9f3f7a4c688565e1c",
+    "semantic_hash": "1d91c20c83ef6ac9f3f7a4c688565e1c"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/resources/infraestructuras/pages/infraestructuras-pisos-diseno.blade.php": {
+    "mtime": 1780239748.401582,
+    "ast_hash": "39a35e468a3c3d81eb6956d5399c5375",
+    "semantic_hash": "39a35e468a3c3d81eb6956d5399c5375"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/resources/infraestructuras/pages/list-infraestructuras-custom.blade.php": {
+    "mtime": 1779632864.6091957,
+    "ast_hash": "cc7f9e1f0b6fcfff24d3a597d617a527",
+    "semantic_hash": "cc7f9e1f0b6fcfff24d3a597d617a527"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/resources/infraestructuras/pages/tiendas-propietarios.blade.php": {
+    "mtime": 1779058084.0,
+    "ast_hash": "10c76a0dd488e35b58243a67532bf439",
+    "semantic_hash": "10c76a0dd488e35b58243a67532bf439"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/resources/usuarios/pages/form-usuarios-custom.blade.php": {
+    "mtime": 1779577048.1234713,
+    "ast_hash": "5366ea9eae2bf842ae85ccc9dde27d76",
+    "semantic_hash": "5366ea9eae2bf842ae85ccc9dde27d76"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/pdf/contrato.blade.php": {
+    "mtime": 1780351213.1838923,
+    "ast_hash": "d6a6cab17c35e55c8580916ad09db724",
+    "semantic_hash": "d6a6cab17c35e55c8580916ad09db724"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/pdf/reporte-cobro.blade.php": {
+    "mtime": 1780351075.2397392,
+    "ast_hash": "b5f941e5f49ad94163c776ee632242a3",
+    "semantic_hash": "b5f941e5f49ad94163c776ee632242a3"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/pdf/reporte-pago.blade.php": {
+    "mtime": 1780613704.8189993,
+    "ast_hash": "3d4f2be6a1bcb444d34f8e00f4adeb41",
+    "semantic_hash": "3d4f2be6a1bcb444d34f8e00f4adeb41"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/pdf/reporte-suscripcion-movimiento.blade.php": {
+    "mtime": 1780610191.8855176,
+    "ast_hash": "0226097f9d3faed87b38c056956399a7",
+    "semantic_hash": "0226097f9d3faed87b38c056956399a7"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/productos.blade.php": {
+    "mtime": 1780239786.1951585,
+    "ast_hash": "bd999d8d23aa75077b2927424797d95d",
+    "semantic_hash": "bd999d8d23aa75077b2927424797d95d"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/suscripciones.blade.php": {
+    "mtime": 1780608391.1468349,
+    "ast_hash": "4bce22501ce2bf04277685665c4cadff",
+    "semantic_hash": "4bce22501ce2bf04277685665c4cadff"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/vendor/filament/components/user-menu.blade.php": {
+    "mtime": 1779463614.7154634,
+    "ast_hash": "8f1dfe8f47d6176860dc0ea0d9a243db",
+    "semantic_hash": "8f1dfe8f47d6176860dc0ea0d9a243db"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/welcome.blade.php": {
+    "mtime": 1780606593.8084285,
+    "ast_hash": "ae7fe6a6b3d236b80cc321c532cc7fad",
+    "semantic_hash": "ae7fe6a6b3d236b80cc321c532cc7fad"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Pages/SeleccionarInfraestructura.php": {
+    "mtime": 1780605661.0807102,
+    "ast_hash": "e7081f7437552e1b768716f8b25539c0",
+    "semantic_hash": "e7081f7437552e1b768716f8b25539c0"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/InfraestructuraDashboardFilter.php": {
+    "mtime": 1780604787.1705935,
+    "ast_hash": "5b9d51016d770bba30b4f12994bf4086",
+    "semantic_hash": "5b9d51016d770bba30b4f12994bf4086"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Filament/Widgets/PagosMonthNavigator.php": {
+    "mtime": 1780614168.9976342,
+    "ast_hash": "797c2b253526e431e1630d56fddd186e",
+    "semantic_hash": "797c2b253526e431e1630d56fddd186e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Http/Middleware/RequiereInfraestructuraActiva.php": {
+    "mtime": 1780605608.0270572,
+    "ast_hash": "f2bb1f2864ca0756ca5984ca46d13b16",
+    "semantic_hash": "f2bb1f2864ca0756ca5984ca46d13b16"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/app/Support/ActiveInfraestructura.php": {
+    "mtime": 1780604315.1383965,
+    "ast_hash": "49c3ca8eb2d71770956d064bf0b72543",
+    "semantic_hash": "49c3ca8eb2d71770956d064bf0b72543"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/database/migrations/2026_06_04_000001_add_infraestructura_id_to_categorias_and_tarifas.php": {
+    "mtime": 1780604322.687482,
+    "ast_hash": "f6dee4f5b42bb7c59fa5dabae9b5723e",
+    "semantic_hash": "f6dee4f5b42bb7c59fa5dabae9b5723e"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/pages/seleccionar-infraestructura.blade.php": {
+    "mtime": 1780605597.836164,
+    "ast_hash": "ccab7978be543a8fc201e26b48859269",
+    "semantic_hash": "ccab7978be543a8fc201e26b48859269"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/widgets/infraestructura-dashboard-filter.blade.php": {
+    "mtime": 1780604394.0189254,
+    "ast_hash": "ab8081fb1dbff2fef4385bc9f50968ec",
+    "semantic_hash": "ab8081fb1dbff2fef4385bc9f50968ec"
+  },
+  "/Users/franco/Documents/source/Proyectos Web/Proyecto Centro Comercial/proyectoint/resources/views/filament/widgets/pagos-month-navigator.blade.php": {
+    "mtime": 1780614118.8272111,
+    "ast_hash": "7964fd16aa014cd427992bce6c1d9554",
+    "semantic_hash": "7964fd16aa014cd427992bce6c1d9554"
+  }
+}

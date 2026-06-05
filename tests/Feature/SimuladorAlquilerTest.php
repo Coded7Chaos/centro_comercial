@@ -23,6 +23,7 @@ class SimuladorAlquilerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->withoutMiddleware(\App\Http\Middleware\RequiereInfraestructuraActiva::class);
 
         // Seed roles & permissions
         $this->seed(RolesAndPermissionsSeeder::class);
@@ -94,10 +95,10 @@ class SimuladorAlquilerTest extends TestCase
             ->set('data.duracion_unidad', 'meses')
             ->call('calcularCotizacion')
             ->assertSet('data.etiqueta', 'Pequeño Custom')
-            ->assertSet('data.precio_mensual_base', '800.00')
             ->assertSet('data.descuento_porcentaje', '0.00')
             ->assertSet('data.pago_mensual_estimado', '800.00')
-            ->assertSet('data.cotizacion', '800.00');
+            ->assertSet('data.garantia', '800.00')
+            ->assertSet('data.cotizacion', '1600.00');
     }
 
     public function test_simulador_calculates_cotizacion_correctly_with_monthly_discount(): void
@@ -105,17 +106,18 @@ class SimuladorAlquilerTest extends TestCase
         $this->actingAs($this->adminUser);
 
         // 3 months contract (10% discount) for size 25.0
-        // Base monthly: 800. Discount monthly: 80. Con descuento: 720. Total con descuento: 2160.
+        // Base monthly: 800. Discount monthly: 80. Con descuento: 720. Total con descuento: 2160. Guarantee: 720. Total: 2880.
         Livewire::test(SimuladorAlquiler::class)
             ->set('data.tamano', 25)
             ->set('data.duracion_valor', 3)
             ->set('data.duracion_unidad', 'meses')
+            ->set('data.garantia', null)
             ->call('calcularCotizacion')
             ->assertSet('data.etiqueta', 'Pequeño Custom')
-            ->assertSet('data.precio_mensual_base', '800.00')
             ->assertSet('data.descuento_porcentaje', '10.00')
             ->assertSet('data.pago_mensual_estimado', '720.00')
-            ->assertSet('data.cotizacion', '2160.00');
+            ->assertSet('data.garantia', '720.00')
+            ->assertSet('data.cotizacion', '2880.00');
     }
 
     public function test_simulador_calculates_cotizacion_correctly_with_yearly_discount(): void
@@ -123,16 +125,35 @@ class SimuladorAlquilerTest extends TestCase
         $this->actingAs($this->adminUser);
 
         // 1 year contract = 12 months (15% discount) for size 25.0
-        // Base monthly: 800. Discount monthly: 120. Con descuento: 680. Total con descuento: 8160.
+        // Base monthly: 800. Discount monthly: 120. Con descuento: 680. Total con descuento: 8160. Guarantee: 680. Total: 8840.
         Livewire::test(SimuladorAlquiler::class)
             ->set('data.tamano', 25)
             ->set('data.duracion_valor', 1)
             ->set('data.duracion_unidad', 'años')
+            ->set('data.garantia', null)
             ->call('calcularCotizacion')
             ->assertSet('data.etiqueta', 'Pequeño Custom')
-            ->assertSet('data.precio_mensual_base', '800.00')
             ->assertSet('data.descuento_porcentaje', '15.00')
             ->assertSet('data.pago_mensual_estimado', '680.00')
-            ->assertSet('data.cotizacion', '8160.00');
+            ->assertSet('data.garantia', '680.00')
+            ->assertSet('data.cotizacion', '8840.00');
+    }
+
+    public function test_simulador_updates_garantia_when_monthly_payment_changes(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        // 1 month contract for size 25.0 -> base price 800, guarantee should be 800
+        $test = Livewire::test(SimuladorAlquiler::class)
+            ->set('data.tamano', 25)
+            ->set('data.duracion_valor', 1)
+            ->set('data.duracion_unidad', 'meses')
+            ->call('calcularCotizacion')
+            ->assertSet('data.garantia', '800.00');
+
+        // Now change duration to 3 months (monthly payment becomes 720.00) -> guarantee should update to 720.00
+        $test->set('data.duracion_valor', 3)
+            ->call('calcularCotizacion')
+            ->assertSet('data.garantia', '720.00');
     }
 }

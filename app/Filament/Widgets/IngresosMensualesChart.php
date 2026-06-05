@@ -4,12 +4,27 @@ namespace App\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
 use App\Models\SuscripcionesPagos;
+use App\Support\ActiveInfraestructura;
 use Illuminate\Support\Carbon;
+use Livewire\Attributes\On;
 
 class IngresosMensualesChart extends ChartWidget
 {
     protected ?string $heading = 'Ingresos por Pagos (Últimos 6 meses)';
     protected static ?int $sort = 2;
+
+    public ?int $activeInfraId = null;
+
+    public function mount(): void
+    {
+        $this->activeInfraId = ActiveInfraestructura::getDashboardId();
+    }
+
+    #[On('dashboardInfraChanged')]
+    public function updateInfraFilter(?int $infraId = null): void
+    {
+        $this->activeInfraId = $infraId ?: null;
+    }
 
     public static function canView(): bool
     {
@@ -22,17 +37,19 @@ class IngresosMensualesChart extends ChartWidget
         $labels = [];
 
         for ($i = 5; $i >= 0; $i--) {
-            // Utilizar startOfMonth para evitar desbordamientos de fecha en el cálculo
-            $month = Carbon::now()->subMonths($i)->startOfMonth();
+            $month = Carbon::now()->startOfMonth()->subMonths($i);
             $labels[] = $month->translatedFormat('M Y');
-            
-            // Sumar los pagos dentro del rango completo del mes (independientemente del formato/timezone)
-            $sum = SuscripcionesPagos::whereBetween('fecha_pago', [
+
+            $query = SuscripcionesPagos::where('estado_verificacion', 'verificado')->whereBetween('fecha_pago', [
                 $month->copy()->startOfMonth()->toDateString(),
-                $month->copy()->endOfMonth()->toDateString()
-            ])->sum('monto_pagado');
-                
-            $data[] = (float) $sum;
+                $month->copy()->endOfMonth()->toDateString(),
+            ]);
+            if ($this->activeInfraId) {
+                $query->whereHas('cobro.suscripcion.infraestructurasTienda.piso',
+                    fn ($q) => $q->where('infraestructura_id', $this->activeInfraId)
+                );
+            }
+            $data[] = (float) $query->sum('monto_pagado');
         }
 
         return [

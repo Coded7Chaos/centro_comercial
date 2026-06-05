@@ -514,7 +514,7 @@ class SuscripcionesPagosForm
 
                 ->disabled()
 
-                ->dehydrated(),
+                ->dehydrated(false),
 
             TextInput::make('total_pagado')
 
@@ -638,7 +638,7 @@ class SuscripcionesPagosForm
 
                 ->disabled()
 
-                ->dehydrated(),
+                ->dehydrated(false),
 
             /*
 |--------------------------------------------------------------------------
@@ -1000,6 +1000,22 @@ class SuscripcionesPagosForm
                 ->visible(fn (Get $get) => (float)$get('pago_pendiente') > 0 && $get('cobro_pendiente_opcion') === 'fecha_intermedia')
                 ->required(fn (Get $get) => (float)$get('pago_pendiente') > 0 && $get('cobro_pendiente_opcion') === 'fecha_intermedia')
                 ->dehydrated(false),
+
+            Select::make('estado_verificacion')
+                ->label('Estado de Verificación')
+                ->options([
+                    'pendiente' => 'Pendiente de Confirmación',
+                    'verificado' => 'Aprobado / Verificado',
+                    'rechazado' => 'Rechazado',
+                ])
+                ->disabled()
+                ->dehydrated(),
+
+            Textarea::make('motivo_rechazo')
+                ->label('Razón del Rechazo')
+                ->disabled()
+                ->visible(fn(Get $get) => $get('estado_verificacion') === 'rechazado')
+                ->dehydrated(),
         ]);
     }
 }

@@ -34,7 +34,15 @@ class SuscripcionesTable
 
                     ->limit(30)
 
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('cliente.user', function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
+                                $sq->whereRaw("unaccent(lower(nombres)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_paterno)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_materno)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                            });
+                        });
+                    }),
 
 
                 /*
@@ -66,7 +74,14 @@ class SuscripcionesTable
 
                     ->limit(25)
 
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('infraestructurasTienda', function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
+                                $sq->whereRaw("unaccent(lower(nombre)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(numero)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                            });
+                        });
+                    }),
 
 
                 /*
@@ -103,26 +118,46 @@ class SuscripcionesTable
 
                     ->sortable()
 
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereRaw("unaccent(lower(tipo)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    }),
 
 
                 /*
     |------------------------------------------------------------------
-    | PRECIO
+    | PAGO MENSUAL
+    |------------------------------------------------------------------
+    */
+
+                TextColumn::make('pago_mensual')
+                    ->label('Pago Mensual')
+                    ->getStateUsing(function ($record) {
+                        $meses = max(1, (int) round(
+                            \Carbon\Carbon::parse($record->fecha_inicio)
+                                ->diffInMonths(\Carbon\Carbon::parse($record->fecha_fin)->addDay())
+                        ));
+                        return $record->precio / $meses;
+                    })
+                    ->formatStateUsing(fn ($state) => 'Bs. ' . number_format($state, 2, ',', '.'))
+                    ->sortable(false),
+
+                /*
+    |------------------------------------------------------------------
+    | PRECIO TOTAL (pago mensual × meses + garantía)
     |------------------------------------------------------------------
     */
 
                 TextColumn::make('precio')
-
-                    ->label('Precio')
-
-                    ->formatStateUsing(
-                        fn($state) =>
-
-                        'Bs. ' .
-                            number_format($state, 2, ',', '.')
-                    )
-
+                    ->label('Precio Total')
+                    ->getStateUsing(function ($record) {
+                        $meses = max(1, (int) round(
+                            \Carbon\Carbon::parse($record->fecha_inicio)
+                                ->diffInMonths(\Carbon\Carbon::parse($record->fecha_fin)->addDay())
+                        ));
+                        $pagoMensual = $record->precio / $meses;
+                        return $record->precio + $pagoMensual;
+                    })
+                    ->formatStateUsing(fn ($state) => 'Bs. ' . number_format($state, 2, ',', '.'))
                     ->sortable(),
 
 
@@ -184,8 +219,6 @@ class SuscripcionesTable
 
                 ViewAction::make(),
 
-                EditAction::make(),
-
                 Action::make('movimiento')
 
                     ->label('Movimiento')
@@ -219,13 +252,6 @@ class SuscripcionesTable
                     ->url(fn ($record) => route('admin.suscripciones.renovar-custom', $record->id)),
             ])
 
-            ->toolbarActions([
-
-                BulkActionGroup::make([
-
-                    DeleteBulkAction::make(),
-
-                ]),
-            ]);
+            ->toolbarActions([]);
     }
 }

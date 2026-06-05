@@ -69,6 +69,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Debug System Date
+    |--------------------------------------------------------------------------
+    |
+    | When FECHA_SISTEMA is empty, null, or "NULL", the application uses the
+    | real system date and time. When set as DD/MM/YYYY, all Laravel/Carbon
+    | "now" helpers use that date with the real current clock time.
+    |
+    */
+
+    'fecha_sistema' => env('FECHA_SISTEMA'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Locale Configuration
     |--------------------------------------------------------------------------
     |

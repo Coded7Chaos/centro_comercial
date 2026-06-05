@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\Suscripciones;
 
 use App\Filament\Resources\Suscripciones\Pages\CreateSuscripciones;
-use App\Filament\Resources\Suscripciones\Pages\EditSuscripciones;
 use App\Filament\Resources\Suscripciones\Pages\ListSuscripciones;
 use App\Filament\Resources\Suscripciones\Pages\ViewSuscripciones;
 use App\Filament\Resources\Suscripciones\Schemas\SuscripcionesForm;
@@ -48,13 +47,30 @@ class SuscripcionesResource extends Resource
         ];
     }
 
+    public static function canDelete(\Illuminate\Database\Eloquent\Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        return false;
+    }
+
     public static function getPages(): array
     {
         return [
             'index' => ListSuscripciones::route('/'),
             'create' => CreateSuscripciones::route('/create'),
             'view' => ViewSuscripciones::route('/{record}'),
-            'edit' => EditSuscripciones::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return \App\Support\ActiveInfraestructura::scopeQuery(
+            parent::getEloquentQuery(),
+            'infraestructurasTienda.piso'
+        );
     }
 }

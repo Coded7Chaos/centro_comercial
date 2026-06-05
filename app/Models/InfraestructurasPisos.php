@@ -58,5 +58,18 @@ class InfraestructurasPisos extends Model
         );
     }
 
+    protected static function booted(): void
+    {
+        static::deleting(function (InfraestructurasPisos $piso) {
+            // Delete all tiendas associated with this floor (triggers their deleting events)
+            foreach ($piso->tiendas as $tienda) {
+                $tienda->delete();
+            }
 
+            // Nullify related subscriptions referencing this floor
+            \App\Models\Suscripciones::where('infraestructuras_piso_id', $piso->id)
+                ->update(['infraestructuras_piso_id' => null]);
+        });
+    }
 }
+

@@ -15,42 +15,14 @@ class MarcasTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label('Marca ID')
-                    ->sortable(),
                 \Filament\Tables\Columns\ImageColumn::make('logo')
                     ->label('Logo')
                     ->disk('public')
                     ->circular(),
                 TextColumn::make('nombre')
-                    ->searchable(),
-                TextColumn::make('cliente_id')
-                    ->label('Cliente ID')
-                    ->sortable()
-                    ->searchable()
-                    ->default('-'),
-                TextColumn::make('cliente.nombre_completo')
-                    ->label('Cliente')
-                    ->default('Global')
                     ->searchable(query: function ($query, string $search) {
-                        return $query->whereHas('cliente.user', function ($q) use ($search) {
-                            $q->where('nombres', 'like', "%{$search}%")
-                                ->orWhere('apellido_paterno', 'like', "%{$search}%")
-                                ->orWhere('apellido_materno', 'like', "%{$search}%");
-                        });
-                    })
-                    ->limit(20)
-                    ->tooltip(fn($record) => $record->cliente?->nombre_completo ?? 'Marca Global')
-                    ->width('220px'),
-                TextColumn::make('estado')
-                    ->badge()
-                    ->color(fn(string $state): string => match ($state) {
-                        'activo' => 'success',
-                        'inactivo' => 'danger',
-                        default => 'gray',
-                    })
-                    ->alignCenter()
-                    ->searchable(),
+                        return $query->whereRaw("unaccent(lower(nombre)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    }),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

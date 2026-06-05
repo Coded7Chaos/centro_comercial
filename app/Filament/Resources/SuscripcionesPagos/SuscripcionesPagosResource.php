@@ -63,4 +63,12 @@ class SuscripcionesPagosResource extends Resource
             'edit' => EditSuscripcionesPagos::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return \App\Support\ActiveInfraestructura::scopeQuery(
+            parent::getEloquentQuery(),
+            'cobro.suscripcion.infraestructurasTienda.piso'
+        );
+    }
 }

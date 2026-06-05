@@ -35,4 +35,15 @@ class Infraestructuras extends Model
             'infraestructura_id'
         );
     }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Infraestructuras $infraestructura) {
+            // Delete all floors associated with this infrastructure (triggers their deleting events)
+            foreach ($infraestructura->pisosInfraestructura as $piso) {
+                $piso->delete();
+            }
+        });
+    }
 }
+

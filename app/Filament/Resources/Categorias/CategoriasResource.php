@@ -57,4 +57,22 @@ class CategoriasResource extends Resource
             'edit' => EditCategorias::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+        $id = \App\Support\ActiveInfraestructura::getId();
+        if ($id) {
+            $query->where(function ($q) use ($id) {
+                $q->where('infraestructura_id', $id)
+                  ->orWhereHas('productos.tienda.piso', function ($qp) use ($id) {
+                      $qp->where('infraestructura_id', $id);
+                  })
+                  ->orWhereHas('subcategorias.productos.tienda.piso', function ($qp) use ($id) {
+                      $qp->where('infraestructura_id', $id);
+                  });
+            });
+        }
+        return $query;
+    }
 }

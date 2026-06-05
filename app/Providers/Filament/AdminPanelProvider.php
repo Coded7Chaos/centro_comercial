@@ -92,6 +92,31 @@ class AdminPanelProvider extends PanelProvider
                     '                            ctx.textAlign = "center";' .
                     '                            ctx.textBaseline = "middle";' .
                     '                            ctx.fillText(text, pillX, pillY);' .
+                    '                        } else if (!isHorizontal && !isStacked) {' .
+                    '                            let text = "Bs. " + Number(dataValue).toLocaleString();' .
+                    '                            const textWidth = ctx.measureText(text).width;' .
+                    '                            const pillWidth = textWidth + 12;' .
+                    '                            const pillHeight = 18;' .
+                    '                            const pillX = center.x;' .
+                    '                            const pillY = center.y - 12;' .
+                    '                            ctx.beginPath();' .
+                    '                            const r = 9;' .
+                    '                            ctx.moveTo(pillX - pillWidth/2 + r, pillY - pillHeight/2);' .
+                    '                            ctx.lineTo(pillX + pillWidth/2 - r, pillY - pillHeight/2);' .
+                    '                            ctx.quadraticCurveTo(pillX + pillWidth/2, pillY - pillHeight/2, pillX + pillWidth/2, pillY - pillHeight/2 + r);' .
+                    '                            ctx.lineTo(pillX + pillWidth/2, pillY + pillHeight/2 - r);' .
+                    '                            ctx.quadraticCurveTo(pillX + pillWidth/2, pillY + pillHeight/2, pillX + pillWidth/2 - r, pillY + pillHeight/2);' .
+                    '                            ctx.lineTo(pillX - pillWidth/2 + r, pillY + pillHeight/2);' .
+                    '                            ctx.quadraticCurveTo(pillX - pillWidth/2, pillY + pillHeight/2, pillX - pillWidth/2, pillY + pillHeight/2 - r);' .
+                    '                            ctx.lineTo(pillX - pillWidth/2, pillY - pillHeight/2 + r);' .
+                    '                            ctx.quadraticCurveTo(pillX - pillWidth/2, pillY - pillHeight/2, pillX - pillWidth/2 + r, pillY - pillHeight/2);' .
+                    '                            ctx.closePath();' .
+                    '                            ctx.fillStyle = "#0f172a";' .
+                    '                            ctx.fill();' .
+                    '                            ctx.fillStyle = "#ffffff";' .
+                    '                            ctx.textAlign = "center";' .
+                    '                            ctx.textBaseline = "middle";' .
+                    '                            ctx.fillText(text, pillX, pillY);' .
                     '                        } else {' .
                     '                            const text = dataValue.toString();' .
                     '                            ctx.beginPath();' .
@@ -168,11 +193,33 @@ class AdminPanelProvider extends PanelProvider
                     </x-filament::button>
                 '),
             )
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_END,
+                function (): string {
+                    $infra = \App\Support\ActiveInfraestructura::get();
+                    if (! $infra) return '';
+                    $url = route('filament.admin.pages.seleccionar-infraestructura');
+                    return Blade::render('
+                        <a href="' . $url . '"
+                           class="mr-4 inline-flex items-center gap-1.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 px-3 py-1.5 text-xs font-bold text-amber-800 transition-colors shadow-sm"
+                           title="Cambiar infraestructura activa">
+                            <svg class="w-3.5 h-3.5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-2 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
+                            <span>' . e($infra->nombre) . '</span>
+                            <svg class="w-3 h-3 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+                            </svg>
+                        </a>
+                    ');
+                },
+            )
             ->pages([
                 Dashboard::class,
             ])
             ->widgets([
                 AccountWidget::class,
+                \App\Filament\Widgets\InfraestructuraDashboardFilter::class,
                 \App\Filament\Widgets\StatsOverview::class,
                 \App\Filament\Widgets\IngresosMensualesChart::class,
                 \App\Filament\Widgets\CobrosPorEstadoChart::class,
@@ -191,6 +238,7 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                \App\Http\Middleware\RequiereInfraestructuraActiva::class,
             ])
             ->plugins([
                 FilamentShieldPlugin::make(),

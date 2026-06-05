@@ -63,4 +63,46 @@ class SuscripcionesCobros extends Model
             'suscripcion_cobro_id'
         );
     }
+
+    public function recalcularEstado(): void
+    {
+        $totalPagado = $this->pagos()->where('estado_verificacion', 'verificado')->sum('monto_pagado');
+
+        if ($totalPagado >= $this->monto) {
+            $estado = 'pagado';
+        } elseif ($totalPagado > 0) {
+            $estado = 'parcial';
+        } else {
+            $hasPending = $this->pagos()->where('estado_verificacion', 'pendiente')->exists();
+            if ($hasPending) {
+                $estado = 'pendiente_confirmacion';
+            } else {
+                $estado = now()->toDateString() > $this->fecha_vencimiento
+                    ? 'vencido'
+                    : 'pendiente';
+            }
+        }
+
+        $this->update(['estado' => $estado]);
+    }
+
+    /**
+     * Fecha de vencimiento para el cobro de saldo parcial pendiente:
+     * el mes siguiente al cobro original.
+     */
+    public static function fechaSaldoPendiente(self $cobro): string
+    {
+        return \Carbon\Carbon::parse($cobro->fecha_vencimiento)
+            ->addMonthNoOverflow()
+            ->toDateString();
+    }
+
+    /**
+     * Concepto descriptivo para el cobro de saldo parcial pendiente.
+     * Deja claro que es un remanente de un cobro anterior.
+     */
+    public static function conceptoSaldoPendiente(self $cobro): string
+    {
+        return 'Saldo pendiente de: ' . $cobro->concepto;
+    }
 }

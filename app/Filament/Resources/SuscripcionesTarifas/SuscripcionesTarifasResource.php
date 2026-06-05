@@ -46,4 +46,14 @@ class SuscripcionesTarifasResource extends Resource
             'edit'   => EditSuscripcionesTarifas::route('/{record}/edit'),
         ];
     }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        $query = parent::getEloquentQuery();
+        $id = \App\Support\ActiveInfraestructura::getId();
+        if ($id) {
+            $query->where('infraestructura_id', $id);
+        }
+        return $query;
+    }
 }

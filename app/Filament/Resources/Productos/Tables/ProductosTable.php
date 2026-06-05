@@ -35,7 +35,9 @@ class ProductosTable
                     ->square()
                     ->size(60),
                 TextColumn::make('nombre')
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereRaw("unaccent(lower(nombre)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    }),
                 TextColumn::make('precio')
                     ->numeric()
                     ->sortable(),
@@ -45,7 +47,12 @@ class ProductosTable
                         fn($state, $record) =>
                         $state . ' - ' . ($record->categoria->nombre ?? '')
                     )
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('categoria', function ($q) use ($search) {
+                            $q->whereRaw("unaccent(lower(nombre)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                        });
+                    }),
 
                 TextColumn::make('marca_id')
                     ->label('Marca')
@@ -53,9 +60,16 @@ class ProductosTable
                         fn($state, $record) =>
                         $state . ' - ' . ($record->marca->nombre ?? '')
                     )
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('marca', function ($q) use ($search) {
+                            $q->whereRaw("unaccent(lower(nombre)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                        });
+                    }),
                 TextColumn::make('estado')
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereRaw("unaccent(lower(estado)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    }),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

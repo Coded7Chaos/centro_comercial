@@ -1,0 +1,1954 @@
+{
+  "communities": {
+    "0": [
+      "admin_suscripcioncustomcontroller",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_checkadmin",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_create",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_descargarcontrato",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_gettiendaprecio",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_pago",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_renovar",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_store",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_storepayment",
+      "admin_suscripcioncustomcontroller_suscripcioncustomcontroller_storerenewal",
+      "app_filament_resources_suscripciones_schemas_suscripcionesform_php_schema",
+      "app_http_controllers_admin_suscripcioncustomcontroller_php_request",
+      "app_http_middleware_requiereinfraestructuraactiva_php_request",
+      "app_models_infraestructurastiendas_php_belongsto",
+      "app_models_infraestructurastiendas_php_belongstomany",
+      "app_models_infraestructurastiendas_php_carbon",
+      "app_models_infraestructurastiendas_php_hasmany",
+      "app_models_infraestructurastiendas_php_logoptions",
+      "app_models_suscripcionestarifas_php_logoptions",
+      "closure",
+      "command",
+      "commands_marcarcobrosvencidos",
+      "commands_marcarcobrosvencidos_marcarcobrosvencidos",
+      "commands_marcarcobrosvencidos_marcarcobrosvencidos_handle",
+      "commands_releaseexpiredsubscriptions",
+      "commands_releaseexpiredsubscriptions_releaseexpiredsubscriptions",
+      "commands_releaseexpiredsubscriptions_releaseexpiredsubscriptions_handle",
+      "controllers_directoriocontroller",
+      "controllers_directoriocontroller_directoriocontroller",
+      "controllers_directoriocontroller_directoriocontroller_catalogo",
+      "controllers_directoriocontroller_directoriocontroller_index",
+      "middleware_requiereinfraestructuraactiva",
+      "middleware_requiereinfraestructuraactiva_requiereinfraestructuraactiva",
+      "middleware_requiereinfraestructuraactiva_requiereinfraestructuraactiva_handle",
+      "models_infraestructurastiendas_infraestructurastiendas",
+      "models_infraestructurastiendas_infraestructurastiendas_booted",
+      "models_infraestructurastiendas_infraestructurastiendas_cliente",
+      "models_infraestructurastiendas_infraestructurastiendas_estado",
+      "models_infraestructurastiendas_infraestructurastiendas_getactivitylogoptions",
+      "models_infraestructurastiendas_infraestructurastiendas_getcostooportunidad",
+      "models_infraestructurastiendas_infraestructurastiendas_getdiaslibre",
+      "models_infraestructurastiendas_infraestructurastiendas_getfechalibredesde",
+      "models_infraestructurastiendas_infraestructurastiendas_getmarcaattribute",
+      "models_infraestructurastiendas_infraestructurastiendas_getpreciomensualreferencial",
+      "models_infraestructurastiendas_infraestructurastiendas_marcas",
+      "models_infraestructurastiendas_infraestructurastiendas_piso",
+      "models_infraestructurastiendas_infraestructurastiendas_productos",
+      "models_suscripcionestarifas_suscripcionestarifas",
+      "models_suscripcionestarifas_suscripcionestarifas_getactivitylogoptions",
+      "models_suscripcionestarifas_suscripcionestarifas_tipos",
+      "response",
+      "schemas_suscripcionesform",
+      "schemas_suscripcionesform_suscripcionesform",
+      "schemas_suscripcionesform_suscripcionesform_configure",
+      "widgets_costooportunidadvacanciachart_costooportunidadvacanciachart_getdata"
+    ],
+    "1": [
+      "database_seeders_suscripcionesdemoseeder_php_carbon",
+      "database_seeders_suscripcionesdemoseeder_php_suscripciones",
+      "database_seeders_suscripcionesdemoseeder_php_suscripcionescobros",
+      "database_seeders_suscripcionesdemoseeder_php_suscripcionespagos",
+      "models_estadotienda",
+      "models_estadotienda_estadotienda",
+      "seeder",
+      "seeders_administradoresseeder",
+      "seeders_administradoresseeder_administradoresseeder",
+      "seeders_administradoresseeder_administradoresseeder_run",
+      "seeders_clientesseeder",
+      "seeders_clientesseeder_clientesseeder",
+      "seeders_clientesseeder_clientesseeder_run",
+      "seeders_databaseseeder",
+      "seeders_databaseseeder_databaseseeder",
+      "seeders_databaseseeder_databaseseeder_run",
+      "seeders_estadostiendasseeder",
+      "seeders_estadostiendasseeder_estadostiendasseeder",
+      "seeders_estadostiendasseeder_estadostiendasseeder_run",
+      "seeders_malldataseeder",
+      "seeders_malldataseeder_malldataseeder",
+      "seeders_malldataseeder_malldataseeder_run",
+      "seeders_notificationtestseeder",
+      "seeders_notificationtestseeder_notificationtestseeder",
+      "seeders_notificationtestseeder_notificationtestseeder_run",
+      "seeders_retroactivevacancyseeder",
+      "seeders_retroactivevacancyseeder_retroactivevacancyseeder",
+      "seeders_retroactivevacancyseeder_retroactivevacancyseeder_run",
+      "seeders_suscripcionesdemoseeder",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_contratoanualnuevo",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_contratomensualconmorosidad",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_contratomensualconpagoparcial",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_contratomensualtotalmentepagado",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_contratosemestralpagado",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_contratotrimestralvencido",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_crearclientesdemo",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_crearcobro",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_crearsuscripcionlimpia",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_pagar",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_run",
+      "seeders_suscripcionesdemoseeder_suscripcionesdemoseeder_tomartiendasdisponibles",
+      "seeders_suscripcionestarifasseeder",
+      "seeders_suscripcionestarifasseeder_suscripcionestarifasseeder",
+      "seeders_suscripcionestarifasseeder_suscripcionestarifasseeder_run"
+    ],
+    "2": [
+      "app_policies_infraestructuraspolicy_php_authuser",
+      "app_policies_infraestructuraspolicy_php_infraestructuras",
+      "app_policies_suscripcionescobrospolicy_php_authuser",
+      "app_policies_suscripcionescobrospolicy_php_suscripcionescobros",
+      "app_policies_suscripcionestarifaspolicy_php_authuser",
+      "handlesauthorization",
+      "policies_infraestructuraspolicy",
+      "policies_infraestructuraspolicy_infraestructuraspolicy",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_create",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_delete",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_deleteany",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_forcedelete",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_forcedeleteany",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_reorder",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_replicate",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_restore",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_restoreany",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_update",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_view",
+      "policies_infraestructuraspolicy_infraestructuraspolicy_viewany",
+      "policies_suscripcionescobrospolicy",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_create",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_delete",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_deleteany",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_forcedelete",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_forcedeleteany",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_reorder",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_replicate",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_restore",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_restoreany",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_update",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_view",
+      "policies_suscripcionescobrospolicy_suscripcionescobrospolicy_viewany",
+      "policies_suscripcionestarifaspolicy",
+      "policies_suscripcionestarifaspolicy_suscripcionestarifaspolicy",
+      "policies_suscripcionestarifaspolicy_suscripcionestarifaspolicy_create",
+      "policies_suscripcionestarifaspolicy_suscripcionestarifaspolicy_delete",
+      "policies_suscripcionestarifaspolicy_suscripcionestarifaspolicy_update",
+      "policies_suscripcionestarifaspolicy_suscripcionestarifaspolicy_view",
+      "policies_suscripcionestarifaspolicy_suscripcionestarifaspolicy_viewany",
+      "policies_userpolicy"
+    ],
+    "3": [
+      "app_filament_resources_categorias_categoriasresource_php_backedenum",
+      "app_filament_resources_categorias_categoriasresource_php_builder",
+      "app_filament_resources_categorias_categoriasresource_php_schema",
+      "app_filament_resources_categorias_categoriasresource_php_table",
+      "app_filament_resources_categorias_categoriasresource_php_unitenum",
+      "app_filament_resources_categorias_schemas_categoriasform_php_schema",
+      "app_filament_resources_categorias_schemas_categoriasinfolist_php_schema",
+      "app_filament_resources_categorias_tables_categoriastable_php_table",
+      "app_policies_categoriaspolicy_php_authuser",
+      "categorias",
+      "categorias_categoriasresource",
+      "categorias_categoriasresource_categoriasresource",
+      "categorias_categoriasresource_categoriasresource_form",
+      "categorias_categoriasresource_categoriasresource_geteloquentquery",
+      "categorias_categoriasresource_categoriasresource_getrelations",
+      "categorias_categoriasresource_categoriasresource_infolist",
+      "categorias_categoriasresource_categoriasresource_table",
+      "policies_categoriaspolicy",
+      "policies_categoriaspolicy_categoriaspolicy",
+      "policies_categoriaspolicy_categoriaspolicy_create",
+      "policies_categoriaspolicy_categoriaspolicy_delete",
+      "policies_categoriaspolicy_categoriaspolicy_deleteany",
+      "policies_categoriaspolicy_categoriaspolicy_forcedelete",
+      "policies_categoriaspolicy_categoriaspolicy_forcedeleteany",
+      "policies_categoriaspolicy_categoriaspolicy_reorder",
+      "policies_categoriaspolicy_categoriaspolicy_replicate",
+      "policies_categoriaspolicy_categoriaspolicy_restore",
+      "policies_categoriaspolicy_categoriaspolicy_restoreany",
+      "policies_categoriaspolicy_categoriaspolicy_update",
+      "policies_categoriaspolicy_categoriaspolicy_view",
+      "policies_categoriaspolicy_categoriaspolicy_viewany",
+      "schemas_categoriasform",
+      "schemas_categoriasform_categoriasform",
+      "schemas_categoriasform_categoriasform_configure",
+      "schemas_categoriasinfolist",
+      "schemas_categoriasinfolist_categoriasinfolist",
+      "schemas_categoriasinfolist_categoriasinfolist_configure",
+      "tables_categoriastable",
+      "tables_categoriastable_categoriastable",
+      "tables_categoriastable_categoriastable_configure"
+    ],
+    "4": [
+      "app_filament_resources_marcas_marcasresource_php_backedenum",
+      "app_filament_resources_marcas_marcasresource_php_schema",
+      "app_filament_resources_marcas_marcasresource_php_table",
+      "app_filament_resources_marcas_marcasresource_php_unitenum",
+      "app_filament_resources_marcas_schemas_marcasform_php_schema",
+      "app_filament_resources_marcas_schemas_marcasinfolist_php_schema",
+      "app_filament_resources_marcas_tables_marcastable_php_table",
+      "app_policies_marcaspolicy_php_authuser",
+      "marcas",
+      "marcas_marcasresource",
+      "marcas_marcasresource_marcasresource",
+      "marcas_marcasresource_marcasresource_form",
+      "marcas_marcasresource_marcasresource_getrelations",
+      "marcas_marcasresource_marcasresource_infolist",
+      "marcas_marcasresource_marcasresource_table",
+      "policies_marcaspolicy",
+      "policies_marcaspolicy_marcaspolicy",
+      "policies_marcaspolicy_marcaspolicy_create",
+      "policies_marcaspolicy_marcaspolicy_delete",
+      "policies_marcaspolicy_marcaspolicy_deleteany",
+      "policies_marcaspolicy_marcaspolicy_forcedelete",
+      "policies_marcaspolicy_marcaspolicy_forcedeleteany",
+      "policies_marcaspolicy_marcaspolicy_reorder",
+      "policies_marcaspolicy_marcaspolicy_replicate",
+      "policies_marcaspolicy_marcaspolicy_restore",
+      "policies_marcaspolicy_marcaspolicy_restoreany",
+      "policies_marcaspolicy_marcaspolicy_update",
+      "policies_marcaspolicy_marcaspolicy_view",
+      "policies_marcaspolicy_marcaspolicy_viewany",
+      "schemas_marcasform",
+      "schemas_marcasform_marcasform",
+      "schemas_marcasform_marcasform_configure",
+      "schemas_marcasinfolist",
+      "schemas_marcasinfolist_marcasinfolist",
+      "schemas_marcasinfolist_marcasinfolist_configure",
+      "tables_marcastable",
+      "tables_marcastable_marcastable",
+      "tables_marcastable_marcastable_configure"
+    ],
+    "5": [
+      "app_filament_resources_suscripcionespagos_schemas_suscripcionespagosform_php_schema",
+      "app_filament_widgets_statsoverview_php_builder",
+      "app_filament_widgets_topmorososwidget_php_table",
+      "app_policies_clientespolicy_php_authuser",
+      "basewidget",
+      "clientes",
+      "policies_clientespolicy",
+      "policies_clientespolicy_clientespolicy",
+      "policies_clientespolicy_clientespolicy_create",
+      "policies_clientespolicy_clientespolicy_delete",
+      "policies_clientespolicy_clientespolicy_deleteany",
+      "policies_clientespolicy_clientespolicy_forcedelete",
+      "policies_clientespolicy_clientespolicy_forcedeleteany",
+      "policies_clientespolicy_clientespolicy_reorder",
+      "policies_clientespolicy_clientespolicy_replicate",
+      "policies_clientespolicy_clientespolicy_restore",
+      "policies_clientespolicy_clientespolicy_restoreany",
+      "policies_clientespolicy_clientespolicy_update",
+      "policies_clientespolicy_clientespolicy_view",
+      "policies_clientespolicy_clientespolicy_viewany",
+      "schemas_suscripcionespagosform",
+      "schemas_suscripcionespagosform_suscripcionespagosform",
+      "schemas_suscripcionespagosform_suscripcionespagosform_configure",
+      "widgets_statsoverview",
+      "widgets_statsoverview_statsoverview",
+      "widgets_statsoverview_statsoverview_canview",
+      "widgets_statsoverview_statsoverview_getstats",
+      "widgets_statsoverview_statsoverview_infrascope",
+      "widgets_statsoverview_statsoverview_mount",
+      "widgets_statsoverview_statsoverview_updateinfrafilter",
+      "widgets_topmorososwidget",
+      "widgets_topmorososwidget_topmorososwidget",
+      "widgets_topmorososwidget_topmorososwidget_canview",
+      "widgets_topmorososwidget_topmorososwidget_getheading",
+      "widgets_topmorososwidget_topmorososwidget_mount",
+      "widgets_topmorososwidget_topmorososwidget_table",
+      "widgets_topmorososwidget_topmorososwidget_updateinfrafilter"
+    ],
+    "6": [
+      "app_http_controllers_auth_forgotpasswordcontroller_php_request",
+      "app_http_controllers_auth_logincontroller_php_request",
+      "app_http_controllers_auth_resetpasswordcontroller_php_request",
+      "auth_forgotpasswordcontroller",
+      "auth_forgotpasswordcontroller_forgotpasswordcontroller",
+      "auth_forgotpasswordcontroller_forgotpasswordcontroller_sendresetlinkemail",
+      "auth_forgotpasswordcontroller_forgotpasswordcontroller_showlinkrequestform",
+      "auth_logincontroller",
+      "auth_logincontroller_logincontroller",
+      "auth_logincontroller_logincontroller_login",
+      "auth_logincontroller_logincontroller_logout",
+      "auth_logincontroller_logincontroller_redirectuser",
+      "auth_logincontroller_logincontroller_showloginform",
+      "auth_resetpasswordcontroller",
+      "auth_resetpasswordcontroller_resetpasswordcontroller",
+      "auth_resetpasswordcontroller_resetpasswordcontroller_reset",
+      "auth_resetpasswordcontroller_resetpasswordcontroller_showresetform",
+      "controllers_controller",
+      "controllers_controller_controller",
+      "pdf_reportecobroscontroller",
+      "pdf_reportecobroscontroller_reportecobroscontroller",
+      "pdf_reportecobroscontroller_reportecobroscontroller_cobro",
+      "pdf_reportecontratocontroller",
+      "pdf_reportecontratocontroller_reportecontratocontroller",
+      "pdf_reportecontratocontroller_reportecontratocontroller_descargar",
+      "pdf_reportepagoscontroller",
+      "pdf_reportepagoscontroller_reportepagoscontroller",
+      "pdf_reportepagoscontroller_reportepagoscontroller_pago",
+      "pdf_reportesuscripcionmovimiento",
+      "pdf_reportesuscripcionmovimiento_reportesuscripcionmovimiento",
+      "pdf_reportesuscripcionmovimiento_reportesuscripcionmovimiento_movimiento"
+    ],
+    "7": [
+      "app_http_controllers_cliente_clientdashboardcontroller_php_request",
+      "app_models_productosimagenes_php_belongsto",
+      "cliente_clientdashboardcontroller",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_actualizarmarca",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_actualizarmarcalogorapido",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_actualizarproducto",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_actualizarproductovitrina",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_actualizartienda",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_actualizartiendapersonalizar",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_actualizarvitrina",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_crearmarca",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_crearproducto",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_dashboard",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_editarmarca",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_editarproducto",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_eliminarmarca",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_eliminarproducto",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_estadocuenta",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_getclienteorabort",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_guardarmarca",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_guardarproducto",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_marcas",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_personalizar",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_productos",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_registrarpago",
+      "cliente_clientdashboardcontroller_clientdashboardcontroller_tienda",
+      "models_productosimagenes",
+      "models_productosimagenes_productosimagenes",
+      "models_productosimagenes_productosimagenes_producto"
+    ],
+    "8": [
+      "app_filament_pages_mapaocupacion_php_backedenum",
+      "app_filament_pages_mapaocupacion_php_htmlable",
+      "app_filament_pages_mapaocupacion_php_unitenum",
+      "app_filament_resources_infraestructuras_pages_tiendaspropietarios_php_infraestructuras",
+      "infraestructuraspisos",
+      "pages_mapaocupacion",
+      "pages_mapaocupacion_mapaocupacion",
+      "pages_mapaocupacion_mapaocupacion_canaccess",
+      "pages_mapaocupacion_mapaocupacion_gettitle",
+      "pages_mapaocupacion_mapaocupacion_getviewdata",
+      "pages_mapaocupacion_mapaocupacion_selectpiso",
+      "pages_tiendaspropietarios",
+      "pages_tiendaspropietarios_tiendaspropietarios",
+      "pages_tiendaspropietarios_tiendaspropietarios_canaccess",
+      "pages_tiendaspropietarios_tiendaspropietarios_getclientesproperty",
+      "pages_tiendaspropietarios_tiendaspropietarios_getmarcasproperty",
+      "pages_tiendaspropietarios_tiendaspropietarios_guardar",
+      "pages_tiendaspropietarios_tiendaspropietarios_mount",
+      "pages_tiendaspropietarios_tiendaspropietarios_updated",
+      "widgets_ocupacionporpisochart",
+      "widgets_ocupacionporpisochart_ocupacionporpisochart",
+      "widgets_ocupacionporpisochart_ocupacionporpisochart_canview",
+      "widgets_ocupacionporpisochart_ocupacionporpisochart_getdata",
+      "widgets_ocupacionporpisochart_ocupacionporpisochart_getoptions",
+      "widgets_ocupacionporpisochart_ocupacionporpisochart_gettype",
+      "widgets_ocupacionporpisochart_ocupacionporpisochart_mount",
+      "widgets_ocupacionporpisochart_ocupacionporpisochart_updateinfrafilter"
+    ],
+    "9": [
+      "app_filament_resources_productos_productosresource_php_backedenum",
+      "app_filament_resources_productos_productosresource_php_builder",
+      "app_filament_resources_productos_productosresource_php_schema",
+      "app_filament_resources_productos_productosresource_php_table",
+      "app_filament_resources_productos_productosresource_php_unitenum",
+      "app_filament_resources_productos_schemas_productosform_php_schema",
+      "app_filament_resources_productos_schemas_productosinfolist_php_schema",
+      "app_filament_resources_productos_tables_productostable_php_table",
+      "productos_productosresource",
+      "productos_productosresource_productosresource",
+      "productos_productosresource_productosresource_form",
+      "productos_productosresource_productosresource_geteloquentquery",
+      "productos_productosresource_productosresource_getrelations",
+      "productos_productosresource_productosresource_infolist",
+      "productos_productosresource_productosresource_mutateformdatabeforecreate",
+      "productos_productosresource_productosresource_mutateformdatabeforesave",
+      "productos_productosresource_productosresource_table",
+      "productos_productosresource_productosresource_validarimagenes",
+      "schemas_productosform",
+      "schemas_productosform_productosform",
+      "schemas_productosform_productosform_configure",
+      "schemas_productosinfolist",
+      "schemas_productosinfolist_productosinfolist",
+      "schemas_productosinfolist_productosinfolist_configure",
+      "tables_productostable",
+      "tables_productostable_productostable",
+      "tables_productostable_productostable_configure"
+    ],
+    "10": [
+      "clientes_clientesresource_clientesresource_getpages",
+      "infraestructuras_infraestructurasresource_infraestructurasresource_getpages",
+      "pages_viewcategorias",
+      "pages_viewcategorias_viewcategorias",
+      "pages_viewcategorias_viewcategorias_getheaderactions",
+      "pages_viewclientecustom",
+      "pages_viewclientecustom_viewclientecustom",
+      "pages_viewclientes",
+      "pages_viewclientes_viewclientes",
+      "pages_viewclientes_viewclientes_getheaderactions",
+      "pages_viewinfraestructuras",
+      "pages_viewinfraestructuras_viewinfraestructuras",
+      "pages_viewinfraestructuras_viewinfraestructuras_getheaderactions",
+      "pages_viewproductos",
+      "pages_viewproductos_viewproductos",
+      "pages_viewproductos_viewproductos_getheaderactions",
+      "pages_viewsuscripcionescobros",
+      "pages_viewsuscripcionescobros_viewsuscripcionescobros",
+      "pages_viewsuscripcionescobros_viewsuscripcionescobros_getheaderactions",
+      "pages_viewsuscripcionespagos",
+      "pages_viewsuscripcionespagos_viewsuscripcionespagos",
+      "pages_viewsuscripcionespagos_viewsuscripcionespagos_getheaderactions",
+      "pages_viewusuarios",
+      "pages_viewusuarios_viewusuarios",
+      "pages_viewusuarios_viewusuarios_getheaderactions",
+      "usuarios_usuariosresource_usuariosresource_getpages",
+      "viewrecord"
+    ],
+    "11": [
+      "app_filament_resources_suscripcionescobros_schemas_suscripcionescobrosform_php_schema",
+      "app_filament_resources_suscripcionescobros_schemas_suscripcionescobrosinfolist_php_schema",
+      "app_filament_resources_suscripcionescobros_suscripcionescobrosresource_php_backedenum",
+      "app_filament_resources_suscripcionescobros_suscripcionescobrosresource_php_builder",
+      "app_filament_resources_suscripcionescobros_suscripcionescobrosresource_php_schema",
+      "app_filament_resources_suscripcionescobros_suscripcionescobrosresource_php_table",
+      "app_filament_resources_suscripcionescobros_suscripcionescobrosresource_php_unitenum",
+      "app_filament_resources_suscripcionescobros_tables_suscripcionescobrostable_php_table",
+      "schemas_suscripcionescobrosform",
+      "schemas_suscripcionescobrosform_suscripcionescobrosform",
+      "schemas_suscripcionescobrosform_suscripcionescobrosform_configure",
+      "schemas_suscripcionescobrosinfolist",
+      "schemas_suscripcionescobrosinfolist_suscripcionescobrosinfolist",
+      "schemas_suscripcionescobrosinfolist_suscripcionescobrosinfolist_configure",
+      "suscripcionescobros_suscripcionescobrosresource",
+      "suscripcionescobros_suscripcionescobrosresource_suscripcionescobrosresource",
+      "suscripcionescobros_suscripcionescobrosresource_suscripcionescobrosresource_cancreate",
+      "suscripcionescobros_suscripcionescobrosresource_suscripcionescobrosresource_form",
+      "suscripcionescobros_suscripcionescobrosresource_suscripcionescobrosresource_geteloquentquery",
+      "suscripcionescobros_suscripcionescobrosresource_suscripcionescobrosresource_getrelations",
+      "suscripcionescobros_suscripcionescobrosresource_suscripcionescobrosresource_infolist",
+      "suscripcionescobros_suscripcionescobrosresource_suscripcionescobrosresource_table",
+      "tables_suscripcionescobrostable",
+      "tables_suscripcionescobrostable_suscripcionescobrostable",
+      "tables_suscripcionescobrostable_suscripcionescobrostable_configure",
+      "tables_suscripcionescobrostable_suscripcionescobrostable_monthoptions"
+    ],
+    "12": [
+      "app_filament_resources_usuarios_schemas_usuariosform_php_schema",
+      "app_filament_resources_usuarios_schemas_usuariosinfolist_php_schema",
+      "app_filament_resources_usuarios_tables_usuariostable_php_table",
+      "app_filament_resources_usuarios_usuariosresource_php_backedenum",
+      "app_filament_resources_usuarios_usuariosresource_php_builder",
+      "app_filament_resources_usuarios_usuariosresource_php_schema",
+      "app_filament_resources_usuarios_usuariosresource_php_table",
+      "app_filament_resources_usuarios_usuariosresource_php_unitenum",
+      "schemas_usuariosform",
+      "schemas_usuariosform_usuariosform",
+      "schemas_usuariosform_usuariosform_configure",
+      "schemas_usuariosinfolist",
+      "schemas_usuariosinfolist_usuariosinfolist",
+      "schemas_usuariosinfolist_usuariosinfolist_configure",
+      "tables_usuariostable",
+      "tables_usuariostable_usuariostable",
+      "tables_usuariostable_usuariostable_configure",
+      "usuarios_usuariosresource",
+      "usuarios_usuariosresource_usuariosresource",
+      "usuarios_usuariosresource_usuariosresource_cancreate",
+      "usuarios_usuariosresource_usuariosresource_form",
+      "usuarios_usuariosresource_usuariosresource_geteloquentquery",
+      "usuarios_usuariosresource_usuariosresource_getrecordroutebindingeloquentquery",
+      "usuarios_usuariosresource_usuariosresource_getrelations",
+      "usuarios_usuariosresource_usuariosresource_infolist",
+      "usuarios_usuariosresource_usuariosresource_table"
+    ],
+    "13": [
+      "app_filament_resources_infraestructuras_infraestructurasresource_php_backedenum",
+      "app_filament_resources_infraestructuras_infraestructurasresource_php_schema",
+      "app_filament_resources_infraestructuras_infraestructurasresource_php_table",
+      "app_filament_resources_infraestructuras_infraestructurasresource_php_unitenum",
+      "app_filament_resources_infraestructuras_schemas_infraestructurasform_php_schema",
+      "app_filament_resources_infraestructuras_schemas_infraestructurasinfolist_php_schema",
+      "app_filament_resources_infraestructuras_tables_infraestructurastable_php_table",
+      "infraestructuras_infraestructurasresource",
+      "infraestructuras_infraestructurasresource_infraestructurasresource",
+      "infraestructuras_infraestructurasresource_infraestructurasresource_form",
+      "infraestructuras_infraestructurasresource_infraestructurasresource_getrelations",
+      "infraestructuras_infraestructurasresource_infraestructurasresource_infolist",
+      "infraestructuras_infraestructurasresource_infraestructurasresource_table",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_save",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_save",
+      "schemas_infraestructurasform",
+      "schemas_infraestructurasform_infraestructurasform",
+      "schemas_infraestructurasform_infraestructurasform_configure",
+      "schemas_infraestructurasinfolist",
+      "schemas_infraestructurasinfolist_infraestructurasinfolist",
+      "schemas_infraestructurasinfolist_infraestructurasinfolist_configure",
+      "tables_infraestructurastable",
+      "tables_infraestructurastable_infraestructurastable",
+      "tables_infraestructurastable_infraestructurastable_configure"
+    ],
+    "14": [
+      "categorias_categoriasresource_categoriasresource_getpages",
+      "createrecord",
+      "pages_createcategorias",
+      "pages_createcategorias_createcategorias",
+      "pages_createcategorias_createcategorias_mutateformdatabeforecreate",
+      "pages_createinfraestructuras",
+      "pages_createinfraestructuras_createinfraestructuras",
+      "pages_createproductos",
+      "pages_createproductos_createproductos",
+      "pages_createproductos_createproductos_aftercreate",
+      "pages_createproductos_createproductos_mutateformdatabeforecreate",
+      "pages_createsuscripciones",
+      "pages_createsuscripciones_createsuscripciones",
+      "pages_createsuscripciones_createsuscripciones_beforecreate",
+      "pages_createsuscripcionescobros",
+      "pages_createsuscripcionescobros_createsuscripcionescobros",
+      "pages_createsuscripcionestarifas",
+      "pages_createsuscripcionestarifas_createsuscripcionestarifas",
+      "pages_createsuscripcionestarifas_createsuscripcionestarifas_mutateformdatabeforecreate",
+      "pages_createusuarios",
+      "pages_createusuarios_createusuarios",
+      "suscripcionescobros_suscripcionescobrosresource_suscripcionescobrosresource_getpages",
+      "suscripcionestarifas_suscripcionestarifasresource_suscripcionestarifasresource_getpages"
+    ],
+    "15": [
+      "editrecord",
+      "pages_editcategorias",
+      "pages_editcategorias_editcategorias",
+      "pages_editcategorias_editcategorias_getheaderactions",
+      "pages_editinfraestructuras",
+      "pages_editinfraestructuras_editinfraestructuras",
+      "pages_editinfraestructuras_editinfraestructuras_getheaderactions",
+      "pages_editmarcas",
+      "pages_editmarcas_editmarcas",
+      "pages_editmarcas_editmarcas_getheaderactions",
+      "pages_editsuscripciones",
+      "pages_editsuscripciones_editsuscripciones",
+      "pages_editsuscripciones_editsuscripciones_getheaderactions",
+      "pages_editsuscripcionescobros",
+      "pages_editsuscripcionescobros_editsuscripcionescobros",
+      "pages_editsuscripcionescobros_editsuscripcionescobros_getheaderactions",
+      "pages_editsuscripcionestarifas",
+      "pages_editsuscripcionestarifas_editsuscripcionestarifas",
+      "pages_editsuscripcionestarifas_editsuscripcionestarifas_getheaderactions",
+      "pages_editusuarios",
+      "pages_editusuarios_editusuarios",
+      "pages_editusuarios_editusuarios_getheaderactions"
+    ],
+    "16": [
+      "app_models_descuentotiempo_php_logoptions",
+      "models_descuentotiempo",
+      "models_descuentotiempo_descuentotiempo",
+      "models_descuentotiempo_descuentotiempo_getactivitylogoptions",
+      "models_suscripcionestarifas_suscripcionestarifas_calcularalquiler",
+      "models_tamanoetiqueta_tamanoetiqueta",
+      "models_tamanoprecio_tamanoprecio",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_canceledit",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_deletedescuento",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_deleteetiqueta",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_deleteprecio",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_editdescuento",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_editetiqueta",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_editprecio",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_mount",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_refreshdata",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_resetformfields",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_savedescuento",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_saveetiqueta",
+      "pages_listsuscripcionestarifas_listsuscripcionestarifas_saveprecio"
+    ],
+    "17": [
+      "listrecords",
+      "pages_listcategorias",
+      "pages_listcategorias_listcategorias",
+      "pages_listcategorias_listcategorias_getheaderactions",
+      "pages_listclientes",
+      "pages_listclientes_listclientes",
+      "pages_listclientes_listclientes_getheaderactions",
+      "pages_listinfraestructuras",
+      "pages_listinfraestructuras_listinfraestructuras",
+      "pages_listinfraestructuras_listinfraestructuras_getheaderactions",
+      "pages_listmarcas",
+      "pages_listmarcas_listmarcas",
+      "pages_listmarcas_listmarcas_getheaderactions",
+      "pages_listsuscripcionescobros",
+      "pages_listsuscripcionescobros_listsuscripcionescobros",
+      "pages_listsuscripcionescobros_listsuscripcionescobros_getdefaultactivetab",
+      "pages_listsuscripcionescobros_listsuscripcionescobros_getheaderactions",
+      "pages_listsuscripcionescobros_listsuscripcionescobros_gettabs",
+      "pages_listusuarios",
+      "pages_listusuarios_listusuarios",
+      "pages_listusuarios_listusuarios_getheaderactions"
+    ],
+    "18": [
+      "app_filament_resources_suscripcionespagos_schemas_suscripcionespagosinfolist_php_schema",
+      "app_filament_resources_suscripcionespagos_suscripcionespagosresource_php_backedenum",
+      "app_filament_resources_suscripcionespagos_suscripcionespagosresource_php_builder",
+      "app_filament_resources_suscripcionespagos_suscripcionespagosresource_php_schema",
+      "app_filament_resources_suscripcionespagos_suscripcionespagosresource_php_table",
+      "app_filament_resources_suscripcionespagos_suscripcionespagosresource_php_unitenum",
+      "app_filament_resources_suscripcionespagos_tables_suscripcionespagostable_php_table",
+      "schemas_suscripcionespagosinfolist",
+      "schemas_suscripcionespagosinfolist_suscripcionespagosinfolist",
+      "schemas_suscripcionespagosinfolist_suscripcionespagosinfolist_configure",
+      "suscripcionespagos_suscripcionespagosresource",
+      "suscripcionespagos_suscripcionespagosresource_suscripcionespagosresource",
+      "suscripcionespagos_suscripcionespagosresource_suscripcionespagosresource_form",
+      "suscripcionespagos_suscripcionespagosresource_suscripcionespagosresource_geteloquentquery",
+      "suscripcionespagos_suscripcionespagosresource_suscripcionespagosresource_getrelations",
+      "suscripcionespagos_suscripcionespagosresource_suscripcionespagosresource_infolist",
+      "suscripcionespagos_suscripcionespagosresource_suscripcionespagosresource_table",
+      "tables_suscripcionespagostable",
+      "tables_suscripcionespagostable_suscripcionespagostable",
+      "tables_suscripcionespagostable_suscripcionespagostable_configure"
+    ],
+    "19": [
+      "app_policies_rolepolicy_php_authuser",
+      "policies_rolepolicy",
+      "policies_rolepolicy_rolepolicy",
+      "policies_rolepolicy_rolepolicy_create",
+      "policies_rolepolicy_rolepolicy_delete",
+      "policies_rolepolicy_rolepolicy_deleteany",
+      "policies_rolepolicy_rolepolicy_forcedelete",
+      "policies_rolepolicy_rolepolicy_forcedeleteany",
+      "policies_rolepolicy_rolepolicy_reorder",
+      "policies_rolepolicy_rolepolicy_replicate",
+      "policies_rolepolicy_rolepolicy_restore",
+      "policies_rolepolicy_rolepolicy_restoreany",
+      "policies_rolepolicy_rolepolicy_update",
+      "policies_rolepolicy_rolepolicy_view",
+      "policies_rolepolicy_rolepolicy_viewany",
+      "role",
+      "seeders_rolesandpermissionsseeder",
+      "seeders_rolesandpermissionsseeder_rolesandpermissionsseeder",
+      "seeders_rolesandpermissionsseeder_rolesandpermissionsseeder_run"
+    ],
+    "20": [
+      "app_filament_pages_auditoria_php_backedenum",
+      "app_filament_pages_auditoria_php_table",
+      "app_filament_pages_auditoria_php_unitenum",
+      "app_filament_pages_miestadodecuenta_php_backedenum",
+      "app_filament_pages_miestadodecuenta_php_table",
+      "hastable",
+      "interactswithtable",
+      "pages_auditoria",
+      "pages_auditoria_auditoria",
+      "pages_auditoria_auditoria_canaccess",
+      "pages_auditoria_auditoria_categorias",
+      "pages_auditoria_auditoria_table",
+      "pages_balancesuscripciones",
+      "pages_miestadodecuenta",
+      "pages_miestadodecuenta_miestadodecuenta",
+      "pages_miestadodecuenta_miestadodecuenta_canaccess",
+      "pages_miestadodecuenta_miestadodecuenta_table",
+      "pages_reportemorosidad"
+    ],
+    "21": [
+      "chartwidget",
+      "widgets_cobrosporestadochart",
+      "widgets_costooportunidadvacanciachart",
+      "widgets_costooportunidadvacanciachart_costooportunidadvacanciachart",
+      "widgets_costooportunidadvacanciachart_costooportunidadvacanciachart_canview",
+      "widgets_costooportunidadvacanciachart_costooportunidadvacanciachart_getoptions",
+      "widgets_costooportunidadvacanciachart_costooportunidadvacanciachart_gettype",
+      "widgets_costooportunidadvacanciachart_costooportunidadvacanciachart_mount",
+      "widgets_costooportunidadvacanciachart_costooportunidadvacanciachart_updateinfrafilter",
+      "widgets_ingresosmensualeschart",
+      "widgets_metodopagochart",
+      "widgets_metodopagochart_metodopagochart",
+      "widgets_metodopagochart_metodopagochart_canview",
+      "widgets_metodopagochart_metodopagochart_getdata",
+      "widgets_metodopagochart_metodopagochart_gettype",
+      "widgets_metodopagochart_metodopagochart_mount",
+      "widgets_metodopagochart_metodopagochart_updateinfrafilter"
+    ],
+    "22": [
+      "app_models_user_php_logoptions",
+      "app_models_user_php_panel",
+      "authenticatable",
+      "filamentuser",
+      "hasfactory",
+      "hasname",
+      "hasroles",
+      "models_user",
+      "models_user_user",
+      "models_user_user_canaccesspanel",
+      "models_user_user_casts",
+      "models_user_user_cliente",
+      "models_user_user_getactivitylogoptions",
+      "models_user_user_getfilamentname",
+      "mustverifyemail",
+      "notifiable"
+    ],
+    "23": [
+      "app_policies_productospolicy_php_authuser",
+      "policies_productospolicy",
+      "policies_productospolicy_productospolicy",
+      "policies_productospolicy_productospolicy_create",
+      "policies_productospolicy_productospolicy_delete",
+      "policies_productospolicy_productospolicy_deleteany",
+      "policies_productospolicy_productospolicy_forcedelete",
+      "policies_productospolicy_productospolicy_forcedeleteany",
+      "policies_productospolicy_productospolicy_reorder",
+      "policies_productospolicy_productospolicy_replicate",
+      "policies_productospolicy_productospolicy_restore",
+      "policies_productospolicy_productospolicy_restoreany",
+      "policies_productospolicy_productospolicy_update",
+      "policies_productospolicy_productospolicy_view",
+      "policies_productospolicy_productospolicy_viewany",
+      "productos"
+    ],
+    "24": [
+      "app_policies_suscripcionespagospolicy_php_authuser",
+      "app_policies_suscripcionespagospolicy_php_suscripcionespagos",
+      "policies_suscripcionespagospolicy",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_create",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_delete",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_deleteany",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_forcedelete",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_forcedeleteany",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_reorder",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_replicate",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_restore",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_restoreany",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_update",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_view",
+      "policies_suscripcionespagospolicy_suscripcionespagospolicy_viewany"
+    ],
+    "25": [
+      "app_policies_suscripcionespolicy_php_authuser",
+      "app_policies_suscripcionespolicy_php_suscripciones",
+      "policies_suscripcionespolicy",
+      "policies_suscripcionespolicy_suscripcionespolicy",
+      "policies_suscripcionespolicy_suscripcionespolicy_create",
+      "policies_suscripcionespolicy_suscripcionespolicy_delete",
+      "policies_suscripcionespolicy_suscripcionespolicy_deleteany",
+      "policies_suscripcionespolicy_suscripcionespolicy_forcedelete",
+      "policies_suscripcionespolicy_suscripcionespolicy_forcedeleteany",
+      "policies_suscripcionespolicy_suscripcionespolicy_reorder",
+      "policies_suscripcionespolicy_suscripcionespolicy_replicate",
+      "policies_suscripcionespolicy_suscripcionespolicy_restore",
+      "policies_suscripcionespolicy_suscripcionespolicy_restoreany",
+      "policies_suscripcionespolicy_suscripcionespolicy_update",
+      "policies_suscripcionespolicy_suscripcionespolicy_view",
+      "policies_suscripcionespolicy_suscripcionespolicy_viewany"
+    ],
+    "26": [
+      "page",
+      "pages_createusuarioscustom",
+      "pages_createusuarioscustom_createusuarioscustom",
+      "pages_createusuarioscustom_createusuarioscustom_canaccess",
+      "pages_createusuarioscustom_createusuarioscustom_save",
+      "pages_editusuarioscustom",
+      "pages_editusuarioscustom_editusuarioscustom",
+      "pages_editusuarioscustom_editusuarioscustom_canaccess",
+      "pages_editusuarioscustom_editusuarioscustom_mount",
+      "pages_editusuarioscustom_editusuarioscustom_save",
+      "pages_listinfraestructurascustom",
+      "pages_listinfraestructurascustom_listinfraestructurascustom",
+      "pages_listinfraestructurascustom_listinfraestructurascustom_canaccess",
+      "pages_listinfraestructurascustom_listinfraestructurascustom_deleteinfraestructura",
+      "pages_listinfraestructurascustom_listinfraestructurascustom_getinfraestructuras",
+      "pages_listsuscripcionestarifas"
+    ],
+    "27": [
+      "app_filament_resources_suscripcionespagos_pages_listsuscripcionespagos_php_table",
+      "pages_createsuscripcionespagos",
+      "pages_createsuscripcionespagos_createsuscripcionespagos",
+      "pages_createsuscripcionespagos_createsuscripcionespagos_aftercreate",
+      "pages_createsuscripcionespagos_createsuscripcionespagos_beforecreate",
+      "pages_editsuscripcionespagos",
+      "pages_editsuscripcionespagos_editsuscripcionespagos",
+      "pages_editsuscripcionespagos_editsuscripcionespagos_getheaderactions",
+      "pages_listsuscripcionespagos",
+      "pages_listsuscripcionespagos_listsuscripcionespagos",
+      "pages_listsuscripcionespagos_listsuscripcionespagos_getheaderactions",
+      "pages_listsuscripcionespagos_listsuscripcionespagos_getheaderwidgets",
+      "pages_listsuscripcionespagos_listsuscripcionespagos_refreshonnavchange",
+      "pages_listsuscripcionespagos_listsuscripcionespagos_table",
+      "suscripcionespagos_suscripcionespagosresource_suscripcionespagosresource_getpages"
+    ],
+    "28": [
+      "app_models_clientesdocumentos_php_belongsto",
+      "app_models_infraestructuras_php_hasmany",
+      "app_models_infraestructuras_php_logoptions",
+      "logsactivity",
+      "model",
+      "models_clientesdocumentos",
+      "models_clientesdocumentos_clientesdocumentos",
+      "models_clientesdocumentos_clientesdocumentos_cliente",
+      "models_infraestructuras",
+      "models_infraestructuras_infraestructuras",
+      "models_infraestructuras_infraestructuras_booted",
+      "models_infraestructuras_infraestructuras_getactivitylogoptions",
+      "models_infraestructuras_infraestructuras_pisosinfraestructura",
+      "models_infraestructurastiendas",
+      "models_suscripcionestarifas"
+    ],
+    "29": [
+      "app_models_suscripciones_php_belongsto",
+      "app_models_suscripciones_php_hasmany",
+      "app_models_suscripciones_php_logoptions",
+      "models_suscripciones",
+      "models_suscripciones_suscripciones",
+      "models_suscripciones_suscripciones_booted",
+      "models_suscripciones_suscripciones_cliente",
+      "models_suscripciones_suscripciones_cobros",
+      "models_suscripciones_suscripciones_generarcobrosmensuales",
+      "models_suscripciones_suscripciones_getactivitylogoptions",
+      "models_suscripciones_suscripciones_getduracionenmeses",
+      "models_suscripciones_suscripciones_infraestructurastienda",
+      "models_suscripciones_suscripciones_marca",
+      "models_suscripciones_suscripciones_renovadade"
+    ],
+    "30": [
+      "app_policies_userpolicy_php_authuser",
+      "policies_userpolicy_userpolicy",
+      "policies_userpolicy_userpolicy_create",
+      "policies_userpolicy_userpolicy_delete",
+      "policies_userpolicy_userpolicy_deleteany",
+      "policies_userpolicy_userpolicy_forcedelete",
+      "policies_userpolicy_userpolicy_forcedeleteany",
+      "policies_userpolicy_userpolicy_reorder",
+      "policies_userpolicy_userpolicy_replicate",
+      "policies_userpolicy_userpolicy_restore",
+      "policies_userpolicy_userpolicy_restoreany",
+      "policies_userpolicy_userpolicy_update",
+      "policies_userpolicy_userpolicy_view",
+      "policies_userpolicy_userpolicy_viewany"
+    ],
+    "31": [
+      "pages_createinfraestructurascustom_createinfraestructurascustom",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_addpiso",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_addtienda",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_backgrounduploadextension",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_canaccess",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_closebackgroundmodal",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_confirmbackgroundimage",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_getbackgroundmodalpreviewurlproperty",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_getbackgroundoptionsproperty",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_mount",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_removepiso",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_removetienda",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_selectbackground",
+      "pages_createinfraestructurascustom_createinfraestructurascustom_updatedbackgroundupload"
+    ],
+    "32": [
+      "pages_editinfraestructurascustom_editinfraestructurascustom",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_addpiso",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_addtienda",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_backgrounduploadextension",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_canaccess",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_closebackgroundmodal",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_confirmbackgroundimage",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_getbackgroundmodalpreviewurlproperty",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_getbackgroundoptionsproperty",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_mount",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_removepiso",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_removetienda",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_selectbackground",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_updatedbackgroundupload"
+    ],
+    "33": [
+      "app_filament_pages_simuladoralquiler_php_backedenum",
+      "app_filament_pages_simuladoralquiler_php_htmlable",
+      "app_filament_pages_simuladoralquiler_php_schema",
+      "app_filament_pages_simuladoralquiler_php_unitenum",
+      "hasforms",
+      "pages_simuladoralquiler",
+      "pages_simuladoralquiler_simuladoralquiler",
+      "pages_simuladoralquiler_simuladoralquiler_calcularcotizacion",
+      "pages_simuladoralquiler_simuladoralquiler_canaccess",
+      "pages_simuladoralquiler_simuladoralquiler_form",
+      "pages_simuladoralquiler_simuladoralquiler_gettitle",
+      "pages_simuladoralquiler_simuladoralquiler_mount",
+      "pages_simuladoralquiler_simuladoralquiler_recalculartotal"
+    ],
+    "34": [
+      "app_support_activeinfraestructura_php_infraestructuras",
+      "pages_seleccionarinfraestructura",
+      "pages_seleccionarinfraestructura_seleccionarinfraestructura",
+      "pages_seleccionarinfraestructura_seleccionarinfraestructura_canaccess",
+      "pages_seleccionarinfraestructura_seleccionarinfraestructura_getviewdata",
+      "pages_seleccionarinfraestructura_seleccionarinfraestructura_selectinfraestructura",
+      "support_activeinfraestructura",
+      "support_activeinfraestructura_activeinfraestructura",
+      "support_activeinfraestructura_activeinfraestructura_get",
+      "support_activeinfraestructura_activeinfraestructura_getdashboardid",
+      "support_activeinfraestructura_activeinfraestructura_getid",
+      "support_activeinfraestructura_activeinfraestructura_setdashboardid",
+      "support_activeinfraestructura_activeinfraestructura_setid"
+    ],
+    "35": [
+      "app_filament_resources_clientes_pages_createclientes_php_model",
+      "pages_createclientes",
+      "pages_createclientes_createclientes",
+      "pages_createclientes_createclientes_adddocumento",
+      "pages_createclientes_createclientes_getcreatednotificationtitle",
+      "pages_createclientes_createclientes_getredirecturl",
+      "pages_createclientes_createclientes_handlerecordcreation",
+      "pages_createclientes_createclientes_removedocumento",
+      "pages_createclientes_createclientes_updatedfotoupload",
+      "pages_createinfraestructurascustom",
+      "pages_editinfraestructurascustom",
+      "withfileuploads"
+    ],
+    "36": [
+      "app_filament_resources_suscripciones_suscripcionesresource_php_backedenum",
+      "app_filament_resources_suscripciones_suscripcionesresource_php_builder",
+      "app_filament_resources_suscripciones_suscripcionesresource_php_schema",
+      "app_filament_resources_suscripciones_suscripcionesresource_php_table",
+      "app_filament_resources_suscripciones_suscripcionesresource_php_unitenum",
+      "suscripciones_suscripcionesresource",
+      "suscripciones_suscripcionesresource_suscripcionesresource",
+      "suscripciones_suscripcionesresource_suscripcionesresource_form",
+      "suscripciones_suscripcionesresource_suscripcionesresource_geteloquentquery",
+      "suscripciones_suscripcionesresource_suscripcionesresource_getrelations",
+      "suscripciones_suscripcionesresource_suscripcionesresource_table"
+    ],
+    "37": [
+      "app_filament_resources_suscripcionestarifas_suscripcionestarifasresource_php_backedenum",
+      "app_filament_resources_suscripcionestarifas_suscripcionestarifasresource_php_builder",
+      "app_filament_resources_suscripcionestarifas_suscripcionestarifasresource_php_schema",
+      "app_filament_resources_suscripcionestarifas_suscripcionestarifasresource_php_table",
+      "app_filament_resources_suscripcionestarifas_suscripcionestarifasresource_php_unitenum",
+      "resource",
+      "suscripcionestarifas_suscripcionestarifasresource",
+      "suscripcionestarifas_suscripcionestarifasresource_suscripcionestarifasresource",
+      "suscripcionestarifas_suscripcionestarifasresource_suscripcionestarifasresource_form",
+      "suscripcionestarifas_suscripcionestarifasresource_suscripcionestarifasresource_geteloquentquery",
+      "suscripcionestarifas_suscripcionestarifasresource_suscripcionestarifasresource_table"
+    ],
+    "38": [
+      "app_models_clientes_php_belongsto",
+      "app_models_clientes_php_hasmany",
+      "app_models_clientes_php_logoptions",
+      "models_clientes",
+      "models_clientes_clientes",
+      "models_clientes_clientes_documentos",
+      "models_clientes_clientes_getactivitylogoptions",
+      "models_clientes_clientes_getnombrecompletoattribute",
+      "models_clientes_clientes_marcas",
+      "models_clientes_clientes_tiendas",
+      "models_clientes_clientes_user"
+    ],
+    "39": [
+      "app_models_productos_php_belongsto",
+      "app_models_productos_php_hasmany",
+      "app_models_productos_php_logoptions",
+      "models_productos",
+      "models_productos_productos",
+      "models_productos_productos_categoria",
+      "models_productos_productos_getactivitylogoptions",
+      "models_productos_productos_imagenes",
+      "models_productos_productos_marca",
+      "models_productos_productos_subcategoria",
+      "models_productos_productos_tienda"
+    ],
+    "40": [
+      "app_models_suscripcionescobros_php_belongsto",
+      "app_models_suscripcionescobros_php_hasmany",
+      "app_models_suscripcionescobros_php_logoptions",
+      "models_suscripcionescobros",
+      "models_suscripcionescobros_suscripcionescobros",
+      "models_suscripcionescobros_suscripcionescobros_booted",
+      "models_suscripcionescobros_suscripcionescobros_conceptosaldopendiente",
+      "models_suscripcionescobros_suscripcionescobros_fechasaldopendiente",
+      "models_suscripcionescobros_suscripcionescobros_getactivitylogoptions",
+      "models_suscripcionescobros_suscripcionescobros_pagos",
+      "models_suscripcionescobros_suscripcionescobros_suscripcion"
+    ],
+    "41": [
+      "app_observers_suscripcionobserver_php_suscripciones",
+      "app_support_activeinfraestructura_php_builder",
+      "observers_suscripcionobserver",
+      "observers_suscripcionobserver_suscripcionobserver",
+      "observers_suscripcionobserver_suscripcionobserver_created",
+      "observers_suscripcionobserver_suscripcionobserver_deleted",
+      "observers_suscripcionobserver_suscripcionobserver_synctienda",
+      "observers_suscripcionobserver_suscripcionobserver_updated",
+      "self",
+      "support_activeinfraestructura_activeinfraestructura_scopequery",
+      "support_activeinfraestructura_activeinfraestructura_scopequerydashboard"
+    ],
+    "42": [
+      "addpiso",
+      "addtienda_pindex",
+      "closebackgroundmodal",
+      "confirmbackgroundimage",
+      "openbackgroundmodal_pindex",
+      "pages_create_infraestructura_custom_blade",
+      "removepiso_pindex",
+      "removetienda_pindex_tindex",
+      "resources_views_filament_resources_infraestructuras_pages_create_infraestructura_custom_blade_php_save",
+      "selectbackground"
+    ],
+    "43": [
+      "app_filament_resources_clientes_clientesresource_php_backedenum",
+      "app_filament_resources_clientes_clientesresource_php_schema",
+      "app_filament_resources_clientes_clientesresource_php_table",
+      "app_filament_resources_clientes_clientesresource_php_unitenum",
+      "clientes_clientesresource",
+      "clientes_clientesresource_clientesresource",
+      "clientes_clientesresource_clientesresource_form",
+      "clientes_clientesresource_clientesresource_getrelations",
+      "clientes_clientesresource_clientesresource_infolist",
+      "clientes_clientesresource_clientesresource_table"
+    ],
+    "44": [
+      "app_filament_resources_clientes_pages_editclientes_php_model",
+      "pages_editclientes",
+      "pages_editclientes_editclientes",
+      "pages_editclientes_editclientes_adddocumento",
+      "pages_editclientes_editclientes_getheaderactions",
+      "pages_editclientes_editclientes_getredirecturl",
+      "pages_editclientes_editclientes_getsavednotificationtitle",
+      "pages_editclientes_editclientes_handlerecordupdate",
+      "pages_editclientes_editclientes_mount",
+      "pages_editclientes_editclientes_updatedfotoupload"
+    ],
+    "45": [
+      "app_models_infraestructuraspisos_php_belongsto",
+      "app_models_infraestructuraspisos_php_hasmany",
+      "app_models_infraestructuraspisos_php_logoptions",
+      "models_infraestructuraspisos",
+      "models_infraestructuraspisos_infraestructuraspisos",
+      "models_infraestructuraspisos_infraestructuraspisos_booted",
+      "models_infraestructuraspisos_infraestructuraspisos_cliente",
+      "models_infraestructuraspisos_infraestructuraspisos_getactivitylogoptions",
+      "models_infraestructuraspisos_infraestructuraspisos_infraestructura",
+      "models_infraestructuraspisos_infraestructuraspisos_tiendas"
+    ],
+    "46": [
+      "app_models_marcas_php_belongsto",
+      "app_models_marcas_php_belongstomany",
+      "app_models_marcas_php_logoptions",
+      "models_marcas",
+      "models_marcas_marcas",
+      "models_marcas_marcas_cliente",
+      "models_marcas_marcas_getactivitylogoptions",
+      "models_marcas_marcas_producto",
+      "models_marcas_marcas_tiendas",
+      "softdeletes"
+    ],
+    "47": [
+      "factories_userfactory",
+      "factories_userfactory_userfactory",
+      "factories_userfactory_userfactory_admin",
+      "factories_userfactory_userfactory_cliente",
+      "factories_userfactory_userfactory_definition",
+      "factories_userfactory_userfactory_superadmin",
+      "factories_userfactory_userfactory_unverified",
+      "factory",
+      "models_suscripcionestarifas_suscripcionestarifas_preciopara",
+      "static"
+    ],
+    "48": [
+      "pages_editproductos",
+      "pages_editproductos_editproductos",
+      "pages_editproductos_editproductos_aftersave",
+      "pages_editproductos_editproductos_getheaderactions",
+      "pages_editproductos_editproductos_mutateformdatabeforefill",
+      "pages_editproductos_editproductos_mutateformdatabeforesave",
+      "pages_listproductos",
+      "pages_listproductos_listproductos",
+      "pages_listproductos_listproductos_getheaderactions",
+      "productos_productosresource_productosresource_getpages"
+    ],
+    "49": [
+      "app_models_categorias_php_belongsto",
+      "app_models_categorias_php_hasmany",
+      "app_models_categorias_php_logoptions",
+      "models_categorias",
+      "models_categorias_categorias",
+      "models_categorias_categorias_getactivitylogoptions",
+      "models_categorias_categorias_padre",
+      "models_categorias_categorias_productos",
+      "models_categorias_categorias_subcategorias"
+    ],
+    "50": [
+      "app_models_suscripcionespagos_php_belongsto",
+      "app_models_suscripcionespagos_php_logoptions",
+      "hasonethrough",
+      "models_suscripcionespagos",
+      "models_suscripcionespagos_suscripcionespagos",
+      "models_suscripcionespagos_suscripcionespagos_booted",
+      "models_suscripcionespagos_suscripcionespagos_cobro",
+      "models_suscripcionespagos_suscripcionespagos_getactivitylogoptions",
+      "models_suscripcionespagos_suscripcionespagos_suscripcion"
+    ],
+    "51": [
+      "widgets_pagosmonthnavigator_pagosmonthnavigator",
+      "widgets_pagosmonthnavigator_pagosmonthnavigator_currentmonth",
+      "widgets_pagosmonthnavigator_pagosmonthnavigator_getviewdata",
+      "widgets_pagosmonthnavigator_pagosmonthnavigator_mount",
+      "widgets_pagosmonthnavigator_pagosmonthnavigator_nextmonth",
+      "widgets_pagosmonthnavigator_pagosmonthnavigator_previousmonth",
+      "widgets_pagosmonthnavigator_pagosmonthnavigator_sync",
+      "widgets_pagosmonthnavigator_pagosmonthnavigator_updatedanio",
+      "widgets_pagosmonthnavigator_pagosmonthnavigator_updatedmes"
+    ],
+    "52": [
+      "app_filament_pages_balancesuscripciones_php_backedenum",
+      "app_filament_pages_balancesuscripciones_php_htmlable",
+      "app_filament_pages_balancesuscripciones_php_table",
+      "app_filament_pages_balancesuscripciones_php_unitenum",
+      "pages_balancesuscripciones_balancesuscripciones",
+      "pages_balancesuscripciones_balancesuscripciones_canaccess",
+      "pages_balancesuscripciones_balancesuscripciones_gettitle",
+      "pages_balancesuscripciones_balancesuscripciones_table"
+    ],
+    "53": [
+      "app_filament_pages_reportemorosidad_php_backedenum",
+      "app_filament_pages_reportemorosidad_php_table",
+      "app_filament_pages_reportemorosidad_php_unitenum",
+      "pages_reportemorosidad_reportemorosidad",
+      "pages_reportemorosidad_reportemorosidad_basequery",
+      "pages_reportemorosidad_reportemorosidad_canaccess",
+      "pages_reportemorosidad_reportemorosidad_getviewdata",
+      "pages_reportemorosidad_reportemorosidad_table"
+    ],
+    "54": [
+      "canceledit",
+      "deletedescuento_d_id",
+      "deleteetiqueta_e_id",
+      "deleteprecio_p_id",
+      "editdescuento_d_id",
+      "editetiqueta_e_id",
+      "editprecio_p_id",
+      "pages_custom_tarifas_blade"
+    ],
+    "55": [
+      "widget",
+      "widgets_infraestructuradashboardfilter",
+      "widgets_infraestructuradashboardfilter_infraestructuradashboardfilter",
+      "widgets_infraestructuradashboardfilter_infraestructuradashboardfilter_canview",
+      "widgets_infraestructuradashboardfilter_infraestructuradashboardfilter_getviewdata",
+      "widgets_infraestructuradashboardfilter_infraestructuradashboardfilter_mount",
+      "widgets_infraestructuradashboardfilter_infraestructuradashboardfilter_updatedselectedinfraid",
+      "widgets_pagosmonthnavigator"
+    ],
+    "56": [
+      "app_filament_resources_infraestructuras_pages_infraestructuraspisosdiseno_php_infraestructuras",
+      "interactswithforms",
+      "pages_infraestructuraspisosdiseno",
+      "pages_infraestructuraspisosdiseno_infraestructuraspisosdiseno",
+      "pages_infraestructuraspisosdiseno_infraestructuraspisosdiseno_canaccess",
+      "pages_infraestructuraspisosdiseno_infraestructuraspisosdiseno_guardar",
+      "pages_infraestructuraspisosdiseno_infraestructuraspisosdiseno_mount"
+    ],
+    "57": [
+      "widgets_cobrosporestadochart_cobrosporestadochart",
+      "widgets_cobrosporestadochart_cobrosporestadochart_canview",
+      "widgets_cobrosporestadochart_cobrosporestadochart_getdata",
+      "widgets_cobrosporestadochart_cobrosporestadochart_getoptions",
+      "widgets_cobrosporestadochart_cobrosporestadochart_gettype",
+      "widgets_cobrosporestadochart_cobrosporestadochart_mount",
+      "widgets_cobrosporestadochart_cobrosporestadochart_updateinfrafilter"
+    ],
+    "58": [
+      "marcas_marcasresource_marcasresource_getpages",
+      "pages_createmarcas",
+      "pages_createmarcas_createmarcas",
+      "pages_viewmarcas",
+      "pages_viewmarcas_viewmarcas",
+      "pages_viewmarcas_viewmarcas_getheaderactions"
+    ],
+    "59": [
+      "pages_listsuscripciones",
+      "pages_listsuscripciones_listsuscripciones",
+      "pages_listsuscripciones_listsuscripciones_getheaderactions",
+      "pages_viewsuscripciones",
+      "pages_viewsuscripciones_viewsuscripciones",
+      "suscripciones_suscripcionesresource_suscripcionesresource_getpages"
+    ],
+    "60": [
+      "providers_appserviceprovider",
+      "providers_appserviceprovider_appserviceprovider",
+      "providers_appserviceprovider_appserviceprovider_boot",
+      "providers_appserviceprovider_appserviceprovider_configuresystemdate",
+      "providers_appserviceprovider_appserviceprovider_register",
+      "serviceprovider"
+    ],
+    "61": [
+      "widgets_ingresosmensualeschart_ingresosmensualeschart",
+      "widgets_ingresosmensualeschart_ingresosmensualeschart_canview",
+      "widgets_ingresosmensualeschart_ingresosmensualeschart_getdata",
+      "widgets_ingresosmensualeschart_ingresosmensualeschart_gettype",
+      "widgets_ingresosmensualeschart_ingresosmensualeschart_mount",
+      "widgets_ingresosmensualeschart_ingresosmensualeschart_updateinfrafilter"
+    ],
+    "62": [
+      "app_models_tamanoetiqueta_php_logoptions",
+      "hasone",
+      "models_tamanoetiqueta",
+      "models_tamanoetiqueta_tamanoetiqueta_getactivitylogoptions",
+      "models_tamanoetiqueta_tamanoetiqueta_precio"
+    ],
+    "63": [
+      "app_models_tamanoprecio_php_belongsto",
+      "app_models_tamanoprecio_php_logoptions",
+      "models_tamanoprecio",
+      "models_tamanoprecio_tamanoprecio_etiqueta",
+      "models_tamanoprecio_tamanoprecio_getactivitylogoptions"
+    ],
+    "64": [
+      "app_providers_filament_adminpanelprovider_php_panel",
+      "filament_adminpanelprovider",
+      "filament_adminpanelprovider_adminpanelprovider",
+      "filament_adminpanelprovider_adminpanelprovider_panel",
+      "panelprovider"
+    ],
+    "65": [
+      "controllers_welcomecontroller",
+      "controllers_welcomecontroller_welcomecontroller",
+      "controllers_welcomecontroller_welcomecontroller_contactoadmin",
+      "controllers_welcomecontroller_welcomecontroller_invoke",
+      "controllers_welcomecontroller_welcomecontroller_vibedelpiso"
+    ],
+    "66": [
+      "app_filament_resources_clientes_schemas_clientesform_php_schema",
+      "schemas_clientesform",
+      "schemas_clientesform_clientesform",
+      "schemas_clientesform_clientesform_configure"
+    ],
+    "67": [
+      "app_filament_resources_clientes_schemas_clientesinfolist_php_schema",
+      "schemas_clientesinfolist",
+      "schemas_clientesinfolist_clientesinfolist",
+      "schemas_clientesinfolist_clientesinfolist_configure"
+    ],
+    "68": [
+      "app_filament_resources_clientes_tables_clientestable_php_table",
+      "tables_clientestable",
+      "tables_clientestable_clientestable",
+      "tables_clientestable_clientestable_configure"
+    ],
+    "69": [
+      "app_filament_resources_suscripciones_tables_suscripcionestable_php_table",
+      "tables_suscripcionestable",
+      "tables_suscripcionestable_suscripcionestable",
+      "tables_suscripcionestable_suscripcionestable_configure"
+    ],
+    "70": [
+      "app_filament_resources_suscripcionestarifas_schemas_suscripcionestarifasform_php_schema",
+      "schemas_suscripcionestarifasform",
+      "schemas_suscripcionestarifasform_suscripcionestarifasform",
+      "schemas_suscripcionestarifasform_suscripcionestarifasform_configure"
+    ],
+    "71": [
+      "app_filament_resources_suscripcionestarifas_tables_suscripcionestarifastable_php_table",
+      "tables_suscripcionestarifastable",
+      "tables_suscripcionestarifastable_suscripcionestarifastable",
+      "tables_suscripcionestarifastable_suscripcionestarifastable_configure"
+    ],
+    "72": [
+      "currentmonth",
+      "nextmonth",
+      "previousmonth",
+      "widgets_pagos_month_navigator_blade"
+    ],
+    "73": [
+      "pages_createinfraestructurascustom_createinfraestructurascustom_openbackgroundmodal",
+      "pages_editclientes_editclientes_removedocumento",
+      "pages_editinfraestructurascustom_editinfraestructurascustom_openbackgroundmodal",
+      "support_activeinfraestructura_activeinfraestructura_isset"
+    ],
+    "74": [
+      "adddocumento",
+      "pages_form_cliente_blade",
+      "removedocumento_index"
+    ],
+    "75": [
+      "migrations_0001_01_01_000000_create_users_table",
+      "migrations_0001_01_01_000000_create_users_table_down",
+      "migrations_0001_01_01_000000_create_users_table_up"
+    ],
+    "76": [
+      "migrations_0001_01_01_000001_create_cache_table",
+      "migrations_0001_01_01_000001_create_cache_table_down",
+      "migrations_0001_01_01_000001_create_cache_table_up"
+    ],
+    "77": [
+      "migrations_0001_01_01_000002_create_jobs_table",
+      "migrations_0001_01_01_000002_create_jobs_table_down",
+      "migrations_0001_01_01_000002_create_jobs_table_up"
+    ],
+    "78": [
+      "migrations_2026_05_10_135044_create_categorias_table",
+      "migrations_2026_05_10_135044_create_categorias_table_down",
+      "migrations_2026_05_10_135044_create_categorias_table_up"
+    ],
+    "79": [
+      "migrations_2026_05_10_145522_create_clientes_table",
+      "migrations_2026_05_10_145522_create_clientes_table_down",
+      "migrations_2026_05_10_145522_create_clientes_table_up"
+    ],
+    "80": [
+      "migrations_2026_05_10_151017_create_table_documentos",
+      "migrations_2026_05_10_151017_create_table_documentos_down",
+      "migrations_2026_05_10_151017_create_table_documentos_up"
+    ],
+    "81": [
+      "migrations_2026_05_10_160050_create_infraestructuras_table",
+      "migrations_2026_05_10_160050_create_infraestructuras_table_down",
+      "migrations_2026_05_10_160050_create_infraestructuras_table_up"
+    ],
+    "82": [
+      "migrations_2026_05_10_160511_create_infraestructuras_pisos_table",
+      "migrations_2026_05_10_160511_create_infraestructuras_pisos_table_down",
+      "migrations_2026_05_10_160511_create_infraestructuras_pisos_table_up"
+    ],
+    "83": [
+      "migrations_2026_05_10_171505_create_marcas_table",
+      "migrations_2026_05_10_171505_create_marcas_table_down",
+      "migrations_2026_05_10_171505_create_marcas_table_up"
+    ],
+    "84": [
+      "migrations_2026_05_10_173354_create_productos_table",
+      "migrations_2026_05_10_173354_create_productos_table_down",
+      "migrations_2026_05_10_173354_create_productos_table_up"
+    ],
+    "85": [
+      "migrations_2026_05_10_173750_create_productos_imagenes_table",
+      "migrations_2026_05_10_173750_create_productos_imagenes_table_down",
+      "migrations_2026_05_10_173750_create_productos_imagenes_table_up"
+    ],
+    "86": [
+      "migrations_2026_05_10_174000_create_infraestructuras_tiendas_table",
+      "migrations_2026_05_10_174000_create_infraestructuras_tiendas_table_down",
+      "migrations_2026_05_10_174000_create_infraestructuras_tiendas_table_up"
+    ],
+    "87": [
+      "migrations_2026_05_10_175311_create_suscripciones_table",
+      "migrations_2026_05_10_175311_create_suscripciones_table_down",
+      "migrations_2026_05_10_175311_create_suscripciones_table_up"
+    ],
+    "88": [
+      "migrations_2026_05_10_192049_create_suscripciones_cobros_table",
+      "migrations_2026_05_10_192049_create_suscripciones_cobros_table_down",
+      "migrations_2026_05_10_192049_create_suscripciones_cobros_table_up"
+    ],
+    "89": [
+      "migrations_2026_05_10_192133_create_suscripciones_pagos_table",
+      "migrations_2026_05_10_192133_create_suscripciones_pagos_table_down",
+      "migrations_2026_05_10_192133_create_suscripciones_pagos_table_up"
+    ],
+    "90": [
+      "migrations_2026_05_10_200751_create_permission_tables",
+      "migrations_2026_05_10_200751_create_permission_tables_down",
+      "migrations_2026_05_10_200751_create_permission_tables_up"
+    ],
+    "91": [
+      "migrations_2026_05_15_200523_add_tienda_id_to_productos_table",
+      "migrations_2026_05_15_200523_add_tienda_id_to_productos_table_down",
+      "migrations_2026_05_15_200523_add_tienda_id_to_productos_table_up"
+    ],
+    "92": [
+      "migrations_2026_05_17_192801_create_suscripciones_tarifas_table",
+      "migrations_2026_05_17_192801_create_suscripciones_tarifas_table_down",
+      "migrations_2026_05_17_192801_create_suscripciones_tarifas_table_up"
+    ],
+    "93": [
+      "migrations_2026_05_17_214500_add_fecha_inicio_to_suscripciones_cobros_table",
+      "migrations_2026_05_17_214500_add_fecha_inicio_to_suscripciones_cobros_table_down",
+      "migrations_2026_05_17_214500_add_fecha_inicio_to_suscripciones_cobros_table_up"
+    ],
+    "94": [
+      "migrations_2026_05_19_152130_update_suscripciones_pagos_add_metodos_pago_fields",
+      "migrations_2026_05_19_152130_update_suscripciones_pagos_add_metodos_pago_fields_down",
+      "migrations_2026_05_19_152130_update_suscripciones_pagos_add_metodos_pago_fields_up"
+    ],
+    "95": [
+      "migrations_2026_05_19_165257_remove_fecha_pago_from_suscripciones_cobros",
+      "migrations_2026_05_19_165257_remove_fecha_pago_from_suscripciones_cobros_down",
+      "migrations_2026_05_19_165257_remove_fecha_pago_from_suscripciones_cobros_up"
+    ],
+    "96": [
+      "migrations_2026_05_23_140717_increase_ubicacion_length_in_infraestructuras_table",
+      "migrations_2026_05_23_140717_increase_ubicacion_length_in_infraestructuras_table_down",
+      "migrations_2026_05_23_140717_increase_ubicacion_length_in_infraestructuras_table_up"
+    ],
+    "97": [
+      "migrations_2026_05_23_194345_create_infraestructuras_tiendas_marcas_table",
+      "migrations_2026_05_23_194345_create_infraestructuras_tiendas_marcas_table_down",
+      "migrations_2026_05_23_194345_create_infraestructuras_tiendas_marcas_table_up"
+    ],
+    "98": [
+      "migrations_2026_05_24_093628_create_estados_tiendas_table",
+      "migrations_2026_05_24_093628_create_estados_tiendas_table_down",
+      "migrations_2026_05_24_093628_create_estados_tiendas_table_up"
+    ],
+    "99": [
+      "migrations_2026_05_24_095140_update_infraestructuras_tiendas_change_estado_column",
+      "migrations_2026_05_24_095140_update_infraestructuras_tiendas_change_estado_column_down",
+      "migrations_2026_05_24_095140_update_infraestructuras_tiendas_change_estado_column_up"
+    ],
+    "100": [
+      "migrations_2026_05_24_110132_fix_productos_imagenes_cascade_delete",
+      "migrations_2026_05_24_110132_fix_productos_imagenes_cascade_delete_down",
+      "migrations_2026_05_24_110132_fix_productos_imagenes_cascade_delete_up"
+    ],
+    "101": [
+      "migrations_2026_05_24_120000_update_suscripciones_tarifas_use_size_range",
+      "migrations_2026_05_24_120000_update_suscripciones_tarifas_use_size_range_down",
+      "migrations_2026_05_24_120000_update_suscripciones_tarifas_use_size_range_up"
+    ],
+    "102": [
+      "migrations_2026_05_24_130000_add_parcial_to_suscripciones_cobros_estado_check",
+      "migrations_2026_05_24_130000_add_parcial_to_suscripciones_cobros_estado_check_down",
+      "migrations_2026_05_24_130000_add_parcial_to_suscripciones_cobros_estado_check_up"
+    ],
+    "103": [
+      "migrations_2026_05_24_142458_add_pago_pendiente_and_estado_snapshot_to_suscripciones_pagos_table",
+      "migrations_2026_05_24_142458_add_pago_pendiente_and_estado_snapshot_to_suscripciones_pagos_table_down",
+      "migrations_2026_05_24_142458_add_pago_pendiente_and_estado_snapshot_to_suscripciones_pagos_table_up"
+    ],
+    "104": [
+      "migrations_2026_05_28_194253_add_contrato_firmado_to_suscripciones_table",
+      "migrations_2026_05_28_194253_add_contrato_firmado_to_suscripciones_table_down",
+      "migrations_2026_05_28_194253_add_contrato_firmado_to_suscripciones_table_up"
+    ],
+    "105": [
+      "migrations_2026_05_28_205542_add_logo_to_marcas_table",
+      "migrations_2026_05_28_205542_add_logo_to_marcas_table_down",
+      "migrations_2026_05_28_205542_add_logo_to_marcas_table_up"
+    ],
+    "106": [
+      "migrations_2026_05_28_210747_make_cliente_id_nullable_in_marcas_table",
+      "migrations_2026_05_28_210747_make_cliente_id_nullable_in_marcas_table_down",
+      "migrations_2026_05_28_210747_make_cliente_id_nullable_in_marcas_table_up"
+    ],
+    "107": [
+      "migrations_2026_05_30_094638_add_imagen_fondo_to_infraestructuras_pisos_table",
+      "migrations_2026_05_30_094638_add_imagen_fondo_to_infraestructuras_pisos_table_down",
+      "migrations_2026_05_30_094638_add_imagen_fondo_to_infraestructuras_pisos_table_up"
+    ],
+    "108": [
+      "migrations_2026_05_30_223857_add_foto_referencial_to_infraestructuras_tiendas_table",
+      "migrations_2026_05_30_223857_add_foto_referencial_to_infraestructuras_tiendas_table_down",
+      "migrations_2026_05_30_223857_add_foto_referencial_to_infraestructuras_tiendas_table_up"
+    ],
+    "109": [
+      "migrations_2026_05_31_000000_add_vitrina_images_to_infraestructuras_tiendas_table",
+      "migrations_2026_05_31_000000_add_vitrina_images_to_infraestructuras_tiendas_table_down",
+      "migrations_2026_05_31_000000_add_vitrina_images_to_infraestructuras_tiendas_table_up"
+    ],
+    "110": [
+      "migrations_2026_05_31_031416_populate_missing_payment_and_cobro_snapshot_fields",
+      "migrations_2026_05_31_031416_populate_missing_payment_and_cobro_snapshot_fields_down",
+      "migrations_2026_05_31_031416_populate_missing_payment_and_cobro_snapshot_fields_up"
+    ],
+    "111": [
+      "migrations_2026_05_31_102207_create_tarifas_y_descuentos_tables",
+      "migrations_2026_05_31_102207_create_tarifas_y_descuentos_tables_down",
+      "migrations_2026_05_31_102207_create_tarifas_y_descuentos_tables_up"
+    ],
+    "112": [
+      "migrations_2026_05_31_103319_add_renovacion_de_id_to_suscripciones_table",
+      "migrations_2026_05_31_103319_add_renovacion_de_id_to_suscripciones_table_down",
+      "migrations_2026_05_31_103319_add_renovacion_de_id_to_suscripciones_table_up"
+    ],
+    "113": [
+      "migrations_2026_05_31_104800_add_numero_to_infraestructuras_pisos_table",
+      "migrations_2026_05_31_104800_add_numero_to_infraestructuras_pisos_table_down",
+      "migrations_2026_05_31_104800_add_numero_to_infraestructuras_pisos_table_up"
+    ],
+    "114": [
+      "migrations_2026_05_31_121500_add_es_parcial_to_suscripciones_cobros_table",
+      "migrations_2026_05_31_121500_add_es_parcial_to_suscripciones_cobros_table_down",
+      "migrations_2026_05_31_121500_add_es_parcial_to_suscripciones_cobros_table_up"
+    ],
+    "115": [
+      "migrations_2026_06_04_000001_add_infraestructura_id_to_categorias_and_tarifas",
+      "migrations_2026_06_04_000001_add_infraestructura_id_to_categorias_and_tarifas_down",
+      "migrations_2026_06_04_000001_add_infraestructura_id_to_categorias_and_tarifas_up"
+    ],
+    "116": [
+      "pages_mapa_ocupacion_blade",
+      "resources_views_filament_pages_mapa_ocupacion_blade_php_set",
+      "selectpiso_stat"
+    ],
+    "117": [
+      "deleteinfraestructura_infra_id",
+      "pages_list_infraestructuras_custom_blade"
+    ],
+    "118": [
+      "js_app",
+      "js_bootstrap"
+    ],
+    "119": [
+      "migrations_2026_05_24_121433_create_activity_log_table",
+      "migrations_2026_05_24_121433_create_activity_log_table_up"
+    ],
+    "120": [
+      "pages_form_usuarios_custom_blade",
+      "resources_views_filament_resources_usuarios_pages_form_usuarios_custom_blade_php_save"
+    ],
+    "121": [
+      "pages_infraestructuras_pisos_diseno_blade",
+      "resources_views_filament_resources_infraestructuras_pages_infraestructuras_pisos_diseno_blade_php_guardar"
+    ],
+    "122": [
+      "pages_seleccionar_infraestructura_blade",
+      "selectinfraestructura_infra_id"
+    ],
+    "123": [
+      "pages_tiendas_propietarios_blade",
+      "resources_views_filament_resources_infraestructuras_pages_tiendas_propietarios_blade_php_guardar"
+    ],
+    "124": [
+      "resources_views_filament_widgets_infraestructura_dashboard_filter_blade_php_set",
+      "widgets_infraestructura_dashboard_filter_blade"
+    ],
+    "125": [
+      "auth_login_blade"
+    ],
+    "126": [
+      "auth_verify_email_blade"
+    ],
+    "127": [
+      "cliente_dashboard_blade"
+    ],
+    "128": [
+      "cliente_estado_cuenta_blade"
+    ],
+    "129": [
+      "cliente_personalizar_blade"
+    ],
+    "130": [
+      "cliente_tienda_blade"
+    ],
+    "131": [
+      "components_auditoria_detalle_blade"
+    ],
+    "132": [
+      "components_leaflet_map_blade"
+    ],
+    "133": [
+      "components_public_navbar_blade"
+    ],
+    "134": [
+      "components_reporte_cliente_modal_blade"
+    ],
+    "135": [
+      "components_user_menu_blade"
+    ],
+    "136": [
+      "components_verify_email_banner_blade"
+    ],
+    "137": [
+      "directorio_catalogo_blade"
+    ],
+    "138": [
+      "directorio_index_blade"
+    ],
+    "139": [
+      "js_leaflet_field"
+    ],
+    "140": [
+      "layouts_app_blade"
+    ],
+    "141": [
+      "layouts_client_blade"
+    ],
+    "142": [
+      "marcas_form_blade"
+    ],
+    "143": [
+      "marcas_index_blade"
+    ],
+    "144": [
+      "pages_auditoria_blade"
+    ],
+    "145": [
+      "pages_balance_suscripciones_blade"
+    ],
+    "146": [
+      "pages_mi_estado_cuenta_blade"
+    ],
+    "147": [
+      "pages_reporte_morosidad_blade"
+    ],
+    "148": [
+      "pages_simulador_alquiler_blade"
+    ],
+    "149": [
+      "pages_ver_cliente_blade"
+    ],
+    "150": [
+      "pages_ver_suscripcion_blade"
+    ],
+    "151": [
+      "pdf_contrato_blade"
+    ],
+    "152": [
+      "pdf_reporte_cobro_blade"
+    ],
+    "153": [
+      "pdf_reporte_pago_blade"
+    ],
+    "154": [
+      "pdf_reporte_suscripcion_movimiento_blade"
+    ],
+    "155": [
+      "productos_create_blade"
+    ],
+    "156": [
+      "productos_edit_blade"
+    ],
+    "157": [
+      "productos_index_blade"
+    ],
+    "158": [
+      "suscripciones_crear_custom_blade"
+    ],
+    "159": [
+      "suscripciones_pago_custom_blade"
+    ],
+    "160": [
+      "suscripciones_renovar_custom_blade"
+    ],
+    "161": [
+      "views_productos_blade"
+    ],
+    "162": [
+      "views_suscripciones_blade"
+    ],
+    "163": [
+      "views_welcome_blade"
+    ]
+  },
+  "cohesion": {
+    "0": 0.05779220779220779,
+    "1": 0.09090909090909091,
+    "2": 0.09523809523809523,
+    "3": 0.08076923076923077,
+    "4": 0.08819345661450925,
+    "5": 0.08408408408408409,
+    "6": 0.09462365591397849,
+    "7": 0.15172413793103448,
+    "8": 0.08547008547008547,
+    "9": 0.09401709401709402,
+    "10": 0.09686609686609686,
+    "11": 0.09846153846153846,
+    "12": 0.10461538461538461,
+    "13": 0.11231884057971014,
+    "14": 0.11462450592885376,
+    "15": 0.12121212121212122,
+    "16": 0.22857142857142856,
+    "17": 0.12380952380952381,
+    "18": 0.13157894736842105,
+    "19": 0.21052631578947367,
+    "20": 0.16993464052287582,
+    "21": 0.1323529411764706,
+    "22": 0.19166666666666668,
+    "23": 0.26666666666666666,
+    "24": 0.26666666666666666,
+    "25": 0.26666666666666666,
+    "26": 0.15,
+    "27": 0.14285714285714285,
+    "28": 0.20952380952380953,
+    "29": 0.24175824175824176,
+    "30": 0.26373626373626374,
+    "31": 0.17582417582417584,
+    "32": 0.16483516483516483,
+    "33": 0.20512820512820512,
+    "34": 0.1794871794871795,
+    "35": 0.19696969696969696,
+    "36": 0.23636363636363636,
+    "37": 0.2545454545454545,
+    "38": 0.2727272727272727,
+    "39": 0.2909090909090909,
+    "40": 0.23636363636363636,
+    "41": 0.3090909090909091,
+    "42": 0.2,
+    "43": 0.28888888888888886,
+    "44": 0.2222222222222222,
+    "45": 0.28888888888888886,
+    "46": 0.28888888888888886,
+    "47": 0.3111111111111111,
+    "48": 0.2,
+    "49": 0.3333333333333333,
+    "50": 0.3055555555555556,
+    "51": 0.3611111111111111,
+    "52": 0.25,
+    "53": 0.25,
+    "54": 0.25,
+    "55": 0.2857142857142857,
+    "56": 0.42857142857142855,
+    "57": 0.2857142857142857,
+    "58": 0.3333333333333333,
+    "59": 0.3333333333333333,
+    "60": 0.4666666666666667,
+    "61": 0.3333333333333333,
+    "62": 0.4,
+    "63": 0.4,
+    "64": 0.6,
+    "65": 0.6,
+    "66": 0.6666666666666666,
+    "67": 0.6666666666666666,
+    "68": 0.6666666666666666,
+    "69": 0.6666666666666666,
+    "70": 0.6666666666666666,
+    "71": 0.6666666666666666,
+    "72": 0.5,
+    "73": 0.5,
+    "74": 0.6666666666666666,
+    "75": 0.6666666666666666,
+    "76": 0.6666666666666666,
+    "77": 0.6666666666666666,
+    "78": 0.6666666666666666,
+    "79": 0.6666666666666666,
+    "80": 0.6666666666666666,
+    "81": 0.6666666666666666,
+    "82": 0.6666666666666666,
+    "83": 0.6666666666666666,
+    "84": 0.6666666666666666,
+    "85": 0.6666666666666666,
+    "86": 0.6666666666666666,
+    "87": 0.6666666666666666,
+    "88": 0.6666666666666666,
+    "89": 0.6666666666666666,
+    "90": 0.6666666666666666,
+    "91": 0.6666666666666666,
+    "92": 0.6666666666666666,
+    "93": 0.6666666666666666,
+    "94": 0.6666666666666666,
+    "95": 0.6666666666666666,
+    "96": 0.6666666666666666,
+    "97": 0.6666666666666666,
+    "98": 0.6666666666666666,
+    "99": 0.6666666666666666,
+    "100": 0.6666666666666666,
+    "101": 0.6666666666666666,
+    "102": 0.6666666666666666,
+    "103": 0.6666666666666666,
+    "104": 0.6666666666666666,
+    "105": 0.6666666666666666,
+    "106": 0.6666666666666666,
+    "107": 0.6666666666666666,
+    "108": 0.6666666666666666,
+    "109": 0.6666666666666666,
+    "110": 0.6666666666666666,
+    "111": 0.6666666666666666,
+    "112": 0.6666666666666666,
+    "113": 0.6666666666666666,
+    "114": 0.6666666666666666,
+    "115": 0.6666666666666666,
+    "116": 0.6666666666666666,
+    "117": 1.0,
+    "118": 1.0,
+    "119": 1.0,
+    "120": 1.0,
+    "121": 1.0,
+    "122": 1.0,
+    "123": 1.0,
+    "124": 1.0,
+    "125": 1.0,
+    "126": 1.0,
+    "127": 1.0,
+    "128": 1.0,
+    "129": 1.0,
+    "130": 1.0,
+    "131": 1.0,
+    "132": 1.0,
+    "133": 1.0,
+    "134": 1.0,
+    "135": 1.0,
+    "136": 1.0,
+    "137": 1.0,
+    "138": 1.0,
+    "139": 1.0,
+    "140": 1.0,
+    "141": 1.0,
+    "142": 1.0,
+    "143": 1.0,
+    "144": 1.0,
+    "145": 1.0,
+    "146": 1.0,
+    "147": 1.0,
+    "148": 1.0,
+    "149": 1.0,
+    "150": 1.0,
+    "151": 1.0,
+    "152": 1.0,
+    "153": 1.0,
+    "154": 1.0,
+    "155": 1.0,
+    "156": 1.0,
+    "157": 1.0,
+    "158": 1.0,
+    "159": 1.0,
+    "160": 1.0,
+    "161": 1.0,
+    "162": 1.0,
+    "163": 1.0
+  },
+  "gods": [
+    {
+      "id": "models_infraestructurastiendas_infraestructurastiendas",
+      "label": "InfraestructurasTiendas",
+      "degree": 38
+    },
+    {
+      "id": "cliente_clientdashboardcontroller_clientdashboardcontroller",
+      "label": "ClientDashboardController",
+      "degree": 25
+    },
+    {
+      "id": "controllers_controller_controller",
+      "label": "Controller",
+      "degree": 21
+    },
+    {
+      "id": "support_activeinfraestructura_activeinfraestructura",
+      "label": "ActiveInfraestructura",
+      "degree": 21
+    },
+    {
+      "id": "pages_createinfraestructurascustom_createinfraestructurascustom",
+      "label": "CreateInfraestructurasCustom",
+      "degree": 19
+    },
+    {
+      "id": "pages_editinfraestructurascustom_editinfraestructurascustom",
+      "label": "EditInfraestructurasCustom",
+      "degree": 19
+    },
+    {
+      "id": "clientes",
+      "label": "Clientes",
+      "degree": 19
+    },
+    {
+      "id": "pages_listsuscripcionestarifas_listsuscripcionestarifas",
+      "label": "ListSuscripcionesTarifas",
+      "degree": 16
+    },
+    {
+      "id": "models_suscripcionestarifas_suscripcionestarifas",
+      "label": "SuscripcionesTarifas",
+      "degree": 16
+    },
+    {
+      "id": "models_user_user",
+      "label": "User",
+      "degree": 15
+    }
+  ],
+  "surprises": [
+    {
+      "source": "SuscripcionCustomController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/Admin/SuscripcionCustomController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "ClientDashboardController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/Cliente/ClientDashboardController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "DirectorioController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/DirectorioController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "WelcomeController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/WelcomeController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "bridges separate communities"
+    },
+    {
+      "source": "ForgotPasswordController",
+      "target": "Controller",
+      "source_files": [
+        "app/Http/Controllers/Auth/ForgotPasswordController.php",
+        "app/Http/Controllers/Controller.php"
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "inherits",
+      "why": "cross-file semantic connection"
+    }
+  ],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `InfraestructurasTiendas` connect `Community 0` to `Community 1`, `Community 5`, `Community 8`, `Community 41`, `Community 9`, `Community 13`, `Community 28`?",
+      "why": "High betweenness centrality (0.106) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `Clientes` connect `Community 5` to `Community 0`, `Community 1`, `Community 7`, `Community 8`, `Community 9`, `Community 43`?",
+      "why": "High betweenness centrality (0.081) - this node is a cross-community bridge."
+    },
+    {
+      "type": "bridge_node",
+      "question": "Why does `ActiveInfraestructura` connect `Community 34` to `Community 0`, `Community 5`, `Community 8`, `Community 73`, `Community 41`, `Community 21`, `Community 55`, `Community 57`, `Community 61`?",
+      "why": "High betweenness centrality (0.060) - this node is a cross-community bridge."
+    },
+    {
+      "type": "verify_inferred",
+      "question": "Are the 23 inferred relationships involving `InfraestructurasTiendas` (e.g. with `.create()` and `.getTiendaPrecio()`) actually correct?",
+      "why": "`InfraestructurasTiendas` has 23 INFERRED edges - model-reasoned connections that need verification."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `BackedEnum`, `UnitEnum`, `BackedEnum` to the rest of the system?",
+      "why": "64 weakly-connected nodes found - possible documentation gaps or missing edges."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 0` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.05779220779220779 - nodes in this community are weakly interconnected."
+    },
+    {
+      "type": "low_cohesion",
+      "question": "Should `Community 1` be split into smaller, more focused modules?",
+      "why": "Cohesion score 0.09090909090909091 - nodes in this community are weakly interconnected."
+    }
+  ]
+}

@@ -140,6 +140,34 @@ class WelcomeController extends Controller
                 ];
             });
 
+        if ($floors->isEmpty()) {
+            $floors = collect([[
+                'level'        => 0,
+                'displayLevel' => 'PB',
+                'name'         => 'Sin pisos configurados',
+                'vibe'         => 'Infraestructura recién creada',
+                'imagen_fondo' => '/images/backgrounds/bg_mall_white.jpg',
+                'stores'       => [[
+                    'id'           => 0,
+                    'numero'       => 1,
+                    'nombre'       => 'Sin tiendas aún',
+                    'descripcion'  => 'Esta infraestructura aún no tiene pisos ni tiendas. Configúrala desde el panel de administración.',
+                    'tamano'       => null,
+                    'telefono'     => null,
+                    'estado'       => 'Disponible',
+                    'is_alquilada' => false,
+                    'marca'        => null,
+                    'marca_logo'   => null,
+                    'inquilino'    => null,
+                    'vitrina_1'    => null,
+                    'vitrina_2'    => null,
+                    'vitrina_3'    => null,
+                    'productos'    => [],
+                    'accent'       => 'graphite',
+                ]],
+            ]]);
+        }
+
         $mall = [
             'id'     => 'mall-' . $infraestructura->id,
             'name'   => $infraestructura->nombre,

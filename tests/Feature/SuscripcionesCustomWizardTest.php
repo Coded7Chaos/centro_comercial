@@ -2,15 +2,23 @@
 
 namespace Tests\Feature;
 
+use App\Filament\Resources\SuscripcionesCobros\SuscripcionesCobrosResource;
 use App\Models\Clientes;
+use App\Models\DescuentoTiempo;
+use App\Models\Infraestructuras;
+use App\Models\InfraestructurasPisos;
 use App\Models\InfraestructurasTiendas;
 use App\Models\Suscripciones;
 use App\Models\SuscripcionesCobros;
+use App\Models\SuscripcionesPagos;
 use App\Models\SuscripcionesTarifas;
+use App\Models\TamanoEtiqueta;
+use App\Models\TamanoPrecio;
 use App\Models\User;
+use App\Support\ActiveInfraestructura;
+use Carbon\Carbon;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -19,9 +27,13 @@ class SuscripcionesCustomWizardTest extends TestCase
     use DatabaseTransactions;
 
     protected $adminUser;
+
     protected $clientUser;
+
     protected $client;
+
     protected $shop;
+
     protected $fee;
 
     protected function setUp(): void
@@ -48,13 +60,13 @@ class SuscripcionesCustomWizardTest extends TestCase
         ]);
 
         // Get a floor and create a shop
-        $piso = \App\Models\InfraestructurasPisos::first();
-        if (!$piso) {
-            $infra = \App\Models\Infraestructuras::create([
+        $piso = InfraestructurasPisos::first();
+        if (! $piso) {
+            $infra = Infraestructuras::create([
                 'nombre' => 'Mall Test Vía',
                 'ubicacion' => 'La Paz',
             ]);
-            $piso = \App\Models\InfraestructurasPisos::create([
+            $piso = InfraestructurasPisos::create([
                 'nombre' => 'Piso 1',
                 'infraestructura_id' => $infra->id,
             ]);
@@ -68,24 +80,24 @@ class SuscripcionesCustomWizardTest extends TestCase
         ]);
 
         // Clear new pricing and discount tables
-        \App\Models\TamanoPrecio::query()->delete();
-        \App\Models\TamanoEtiqueta::query()->delete();
-        \App\Models\DescuentoTiempo::query()->delete();
+        TamanoPrecio::query()->delete();
+        TamanoEtiqueta::query()->delete();
+        DescuentoTiempo::query()->delete();
 
         // Create the new size label and price configuration
-        $etiqueta = \App\Models\TamanoEtiqueta::create([
+        $etiqueta = TamanoEtiqueta::create([
             'nombre' => 'Tarifa Test',
             'desde' => 5.0,
             'hasta' => 15.0,
         ]);
 
-        \App\Models\TamanoPrecio::create([
+        TamanoPrecio::create([
             'tamano_etiqueta_id' => $etiqueta->id,
             'precio_mensual' => 500.00,
         ]);
 
         // Seed 10% discount for min 3 months
-        \App\Models\DescuentoTiempo::create([
+        DescuentoTiempo::create([
             'min_meses' => 3,
             'descuento' => 10.00,
         ]);
@@ -130,7 +142,7 @@ class SuscripcionesCustomWizardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Crear Contrato de Arrendamiento');
         $response->assertSee($this->client->nombre_completo);
-        $response->assertSee('Local N° ' . $this->shop->numero);
+        $response->assertSee('Local N° '.$this->shop->numero);
     }
 
     public function test_ajax_tienda_precio_endpoint(): void
@@ -212,8 +224,124 @@ class SuscripcionesCustomWizardTest extends TestCase
 
         $response->assertRedirect(route('admin.suscripciones.pago-custom', [
             'id' => $suscripcion->id,
-            'download_pdf' => 1
+            'download_pdf' => 1,
         ]));
+    }
+
+    public function test_subscription_creation_generates_one_charge_per_month_with_initial_payment_and_guarantee(): void
+    {
+        $this->actingAs($this->adminUser)
+            ->post('/admin/suscripciones-custom/guardar', [
+                'cliente_id' => $this->client->id,
+                'infraestructuras_tienda_id' => $this->shop->id,
+                'duracion_valor' => 3,
+                'duracion_unidad' => 'meses',
+                'fecha_inicio' => '2026-06-15',
+            ])
+            ->assertRedirect();
+
+        $suscripcion = Suscripciones::where('cliente_id', $this->client->id)
+            ->where('infraestructuras_tienda_id', $this->shop->id)
+            ->firstOrFail();
+
+        $cobros = $suscripcion->cobros()
+            ->orderBy('fecha_vencimiento')
+            ->get();
+
+        $this->assertCount(3, $cobros);
+        $this->assertEquals(['2026-06-15', '2026-07-15', '2026-08-15'], $cobros->pluck('fecha_vencimiento')->all());
+        $this->assertEquals([900.00, 450.00, 450.00], $cobros->pluck('monto')->map(fn ($monto) => (float) $monto)->all());
+        $this->assertStringContainsString('Garantía', $cobros->first()->concepto);
+        $this->assertTrue($cobros->every(fn (SuscripcionesCobros $cobro) => $cobro->observaciones === 'Cobro generado automáticamente'));
+    }
+
+    public function test_admin_cobros_page_separates_paid_pending_and_overdue_charges(): void
+    {
+        $startDate = Carbon::parse(now()->toDateString());
+
+        $subscription = Suscripciones::create([
+            'cliente_id' => $this->client->id,
+            'infraestructuras_tienda_id' => $this->shop->id,
+            'infraestructuras_piso_id' => $this->shop->infraestructura_piso_id,
+            'fecha_inicio' => $startDate->toDateString(),
+            'fecha_fin' => $startDate->copy()->addMonthsNoOverflow(3)->subDay()->toDateString(),
+            'tipo' => '3 meses',
+            'precio' => 1350.00,
+        ]);
+
+        $firstCharge = $subscription->cobros()
+            ->orderBy('fecha_vencimiento')
+            ->firstOrFail();
+
+        SuscripcionesPagos::create([
+            'suscripcion_cobro_id' => $firstCharge->id,
+            'monto_pagado' => $firstCharge->monto,
+            'pago_pendiente' => 0,
+            'fecha_pago' => $startDate->toDateString(),
+            'fecha_hora_operacion' => now(),
+            'metodo_pago' => 'efectivo',
+            'nombre_pagador' => 'Pago Test',
+            'estado_verificacion' => 'verificado',
+            'monto_total' => $firstCharge->monto,
+            'estado_snapshot' => 'pagado',
+        ]);
+
+        $pastPendingCharge = SuscripcionesCobros::create([
+            'suscripcion_id' => $subscription->id,
+            'concepto' => 'Cobro Mensual vencido - Local Test',
+            'monto' => 450.00,
+            'fecha_inicio' => $startDate->copy()->subDay()->toDateString(),
+            'fecha_vencimiento' => $startDate->copy()->subDay()->toDateString(),
+            'estado' => 'pendiente',
+            'observaciones' => 'Cobro vencido de prueba',
+            'es_parcial' => false,
+        ]);
+
+        $firstCharge->update([
+            'estado' => 'pagado',
+            'saldo_pendiente' => 0,
+            'estado_snapshot' => 'pagado',
+        ]);
+
+        $infraestructuraId = $this->shop->piso->infraestructura_id;
+
+        $this->withSession([ActiveInfraestructura::SESSION_KEY => $infraestructuraId]);
+
+        $this->actingAs($this->adminUser)
+            ->get(SuscripcionesCobrosResource::getUrl('index'))
+            ->assertOk();
+
+        $futurePendingIds = $subscription->cobros()
+            ->orderBy('fecha_vencimiento')
+            ->where('id', '!=', $firstCharge->id)
+            ->where('id', '!=', $pastPendingCharge->id)
+            ->pluck('id')
+            ->all();
+
+        $visibleMonthlyIds = SuscripcionesCobrosResource::getEloquentQuery()
+            ->where('es_parcial', false)
+            ->whereNotIn('estado', ['pagado', 'anulado'])
+            ->where('fecha_vencimiento', '>=', now()->toDateString())
+            ->pluck('id')
+            ->all();
+
+        $morosoIds = SuscripcionesCobrosResource::getEloquentQuery()
+            ->where('es_parcial', false)
+            ->whereNotIn('estado', ['pagado', 'anulado'])
+            ->where('fecha_vencimiento', '<', now()->toDateString())
+            ->pluck('id')
+            ->all();
+
+        $allActiveCobroIds = SuscripcionesCobrosResource::getEloquentQuery()
+            ->whereNotIn('estado', ['pagado', 'anulado'])
+            ->pluck('id')
+            ->all();
+
+        $this->assertEqualsCanonicalizing($futurePendingIds, array_intersect($futurePendingIds, $visibleMonthlyIds));
+        $this->assertNotContains($firstCharge->id, $visibleMonthlyIds);
+        $this->assertNotContains($pastPendingCharge->id, $visibleMonthlyIds);
+        $this->assertContains($pastPendingCharge->id, $morosoIds);
+        $this->assertNotContains($firstCharge->id, $allActiveCobroIds);
     }
 
     public function test_pago_view_calculates_correct_initial_payment(): void
@@ -281,6 +409,7 @@ class SuscripcionesCustomWizardTest extends TestCase
                 'nombre_titular' => 'Sofia Suarez',
                 'referencia' => 987654,
                 'banco_origen' => 'BCP',
+                'comprobante' => \Illuminate\Http\UploadedFile::fake()->create('comprobante.pdf', 100),
             ]);
 
         $response->assertRedirect('/admin/suscripciones');
@@ -383,7 +512,7 @@ class SuscripcionesCustomWizardTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Renovar Contrato de Alquiler');
         $response->assertSee($this->client->nombre_completo);
-        $response->assertSee('Local N° ' . $this->shop->numero);
+        $response->assertSee('Local N° '.$this->shop->numero);
     }
 
     public function test_renewal_creation_and_no_double_monto_inicial(): void
@@ -415,7 +544,7 @@ class SuscripcionesCustomWizardTest extends TestCase
         // It should redirect to payment page
         $response->assertRedirect(route('admin.suscripciones.pago-custom', [
             'id' => $renewalSub->id,
-            'download_pdf' => 1
+            'download_pdf' => 1,
         ]));
 
         // Now test the payment calculation for this renewal subscription (it should NOT double the first month's payment!)
@@ -427,6 +556,6 @@ class SuscripcionesCustomWizardTest extends TestCase
         // regular price is $500, discounted price is $450/month.
         // For a normal contract, pago_inicial is $450 * 2 = $900 (rent + guarantee).
         // But for a renewal, it must be only $450 (rent only, no guarantee deposit!).
-        $pagoResponse->assertViewHas('pago_inicial', 450.00); 
+        $pagoResponse->assertViewHas('pago_inicial', 450.00);
     }
 }

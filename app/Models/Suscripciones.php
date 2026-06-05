@@ -2,14 +2,12 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Models\InfraestructurasTiendas;
-use App\Models\SuscripcionesCobros;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
-
 
 class Suscripciones extends Model
 {
@@ -82,60 +80,62 @@ class Suscripciones extends Model
     protected static function booted(): void
     {
         static::created(function ($suscripcion) {
-
-            /*
-        |--------------------------------------------------------------------------
-        | EVITAR DUPLICADOS
-        |--------------------------------------------------------------------------
-        */
-
-            $existeCobro = SuscripcionesCobros::where(
-                'suscripcion_id',
-                $suscripcion->id
-            )->exists();
-
-            if ($existeCobro) {
-                return;
-            }
-
-            /*
-        |--------------------------------------------------------------------------
-        | CREAR COBROS MENSUALES
-        |--------------------------------------------------------------------------
-        */
-
-            $start = \Carbon\Carbon::parse($suscripcion->fecha_inicio);
-            $end = \Carbon\Carbon::parse($suscripcion->fecha_fin)->addDay();
-            $totalMonths = (int) max(1, round($start->diffInMonths($end)));
-
-            $monthlyRent = (float)$suscripcion->precio / $totalMonths;
-            $isRenewal = $suscripcion->renovacion_de_id !== null;
-            $pago_inicial = ($totalMonths > 1 && !$isRenewal) ? $monthlyRent * 2 : $monthlyRent;
-
-            $tienda = $suscripcion->infraestructurasTienda;
-            $tiendaNombre = $tienda?->nombre ?: ($tienda ? 'Tienda #' . $tienda->numero : 'Sin nombre');
-
-            for ($i = 0; $i < $totalMonths; $i++) {
-                $fechaVencimiento = $start->copy()->addMonths($i)->toDateString();
-                
-                $monto = ($i === 0) ? $pago_inicial : $monthlyRent;
-                
-                $concepto = 'Cobro Mensual #' . ($i + 1) . ' - ' . $tiendaNombre;
-                if ($i === 0 && $totalMonths > 1 && !$isRenewal) {
-                    $concepto = 'Cobro Mensual #1 + Garantía - ' . $tiendaNombre;
-                }
-
-                SuscripcionesCobros::create([
-                    'suscripcion_id' => $suscripcion->id,
-                    'concepto' => $concepto,
-                    'monto' => $monto,
-                    'fecha_inicio' => $fechaVencimiento,
-                    'fecha_vencimiento' => $fechaVencimiento,
-                    'estado' => 'pendiente',
-                    'observaciones' => 'Cobro generado automáticamente',
-                    'es_parcial' => false,
-                ]);
-            }
+            $suscripcion->generarCobrosMensuales();
         });
+    }
+
+    public function generarCobrosMensuales(): void
+    {
+        if ($this->cobros()->exists()) {
+            return;
+        }
+
+        $start = Carbon::parse($this->fecha_inicio);
+        $totalMonths = $this->getDuracionEnMeses();
+
+        $monthlyRent = round((float) $this->precio / $totalMonths, 2);
+        $isRenewal = $this->renovacion_de_id !== null;
+        $pagoInicial = ($totalMonths > 1 && ! $isRenewal) ? $monthlyRent * 2 : $monthlyRent;
+
+        $tienda = $this->infraestructurasTienda;
+        $tiendaNombre = $tienda?->nombre ?: ($tienda ? 'Tienda #'.$tienda->numero : 'Sin nombre');
+
+        for ($i = 0; $i < $totalMonths; $i++) {
+            $fechaVencimiento = $start->copy()->addMonthsNoOverflow($i)->toDateString();
+
+            $monto = ($i === 0) ? $pagoInicial : $monthlyRent;
+
+            $concepto = 'Cobro Mensual #'.($i + 1).' - '.$tiendaNombre;
+            if ($i === 0 && $totalMonths > 1 && ! $isRenewal) {
+                $concepto = 'Cobro Mensual #1 + Garantía - '.$tiendaNombre;
+            }
+
+            SuscripcionesCobros::create([
+                'suscripcion_id' => $this->id,
+                'concepto' => $concepto,
+                'monto' => $monto,
+                'fecha_inicio' => $fechaVencimiento,
+                'fecha_vencimiento' => $fechaVencimiento,
+                'estado' => 'pendiente',
+                'observaciones' => 'Cobro generado automáticamente',
+                'es_parcial' => false,
+            ]);
+        }
+    }
+
+    public function getDuracionEnMeses(): int
+    {
+        $tipo = strtolower((string) $this->tipo);
+
+        if (preg_match('/\d+/', $tipo, $matches)) {
+            $valor = max(1, (int) $matches[0]);
+
+            return str_contains($tipo, 'año') ? $valor * 12 : $valor;
+        }
+
+        $start = Carbon::parse($this->fecha_inicio);
+        $end = Carbon::parse($this->fecha_fin)->addDay();
+
+        return (int) max(1, round($start->diffInMonths($end)));
     }
 }

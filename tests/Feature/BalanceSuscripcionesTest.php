@@ -168,5 +168,12 @@ class BalanceSuscripcionesTest extends TestCase
         $this->assertStringContainsString('Cobro Mensual #2 - Nébula Coffee', $rendered);
         $this->assertStringContainsString('PAGADO', $rendered);
         $this->assertStringContainsString('PAGO PARCIAL', $rendered);
+        $this->assertStringContainsString('ATRASADO', $rendered);
+        $this->assertStringContainsString('COBRO PROGRAMADO', $rendered);
+
+        // Verify that the due date of an unpaid charge is shown as the payment date
+        $secondCobroSub2 = $sub2->cobros()->orderBy('fecha_vencimiento', 'asc')->skip(1)->first();
+        $expectedUnpaidDate = \Carbon\Carbon::parse($secondCobroSub2->fecha_vencimiento)->format('d/m/Y');
+        $this->assertStringContainsString($expectedUnpaidDate, $rendered);
     }
 }

@@ -137,7 +137,7 @@ class ClientDashboardController extends Controller
         $tiendaIds = $cliente->tiendas->pluck('id')->toArray();
         
         $productos = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)
-            ->with(['categoria', 'marca', 'imagenes', 'tienda'])
+            ->with(['categoria.padre', 'marca', 'imagenes', 'tienda'])
             ->orderBy('id', 'desc')
             ->get();
 
@@ -292,7 +292,9 @@ class ClientDashboardController extends Controller
             ->orderBy('fecha_vencimiento', 'desc')
             ->get();
 
-        return view('cliente.estado-cuenta', compact('cobros'));
+        $settings = \App\Models\PaymentSettings::first();
+
+        return view('cliente.estado-cuenta', compact('cobros', 'settings'));
     }
 
     public function registrarPago(Request $request)
@@ -303,9 +305,7 @@ class ClientDashboardController extends Controller
         
         $request->validate([
             'suscripcion_cobro_id' => 'required|exists:suscripciones_cobros,id',
-            'monto_pagado' => 'required|numeric|min:0.1',
-            'metodo_pago' => 'required|in:efectivo,transferencia,qr,tarjeta',
-            'nombre_pagador' => 'required_if:metodo_pago,efectivo|nullable|string|max:100',
+            'metodo_pago' => 'required|in:transferencia,qr',
             'numero_transaccion' => 'required_if:metodo_pago,transferencia|nullable|string|max:50',
             'banco_origen' => 'required_if:metodo_pago,transferencia|nullable|string|max:50',
             'comprobante' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
@@ -314,86 +314,71 @@ class ClientDashboardController extends Controller
         $cobro = SuscripcionesCobros::whereIn('suscripcion_id', $suscripcionIds)
             ->findOrFail($request->suscripcion_cobro_id);
 
-        $totalPagado = $cobro->pagos()->sum('monto_pagado') + $request->monto_pagado;
-        $pendiente = max(0, $cobro->monto - $totalPagado);
+        // Check if there is already a pending request for this cobro
+        $hasPending = SuscripcionesPagos::where('suscripcion_cobro_id', $cobro->id)
+            ->where('estado_verificacion', 'pendiente')
+            ->exists();
+        if ($hasPending) {
+            return redirect()->route('cliente.estado-cuenta')->with('error', 'Ya tiene una solicitud de pago pendiente para este cobro.');
+        }
+
+        $pagado = $cobro->pagos()->where('estado_verificacion', 'verificado')->sum('monto_pagado');
+        $restante = max(0, $cobro->monto - $pagado);
+
+        if ($restante <= 0) {
+            return redirect()->route('cliente.estado-cuenta')->with('error', 'Este cobro ya se encuentra totalmente pagado.');
+        }
 
         $comprobantePath = null;
         if ($request->hasFile('comprobante')) {
             $comprobantePath = $request->file('comprobante')->store('comprobantes-pagos', 'public');
         }
 
-        if ($pendiente > 0) {
-            // Unpaid balance. Split it into a new cobro!
-            $fechaVencimientoCobro = \Carbon\Carbon::parse($cobro->fecha_vencimiento)->addMonth()->toDateString();
-            
-            $pago = SuscripcionesPagos::create([
-                'suscripcion_cobro_id' => $cobro->id,
-                'monto_pagado' => $request->monto_pagado,
-                'pago_pendiente' => 0, // set to 0 as the balance is transferred to the new cobro
-                'fecha_pago' => now()->toDateString(),
-                'metodo_pago' => $request->metodo_pago,
-                'estado_verificacion' => 'verificado',
-                'nombre_pagador' => $request->nombre_pagador,
-                'numero_transaccion' => $request->numero_transaccion,
-                'banco_origen' => $request->banco_origen,
-                'comprobante' => $comprobantePath,
-                'observaciones' => 'Pago reportado por el cliente desde el panel. Saldo pendiente diferido al siguiente mes.',
-                'estado_snapshot' => 'pagado',
-            ]);
+        $pago = SuscripcionesPagos::create([
+            'suscripcion_cobro_id' => $cobro->id,
+            'monto_pagado' => $restante, // Fixed payment amount
+            'pago_pendiente' => 0,
+            'fecha_pago' => now()->toDateString(),
+            'metodo_pago' => $request->metodo_pago,
+            'estado_verificacion' => 'pendiente',
+            'numero_transaccion' => $request->metodo_pago === 'transferencia' ? $request->numero_transaccion : null,
+            'banco_origen' => $request->metodo_pago === 'transferencia' ? $request->banco_origen : null,
+            'comprobante' => $comprobantePath,
+            'observaciones' => 'Solicitud de pago reportada por el cliente desde el panel.',
+            'estado_snapshot' => 'pendiente',
+            'creado_por_admin' => false,
+        ]);
 
-            // Create new cobro
-            SuscripcionesCobros::create([
-                'suscripcion_id' => $cobro->suscripcion_id,
-                'concepto' => 'Saldo pendiente de: ' . $cobro->concepto,
-                'monto' => $pendiente,
-                'fecha_inicio' => now()->toDateString(),
-                'fecha_vencimiento' => $fechaVencimientoCobro,
-                'estado' => 'pendiente',
-                'observaciones' => 'Cobro generado de saldo pendiente reportado por el cliente en pago #' . $pago->id,
-            ]);
+        // Recalculate status of the cobro
+        $cobro->recalcularEstado();
 
-            // Adjust original cobro
-            $cobro->update([
-                'monto' => $totalPagado,
-                'saldo_pendiente' => 0,
-                'estado' => 'pagado',
-                'estado_snapshot' => 'pagado',
-            ]);
-        } else {
-            // Fully paid
-            SuscripcionesPagos::create([
-                'suscripcion_cobro_id' => $cobro->id,
-                'monto_pagado' => $request->monto_pagado,
-                'pago_pendiente' => 0,
-                'fecha_pago' => now()->toDateString(),
-                'metodo_pago' => $request->metodo_pago,
-                'estado_verificacion' => 'verificado',
-                'nombre_pagador' => $request->nombre_pagador,
-                'numero_transaccion' => $request->numero_transaccion,
-                'banco_origen' => $request->banco_origen,
-                'comprobante' => $comprobantePath,
-                'observaciones' => 'Pago reportado por el cliente desde el panel.',
-                'estado_snapshot' => 'pagado',
-            ]);
+        return redirect()->route('cliente.estado-cuenta')->with('success', 'Su solicitud de pago ha sido enviada y se encuentra pendiente de confirmación.');
+    }
 
-            $cobro->update([
-                'saldo_pendiente' => 0,
-                'estado' => 'pagado',
-                'estado_snapshot' => 'pagado',
-            ]);
-        }
+    public function marcarNotificacionLeida($id)
+    {
+        $cliente = $this->getClienteOrAbort();
+        $notif = \App\Models\ClientNotification::where('cliente_id', $cliente->id)->findOrFail($id);
+        $notif->update(['leido' => true]);
 
-        return redirect()->route('cliente.estado-cuenta')->with('success', 'El pago ha sido registrado y reportado correctamente al administrador.');
+        return redirect()->back()->with('success', 'Notificación descartada.');
     }
 
     public function marcas()
     {
         $cliente = $this->getClienteOrAbort();
-        $marcas = Marcas::where('cliente_id', $cliente->id)
-            ->orWhereNull('cliente_id')
-            ->orderBy('id', 'desc')
+
+        // Marcas propias del cliente
+        $misMarcas = Marcas::where('cliente_id', $cliente->id)
+            ->orderBy('nombre')
             ->get();
-        return view('cliente.marcas.index', compact('marcas'));
+
+        // Marcas públicas creadas por administradores (sin cliente asignado)
+        $marcasAdmin = Marcas::whereNull('cliente_id')
+            ->orderBy('nombre')
+            ->get();
+
+        return view('cliente.marcas.index', compact('misMarcas', 'marcasAdmin'));
     }
 
     public function crearMarca()
@@ -661,6 +646,66 @@ class ClientDashboardController extends Controller
         }
 
         return back()->with('success', 'Logotipo de la marca actualizado correctamente.');
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // CATEGORÍAS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function categorias()
+    {
+        $this->getClienteOrAbort();
+
+        // Categorías raíz con sus subcategorías
+        $categorias = Categorias::whereNull('categoria_padre_id')
+            ->with('subcategorias')
+            ->orderBy('nombre')
+            ->get();
+
+        return view('cliente.categorias.index', compact('categorias'));
+    }
+
+    public function storeCategoria(Request $request)
+    {
+        $this->getClienteOrAbort();
+
+        $request->validate([
+            'nombre'             => 'required|string|max:100',
+            'categoria_padre_id' => 'nullable|exists:categorias,id',
+        ], [
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.max'      => 'El nombre no puede superar los 100 caracteres.',
+        ]);
+
+        Categorias::create([
+            'nombre'             => $request->nombre,
+            'descripcion'        => $request->descripcion,
+            'categoria_padre_id' => $request->categoria_padre_id ?: null,
+            'estado'             => 'activo',
+            'tipo'               => 'categoria',
+        ]);
+
+        $tipo = $request->categoria_padre_id ? 'Subcategoría' : 'Categoría';
+        return back()->with('success', "{$tipo} creada correctamente.");
+    }
+
+    public function destroyCategoria($id)
+    {
+        $this->getClienteOrAbort();
+
+        $categoria = Categorias::withCount(['subcategorias', 'productos'])->findOrFail($id);
+
+        if ($categoria->subcategorias_count > 0) {
+            return back()->with('error', 'No puedes eliminar una categoría que tiene subcategorías. Elimínalas primero.');
+        }
+
+        if ($categoria->productos_count > 0) {
+            return back()->with('error', 'No puedes eliminar esta categoría porque tiene productos asociados.');
+        }
+
+        $categoria->delete();
+
+        return back()->with('success', 'Categoría eliminada correctamente.');
     }
 }
 

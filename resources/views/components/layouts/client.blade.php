@@ -3,11 +3,11 @@
     $user = Auth::user();
     if ($user && $user->cliente) {
         $cliente = $user->cliente;
-        // Query unpaid cobros (where state is NOT 'pagado' and NOT 'anulado')
+        // Query unpaid cobros (where state is NOT 'pagado', NOT 'anulado', and NOT 'pendiente_confirmacion')
         $unpaidCobros = \App\Models\SuscripcionesCobros::whereHas('suscripcion', function ($q) use ($cliente) {
             $q->where('cliente_id', $cliente->id);
         })
-        ->whereNotIn('estado', ['pagado', 'anulado'])
+        ->whereNotIn('estado', ['pagado', 'anulado', 'pendiente_confirmacion'])
         ->get();
 
         foreach ($unpaidCobros as $cobro) {
@@ -36,6 +36,23 @@
                     'cobro_id' => $cobro->id,
                 ];
             }
+        }
+
+        // Load database notifications
+        $dbNotifications = \App\Models\ClientNotification::where('cliente_id', $cliente->id)
+            ->where('leido', false)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        foreach ($dbNotifications as $dbNotif) {
+            $notifications[] = [
+                'id' => $dbNotif->id,
+                'tipo' => $dbNotif->tipo,
+                'titulo' => $dbNotif->titulo,
+                'mensaje' => $dbNotif->mensaje,
+                'fecha' => $dbNotif->created_at,
+                'db' => true,
+            ];
         }
     }
 @endphp
@@ -111,7 +128,13 @@
                 Mis Marcas
             </a>
 
-            <a href="{{ route('cliente.estado-cuenta') }}" 
+            <a href="{{ route('cliente.categorias.index') }}"
+               class="flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-bold {{ request()->routeIs('cliente.categorias.*') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+                Categorías
+            </a>
+
+            <a href="{{ route('cliente.estado-cuenta') }}"
                class="flex items-center gap-3 px-4 py-3 rounded-xl transition text-sm font-bold {{ request()->routeIs('cliente.estado-cuenta') ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30' : 'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200' }}">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 Estado de Cuenta
@@ -171,12 +194,29 @@
                             @else
                                 @foreach($notifications as $notif)
                                     <div class="p-4 hover:bg-slate-50 transition">
-                                        <div class="flex gap-3">
-                                            <span class="w-2 h-2 mt-1.5 rounded-full shrink-0 {{ $notif['tipo'] === 'moroso' ? 'bg-rose-500' : 'bg-amber-500' }}"></span>
-                                            <div class="space-y-1">
-                                                <div class="text-xs font-bold text-slate-900">{{ $notif['titulo'] }}</div>
-                                                <p class="text-[11px] text-slate-500 leading-normal font-medium">{{ $notif['mensaje'] }}</p>
+                                        <div class="flex items-start justify-between gap-2">
+                                            <div class="flex gap-3">
+                                                <span class="w-2 h-2 mt-1.5 rounded-full shrink-0 
+                                                    {{ $notif['tipo'] === 'moroso' || $notif['tipo'] === 'danger' ? 'bg-rose-500' : '' }}
+                                                    {{ $notif['tipo'] === 'proximo' || $notif['tipo'] === 'warning' ? 'bg-amber-500' : '' }}
+                                                    {{ $notif['tipo'] === 'success' ? 'bg-emerald-500' : '' }}
+                                                    {{ $notif['tipo'] === 'info' ? 'bg-indigo-500' : '' }}
+                                                "></span>
+                                                <div class="space-y-1">
+                                                    <div class="text-xs font-bold text-slate-900">{{ $notif['titulo'] }}</div>
+                                                    <p class="text-[11px] text-slate-500 leading-normal font-medium">{{ $notif['mensaje'] }}</p>
+                                                </div>
                                             </div>
+                                            @if(!empty($notif['db']))
+                                                <form method="POST" action="{{ route('cliente.notificaciones.leer', $notif['id']) }}" class="shrink-0">
+                                                    @csrf
+                                                    <button type="submit" class="text-slate-300 hover:text-slate-600 transition p-1" title="Descartar">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                                                        </svg>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         </div>
                                     </div>
                                 @endforeach

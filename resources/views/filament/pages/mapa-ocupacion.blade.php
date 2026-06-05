@@ -12,7 +12,9 @@
                 <div class="flex items-center gap-x-4">
                     <div class="flex-1">
                         <div class="flex justify-between items-center">
-                            <h2 class="text-xl font-bold text-gray-950 dark:text-white">{{ $stat['piso'] }}</h2>
+                            <h2 class="text-xl font-bold text-gray-950 dark:text-white">
+                                {{ $stat['piso'] }}<span class="text-gray-400 dark:text-gray-500 font-semibold text-base ml-1">{{ $stat['numero'] }}</span>
+                            </h2>
                             @if($selectedPisoId === $stat['id'])
                                 <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-primary-100 dark:bg-primary-950 text-primary-700 dark:text-primary-400">Activo</span>
                             @endif
@@ -52,7 +54,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <h3 class="text-2xl font-black text-gray-950 dark:text-white">
-                        Distribución y Detalle: {{ $selectedPiso->nombre }}
+                        Distribución y Detalle: {{ $selectedPiso->nombre }} <span class="text-gray-400 dark:text-gray-500 font-semibold">{{ $selectedPiso->numero }}</span>
                     </h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
                         Catálogo de locales comerciales en este nivel con estados de contratos y pérdidas por vacancia estimadas.

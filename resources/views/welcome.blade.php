@@ -275,12 +275,20 @@
         // Auto-sync store changes from personalization panel without manual refresh
         const dataObj = $data;
         setInterval(() => {
-            fetch('/?json=1')
+            const syncUrl = new URL(window.location.href);
+            syncUrl.searchParams.set('json', '1');
+
+            fetch(syncUrl.toString(), { cache: 'no-store' })
                 .then(res => res.json())
                 .then(data => {
                     if (data.mall && data.mall.floors) {
                         data.mall.floors.forEach((floor, fi) => {
                             if (dataObj.mall.floors[fi]) {
+                                dataObj.mall.floors[fi].displayLevel = floor.displayLevel;
+                                dataObj.mall.floors[fi].name = floor.name;
+                                dataObj.mall.floors[fi].vibe = floor.vibe;
+                                dataObj.mall.floors[fi].imagen_fondo = floor.imagen_fondo;
+
                                 floor.stores.forEach((store, si) => {
                                     const target = dataObj.mall.floors[fi].stores[si];
                                     if (target) {
@@ -767,7 +775,7 @@
                                     <p class="text-slate-700 dark:text-slate-200 text-sm md:text-base flex-1">
                                         Tenemos tarifas mensuales, trimestrales, semestrales y anuales según el tamaño del local. Revisa las opciones publicadas y elige la que mejor se ajuste a tu proyecto.
                                     </p>
-                                    <a :href="suscripcionesUrl + (activeStore?.tamano ? '?tamano=' + activeStore.tamano : '')"
+                                    <a :href="suscripcionesUrl + '?tienda_id=' + activeStore.id + (activeStore?.tamano ? '&tamano=' + activeStore.tamano : '')"
                                         class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black px-5 py-3 text-sm md:text-base shadow-lg transition">
                                         Ver las suscripciones disponibles
                                         <x-heroicon-o-arrow-right class="w-4 h-4 md:w-5 md:h-5" />

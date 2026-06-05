@@ -3,14 +3,30 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Clientes;
+use App\Support\ActiveInfraestructura;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
+use Livewire\Attributes\On;
 
 class TopMorososWidget extends BaseWidget
 {
     protected static ?int $sort = 6;
     protected int|string|array $columnSpan = 'full';
+
+    public ?int $activeInfraId = null;
+
+    public function mount(): void
+    {
+        $this->activeInfraId = ActiveInfraestructura::getDashboardId();
+    }
+
+    #[On('dashboardInfraChanged')]
+    public function updateInfraFilter(?int $infraId = null): void
+    {
+        $this->activeInfraId = $infraId ?: null;
+        $this->resetTable();
+    }
 
     public static function canView(): bool
     {
@@ -24,9 +40,13 @@ class TopMorososWidget extends BaseWidget
 
     public function table(Table $table): Table
     {
-        // Deuda vencida por cliente = SUM(monto del cobro - SUM(monto_pagado)) por cada cobro
-        // vencido y no totalmente pagado. PG no permite usar el alias del SELECT en HAVING/WHERE,
-        // por eso repetimos la subquery en whereRaw/orderByRaw.
+        $infraJoin = $this->activeInfraId ? "
+            INNER JOIN infraestructuras_tiendas it_m
+                ON it_m.id = suscripciones.infraestructuras_tienda_id
+            INNER JOIN infraestructuras_pisos ip_m
+                ON ip_m.id = it_m.infraestructura_piso_id
+              AND ip_m.infraestructura_id = {$this->activeInfraId}" : '';
+
         $deudaSql = "(
             SELECT COALESCE(SUM(
                 suscripciones_cobros.monto -
@@ -40,6 +60,7 @@ class TopMorososWidget extends BaseWidget
             FROM suscripciones_cobros
             INNER JOIN suscripciones
                 ON suscripciones.id = suscripciones_cobros.suscripcion_id
+            {$infraJoin}
             WHERE suscripciones.cliente_id = clientes.id
               AND suscripciones_cobros.estado IN ('vencido','parcial','pendiente')
               AND suscripciones_cobros.fecha_vencimiento < CURRENT_DATE

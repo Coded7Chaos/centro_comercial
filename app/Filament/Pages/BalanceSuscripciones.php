@@ -27,7 +27,10 @@ class BalanceSuscripciones extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(Suscripciones::query()->with(['cliente.user', 'cobros.pagos', 'infraestructurasTienda']))
+            ->query(\App\Support\ActiveInfraestructura::scopeQuery(
+                Suscripciones::query()->with(['cliente.user', 'cobros.pagos', 'infraestructurasTienda']),
+                'infraestructurasTienda.piso'
+            ))
             ->columns([
                 TextColumn::make('cliente.user.nombres')
                     ->label('Inquilino')
@@ -36,7 +39,15 @@ class BalanceSuscripciones extends Page implements HasTable
                         if (! $u) return $state ?: '—';
                         return trim($u->nombres . ' ' . $u->apellido_paterno);
                     })
-                    ->searchable(['users.nombres', 'users.apellido_paterno'])
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('cliente.user', function ($q) use ($search) {
+                            $q->where(function ($sq) use ($search) {
+                                $sq->whereRaw("unaccent(lower(nombres)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_paterno)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_materno)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                            });
+                        });
+                    })
                     ->sortable(query: function ($query, string $direction) {
                         $query
                             ->leftJoin('clientes', 'clientes.id', '=', 'suscripciones.cliente_id')
@@ -130,7 +141,8 @@ class BalanceSuscripciones extends Page implements HasTable
                             ->get()
                             ->flatMap->cobros
                             ->sum('monto'),
-                        'pagado' => \App\Models\SuscripcionesPagos::whereIn('suscripcion_cobro_id', function ($query) use ($record) {
+                        'pagado' => \App\Models\SuscripcionesPagos::where('estado_verificacion', 'verificado')
+                        ->whereIn('suscripcion_cobro_id', function ($query) use ($record) {
                             $query->select('id')
                                 ->from('suscripciones_cobros')
                                 ->whereIn('suscripcion_id', Suscripciones::where('cliente_id', $record->cliente_id)

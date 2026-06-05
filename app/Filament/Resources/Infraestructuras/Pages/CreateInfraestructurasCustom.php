@@ -9,9 +9,14 @@ use App\Models\InfraestructurasTiendas;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Livewire\WithFileUploads;
 
 class CreateInfraestructurasCustom extends Page
 {
+    use WithFileUploads;
+
     protected static string $resource = InfraestructurasResource::class;
 
     protected string $view = 'filament.resources.infraestructuras.pages.create-infraestructura-custom';
@@ -20,10 +25,24 @@ class CreateInfraestructurasCustom extends Page
 
     // Propiedades del formulario
     public $nombre = '';
+
     public $ubicacion = '';
+
     public $lat = '-16.5000'; // Coordenadas por defecto (Bolivia/La Paz ej)
+
     public $long = '-68.1500';
+
     public $pisos = [];
+
+    public $backgroundModalOpen = false;
+
+    public $backgroundModalPisoIndex = null;
+
+    public $backgroundPreview = '';
+
+    public $backgroundUpload = null;
+
+    public bool $backgroundSelectionMade = false;
 
     public static function canAccess(array $parameters = []): bool
     {
@@ -39,7 +58,7 @@ class CreateInfraestructurasCustom extends Page
     public function addPiso()
     {
         $numeroPiso = count($this->pisos) + 1;
-        $nivelDefault = $numeroPiso === 1 ? 'Planta baja' : "Piso " . ($numeroPiso - 1);
+        $nivelDefault = $numeroPiso === 1 ? 'Planta baja' : 'Piso '.($numeroPiso - 1);
         $this->pisos[] = [
             'nombre' => "Piso $numeroPiso",
             'numero' => $nivelDefault,
@@ -53,8 +72,7 @@ class CreateInfraestructurasCustom extends Page
                     'tamano' => '',
                     'descripcion' => '',
                     'estado' => 1,
-                    'marcas' => [],
-                ]
+                ],
             ],
         ];
     }
@@ -63,7 +81,7 @@ class CreateInfraestructurasCustom extends Page
     {
         unset($this->pisos[$index]);
         $this->pisos = array_values($this->pisos);
-        
+
         // No renombrar automáticamente para permitir nombres personalizados
     }
 
@@ -72,12 +90,11 @@ class CreateInfraestructurasCustom extends Page
         $proximoNumero = count($this->pisos[$pisoIndex]['tiendas']) + 1;
         $this->pisos[$pisoIndex]['tiendas'][] = [
             'nombre' => '',
-            'numero' => (string)$proximoNumero,
+            'numero' => (string) $proximoNumero,
             'telefono_referencia' => '',
             'tamano' => '',
             'descripcion' => '',
             'estado' => 1,
-            'marcas' => [],
         ];
     }
 
@@ -85,6 +102,117 @@ class CreateInfraestructurasCustom extends Page
     {
         unset($this->pisos[$pisoIndex]['tiendas'][$tiendaIndex]);
         $this->pisos[$pisoIndex]['tiendas'] = array_values($this->pisos[$pisoIndex]['tiendas']);
+    }
+
+    public function getBackgroundOptionsProperty(): array
+    {
+        return [
+            ['label' => 'Blanco', 'url' => '/images/backgrounds/bg_mall_white.jpg'],
+            ['label' => 'Calido', 'url' => '/images/backgrounds/bg_mall_warm.jpg'],
+            ['label' => 'Gris', 'url' => '/images/backgrounds/bg_mall_grey.jpg'],
+            ['label' => 'Oscuro', 'url' => '/images/backgrounds/bg_mall_dark.jpg'],
+        ];
+    }
+
+    public function getBackgroundModalPreviewUrlProperty(): string
+    {
+        if ($this->backgroundUpload) {
+            try {
+                return $this->backgroundUpload->temporaryUrl();
+            } catch (\Throwable $exception) {
+                return $this->backgroundPreview ?: '/images/backgrounds/bg_mall_white.jpg';
+            }
+        }
+
+        return $this->backgroundPreview ?: '/images/backgrounds/bg_mall_white.jpg';
+    }
+
+    public function openBackgroundModal($pisoIndex): void
+    {
+        if (! isset($this->pisos[$pisoIndex])) {
+            return;
+        }
+
+        $this->backgroundModalPisoIndex = $pisoIndex;
+        $this->backgroundPreview = $this->pisos[$pisoIndex]['imagen_fondo'] ?? '/images/backgrounds/bg_mall_white.jpg';
+        $this->backgroundModalOpen = true;
+        $this->backgroundUpload = null;
+        $this->backgroundSelectionMade = false;
+        $this->resetErrorBag('backgroundUpload');
+        $this->resetErrorBag('backgroundSelection');
+    }
+
+    public function selectBackground(string $url): void
+    {
+        $this->backgroundPreview = $url;
+        $this->backgroundUpload = null;
+        $this->backgroundSelectionMade = true;
+        $this->resetErrorBag('backgroundUpload');
+        $this->resetErrorBag('backgroundSelection');
+    }
+
+    public function updatedBackgroundUpload(): void
+    {
+        $this->validateOnly('backgroundUpload', [
+            'backgroundUpload' => 'file|mimetypes:image/jpeg,image/png,image/webp,image/gif,image/avif|max:5120',
+        ]);
+
+        $this->backgroundSelectionMade = true;
+        $this->resetErrorBag('backgroundSelection');
+    }
+
+    public function confirmBackgroundImage(): void
+    {
+        if ($this->backgroundModalPisoIndex === null || ! isset($this->pisos[$this->backgroundModalPisoIndex])) {
+            return;
+        }
+
+        if (! $this->backgroundSelectionMade && ! $this->backgroundUpload) {
+            $this->addError('backgroundSelection', 'Debes elegir una imagen de fondo antes de confirmar.');
+
+            return;
+        }
+
+        $selectedBackground = $this->backgroundPreview ?: '/images/backgrounds/bg_mall_white.jpg';
+
+        if ($this->backgroundUpload) {
+            $this->validate([
+                'backgroundUpload' => 'file|mimetypes:image/jpeg,image/png,image/webp,image/gif,image/avif|max:5120',
+            ]);
+
+            $path = $this->backgroundUpload->storeAs(
+                'infraestructuras/fondos',
+                Str::uuid().'.'.$this->backgroundUploadExtension(),
+                'public',
+            );
+
+            $selectedBackground = Storage::url($path);
+        }
+
+        $this->pisos[$this->backgroundModalPisoIndex]['imagen_fondo'] = $selectedBackground;
+        $this->closeBackgroundModal();
+    }
+
+    public function closeBackgroundModal(): void
+    {
+        $this->backgroundModalOpen = false;
+        $this->backgroundModalPisoIndex = null;
+        $this->backgroundPreview = '';
+        $this->backgroundUpload = null;
+        $this->backgroundSelectionMade = false;
+        $this->resetErrorBag('backgroundUpload');
+        $this->resetErrorBag('backgroundSelection');
+    }
+
+    protected function backgroundUploadExtension(): string
+    {
+        return match ($this->backgroundUpload?->getMimeType()) {
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif',
+            'image/avif' => 'avif',
+            default => 'jpg',
+        };
     }
 
     public function save()
@@ -127,7 +255,7 @@ class CreateInfraestructurasCustom extends Page
                     ]);
 
                     foreach ($pisoData['tiendas'] as $tiendaData) {
-                        $tienda = InfraestructurasTiendas::create([
+                        InfraestructurasTiendas::create([
                             'infraestructura_piso_id' => $piso->id,
                             'nombre' => $tiendaData['nombre'],
                             'numero' => $tiendaData['numero'],
@@ -136,10 +264,6 @@ class CreateInfraestructurasCustom extends Page
                             'descripcion' => $tiendaData['descripcion'],
                             'id_estado' => $tiendaData['estado'],
                         ]);
-
-                        if (!empty($tiendaData['marcas'])) {
-                            $tienda->marcas()->sync($tiendaData['marcas']);
-                        }
                     }
                 }
             });

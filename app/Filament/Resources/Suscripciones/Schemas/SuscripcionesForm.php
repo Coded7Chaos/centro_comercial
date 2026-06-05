@@ -4,16 +4,17 @@ namespace App\Filament\Resources\Suscripciones\Schemas;
 
 use App\Models\Clientes;
 use App\Models\InfraestructurasTiendas;
-use App\Models\SuscripcionesTarifas;
 use App\Models\Marcas;
+use App\Models\SuscripcionesTarifas;
 use Carbon\Carbon;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
 
 class SuscripcionesForm
 {
@@ -36,10 +37,9 @@ class SuscripcionesForm
                         Clientes::with('user')->get()
                             ->mapWithKeys(function ($cliente) {
                                 return [
-                                    $cliente->id =>
-                                    $cliente->id .
-                                        ' - ' .
-                                        $cliente->nombre_completo
+                                    $cliente->id => $cliente->id.
+                                        ' - '.
+                                        $cliente->nombre_completo,
                                 ];
                             })
                     )
@@ -48,9 +48,10 @@ class SuscripcionesForm
                     ->afterStateUpdated(
                         function (Set $set, $state) {
                             $tienda = InfraestructurasTiendas::where('cliente_id', $state)->first();
-                            if (!$tienda) {
+                            if (! $tienda) {
                                 $set('infraestructuras_tienda_id', null);
                                 $set('tamano', null);
+
                                 return;
                             }
                             $set('infraestructuras_tienda_id', $tienda->id);
@@ -67,6 +68,7 @@ class SuscripcionesForm
                         if ($clienteId) {
                             $query->orWhere('cliente_id', $clienteId);
                         }
+
                         return $query->pluck('nombre', 'id');
                     })
                     ->searchable()
@@ -84,11 +86,10 @@ class SuscripcionesForm
                         return InfraestructurasTiendas::all()
                             ->mapWithKeys(function ($tienda) {
                                 return [
-                                    $tienda->id =>
-                                    'Tienda #' .
-                                        $tienda->numero .
-                                        ' - ' .
-                                        ($tienda->nombre ?? 'Sin nombre')
+                                    $tienda->id => 'Tienda #'.
+                                        $tienda->numero.
+                                        ' - '.
+                                        ($tienda->nombre ?? 'Sin nombre'),
                                 ];
                             });
                     })
@@ -96,8 +97,9 @@ class SuscripcionesForm
                     ->live()
                     ->afterStateUpdated(function (Set $set, $state) {
                         $tienda = InfraestructurasTiendas::find($state);
-                        if (!$tienda) {
+                        if (! $tienda) {
                             $set('tamano', null);
+
                             return;
                         }
                         $set('tamano', $tienda->tamano);
@@ -155,13 +157,13 @@ class SuscripcionesForm
                                 $get('fecha_inicio')
                             );
 
-                            if (!$state || $state === 'personalizado') {
+                            if (! $state || $state === 'personalizado') {
                                 $fin = null;
                             } else {
                                 preg_match('/\d+/', strtolower($state), $matches);
                                 $val = isset($matches[0]) ? (int) $matches[0] : 1;
                                 $months = str_contains(strtolower($state), 'año') ? $val * 12 : $val;
-                                $fin = $inicio->copy()->addMonths($months)->subDay();
+                                $fin = $inicio->copy()->addMonthsNoOverflow($months)->subDay();
                             }
 
                             $set('fecha_fin', $fin?->format('Y-m-d'));
@@ -214,14 +216,14 @@ class SuscripcionesForm
                             $state
                         ) {
                             $tipoState = $get('tipo');
-                            if (!$tipoState || $tipoState === 'personalizado' || !$state) {
+                            if (! $tipoState || $tipoState === 'personalizado' || ! $state) {
                                 $fin = null;
                             } else {
                                 $inicio = Carbon::parse($state);
                                 preg_match('/\d+/', strtolower($tipoState), $matches);
                                 $val = isset($matches[0]) ? (int) $matches[0] : 1;
                                 $months = str_contains(strtolower($tipoState), 'año') ? $val * 12 : $val;
-                                $fin = $inicio->copy()->addMonths($months)->subDay();
+                                $fin = $inicio->copy()->addMonthsNoOverflow($months)->subDay();
                             }
 
                             $set('fecha_fin', $fin?->format('Y-m-d'));
@@ -236,18 +238,22 @@ class SuscripcionesForm
                 */
 
                 DatePicker::make('fecha_fin')
-                    ->disabled(fn(Get $get) => $get('tipo') !== 'personalizado')
+                    ->disabled(fn (Get $get) => $get('tipo') !== 'personalizado')
                     ->dehydrated()
                     ->required()
                     ->afterStateHydrated(function (Get $get, Set $set) {
                         $tiendaId = $get('infraestructuras_tienda_id');
-                        if (!$tiendaId) return;
+                        if (! $tiendaId) {
+                            return;
+                        }
                         $tienda = InfraestructurasTiendas::find($tiendaId);
-                        if (!$tienda) return;
+                        if (! $tienda) {
+                            return;
+                        }
                         $set('tamano', $tienda->tamano);
                     }),
 
-                \Filament\Forms\Components\FileUpload::make('contrato_firmado')
+                FileUpload::make('contrato_firmado')
                     ->label('Contrato Firmado (PDF/Imagen)')
                     ->disk('public')
                     ->directory('contratos-firmados')

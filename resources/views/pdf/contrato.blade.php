@@ -126,7 +126,7 @@
             <th>Piso / Nivel</th>
             <td>
                 @if($piso?->numero)
-                    Piso {{ $piso->numero }}
+                    {{ $piso->numero }}
                     @if($piso->nombre && $piso->nombre !== $piso->numero)
                         - {{ $piso->nombre }}
                     @endif
@@ -139,7 +139,7 @@
         </tr>
         <tr>
             <th>Tamaño del Local</th>
-            <td>{{ ucfirst($tienda?->tamano ?? 'pequeño') }}</td>
+            <td>{{ $tienda?->tamano ? $tienda->tamano . ' m^2' : 'N/A' }}</td>
             <th>Precio de Alquiler</th>
             <td class="bold">Bs. {{ number_format($suscripcion->precio, 2) }}</td>
         </tr>

@@ -45,6 +45,7 @@ class ReportePagosController extends Controller
 
         $historialPagos = $cobro
             ?->pagos()
+            ->where('created_at', '<=', $pago->created_at)
             ->orderBy('fecha_pago')
             ->get();
 

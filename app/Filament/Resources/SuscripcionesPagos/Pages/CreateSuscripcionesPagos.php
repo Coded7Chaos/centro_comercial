@@ -4,8 +4,9 @@ namespace App\Filament\Resources\SuscripcionesPagos\Pages;
 
 use App\Filament\Resources\SuscripcionesPagos\SuscripcionesPagosResource;
 use App\Models\SuscripcionesCobros;
-use Filament\Resources\Pages\CreateRecord;
+use Carbon\Carbon;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Validation\ValidationException;
 
 class CreateSuscripcionesPagos extends CreateRecord
@@ -33,10 +34,7 @@ class CreateSuscripcionesPagos extends CreateRecord
                 ->send();
 
             throw ValidationException::withMessages([
-
-                'tienda_id' =>
-
-                'La tienda no tiene pagos pendientes.',
+                'tienda_id' => 'La tienda no tiene pagos pendientes.',
             ]);
         }
     }
@@ -81,27 +79,28 @@ class CreateSuscripcionesPagos extends CreateRecord
             $saldoPendiente = 0;
         }
 
-        $data = $this->form->getState();
+        $data = $this->form->getRawState();
+        $data = is_array($data) ? $data : $data->toArray();
 
         if ($saldoPendiente > 0) {
             // There is a pending balance. We split it into a new cobro!
             $opcion = $data['cobro_pendiente_opcion'] ?? 'siguiente_mes';
             $fechaVencimientoCobro = null;
-            if ($opcion === 'fecha_intermedia' && !empty($data['fecha_cobro_pendiente'])) {
+            if ($opcion === 'fecha_intermedia' && ! empty($data['fecha_cobro_pendiente'])) {
                 $fechaVencimientoCobro = $data['fecha_cobro_pendiente'];
             } else {
-                $fechaVencimientoCobro = \Carbon\Carbon::parse($cobro->fecha_vencimiento)->addMonth()->toDateString();
+                $fechaVencimientoCobro = SuscripcionesCobros::fechaSaldoPendiente($cobro);
             }
 
             // Create new SuscripcionesCobros
             SuscripcionesCobros::create([
                 'suscripcion_id' => $cobro->suscripcion_id,
-                'concepto' => 'Saldo pendiente de: ' . $cobro->concepto,
+                'concepto' => \App\Models\SuscripcionesCobros::conceptoSaldoPendiente($cobro),
                 'monto' => $saldoPendiente,
                 'fecha_inicio' => $pago->fecha_pago ?? now()->toDateString(),
                 'fecha_vencimiento' => $fechaVencimientoCobro,
                 'estado' => 'pendiente',
-                'observaciones' => 'Cobro generado de saldo pendiente del pago #' . $pago->id,
+                'observaciones' => 'Cobro generado de saldo pendiente del pago #'.$pago->id,
                 'es_parcial' => true,
             ]);
 
@@ -115,8 +114,8 @@ class CreateSuscripcionesPagos extends CreateRecord
 
             // Adjust payment snapshot
             $pago->update([
-                'pago_pendiente' => 0,
-                'estado_snapshot' => 'pagado',
+                'pago_pendiente' => $saldoPendiente,
+                'estado_snapshot' => 'parcial',
             ]);
         } else {
             // Fully paid

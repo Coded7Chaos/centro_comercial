@@ -4,13 +4,28 @@ namespace App\Filament\Widgets;
 
 use App\Models\InfraestructurasTiendas;
 use App\Models\SuscripcionesTarifas;
+use App\Support\ActiveInfraestructura;
 use Filament\Widgets\ChartWidget;
 use Illuminate\Support\Carbon;
+use Livewire\Attributes\On;
 
 class CostoOportunidadVacanciaChart extends ChartWidget
 {
     protected ?string $heading = 'Costo de Oportunidad por Vacancia (Pérdidas Acumuladas 30 días)';
     protected static ?int $sort = 5;
+
+    public ?int $activeInfraId = null;
+
+    public function mount(): void
+    {
+        $this->activeInfraId = ActiveInfraestructura::getDashboardId();
+    }
+
+    #[On('dashboardInfraChanged')]
+    public function updateInfraFilter(?int $infraId = null): void
+    {
+        $this->activeInfraId = $infraId ?: null;
+    }
 
     public static function canView(): bool
     {
@@ -19,7 +34,11 @@ class CostoOportunidadVacanciaChart extends ChartWidget
 
     protected function getData(): array
     {
-        $tiendasDisponibles = InfraestructurasTiendas::whereHas('estado', fn ($q) => $q->where('estado', 'Disponible'))->get();
+        $tiendasQuery = InfraestructurasTiendas::whereHas('estado', fn ($q) => $q->where('estado', 'Disponible'));
+        if ($this->activeInfraId) {
+            $tiendasQuery->whereHas('piso', fn ($q) => $q->where('infraestructura_id', $this->activeInfraId));
+        }
+        $tiendasDisponibles = $tiendasQuery->get();
 
         $labels = [];
         $dataMin = [];

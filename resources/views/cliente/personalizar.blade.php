@@ -29,8 +29,96 @@
                      this.selectedCategory = this.categories[0].id;
                  }
                  this.productModalOpen = true;
+             },
+
+             // Modal de confirmación de eliminación
+             deleteModal: false,
+             deleteName: '',
+             deleteUrl: '',
+             openDeleteModal(name, url) {
+                 this.deleteName = name;
+                 this.deleteUrl  = url;
+                 this.deleteModal = true;
              }
          }">
+
+        {{-- TOAST éxito --}}
+        @if(session('success'))
+            <div x-data="{ visible: true }"
+                 x-show="visible"
+                 x-init="setTimeout(() => visible = false, 4000)"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-4"
+                 class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-emerald-600 text-white px-5 py-4 rounded-2xl shadow-xl shadow-emerald-600/30 text-sm font-semibold max-w-sm">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <span>{{ session('success') }}</span>
+                <button @click="visible = false" class="ml-2 opacity-70 hover:opacity-100 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+        @endif
+
+        {{-- TOAST error --}}
+        @if(session('error'))
+            <div x-data="{ visible: true }"
+                 x-show="visible"
+                 x-init="setTimeout(() => visible = false, 5000)"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-4"
+                 class="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-red-600 text-white px-5 py-4 rounded-2xl shadow-xl shadow-red-600/30 text-sm font-semibold max-w-sm">
+                <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>{{ session('error') }}</span>
+                <button @click="visible = false" class="ml-2 opacity-70 hover:opacity-100 transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+            </div>
+        @endif
+
+        {{-- MODAL confirmación eliminar producto --}}
+        <div x-show="deleteModal" x-cloak
+             x-transition:enter="transition ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed inset-0 z-50 flex items-center justify-center p-4"
+             @keydown.escape.window="deleteModal = false">
+            <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" @click="deleteModal = false"></div>
+            <div x-show="deleteModal"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95"
+                 class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md p-7 space-y-5">
+                <div class="flex items-center justify-center w-14 h-14 bg-red-100 rounded-2xl mx-auto">
+                    <svg class="w-7 h-7 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                </div>
+                <div class="text-center space-y-1">
+                    <h3 class="text-lg font-black text-slate-800">¿Eliminar producto?</h3>
+                    <p class="text-sm text-slate-500">Estás a punto de eliminar <strong class="text-slate-700" x-text="'«' + deleteName + '»'"></strong>. Esta acción no se puede deshacer.</p>
+                </div>
+                <div class="flex gap-3 pt-1">
+                    <button type="button" @click="deleteModal = false"
+                            class="flex-1 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-600 hover:bg-slate-50 transition">
+                        Cancelar
+                    </button>
+                    <form :action="deleteUrl" method="POST" class="flex-1">
+                        @csrf @method('DELETE')
+                        <button type="submit"
+                                class="w-full py-3 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-bold transition shadow-sm shadow-red-600/30">
+                            Sí, eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
 
         @if($tiendas->isEmpty())
             <div class="bg-white rounded-3xl border border-slate-200 p-8 text-center text-slate-500">
@@ -497,13 +585,11 @@
                                             </span>
                                             
                                             {{-- Delete product --}}
-                                            <form method="POST" action="{{ route('cliente.productos.destroy', $p->id) }}" onsubmit="return confirm('¿Estás seguro de eliminar este producto del catálogo?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="text-xs font-bold text-rose-500 hover:text-rose-700 transition cursor-pointer">
-                                                    Eliminar
-                                                </button>
-                                            </form>
+                                            <button type="button"
+                                                    @click="openDeleteModal('{{ addslashes($p->nombre) }}', '{{ route('cliente.productos.destroy', $p->id) }}')"
+                                                    class="text-xs font-bold text-rose-500 hover:text-rose-700 transition cursor-pointer">
+                                                Eliminar
+                                            </button>
                                         </div>
                                     </div>
                                 @endforeach

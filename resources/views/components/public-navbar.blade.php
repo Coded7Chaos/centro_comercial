@@ -115,7 +115,9 @@
                             class="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white focus:outline-none cursor-pointer">
                             <x-heroicon-o-building-office-2 class="w-4 h-4 text-slate-700 dark:text-slate-350" />
                             <span>{{ $mallName }}</span>
-                            <x-heroicon-m-chevron-down class="w-4 h-4 text-slate-500 transition-transform duration-300" :class="open ? 'rotate-180' : ''" />
+                            <svg :class="open ? 'rotate-180' : ''" class="w-4 h-4 text-slate-500 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+                            </svg>
                         </button>
                         
                         {{-- Dropdown Menu --}}

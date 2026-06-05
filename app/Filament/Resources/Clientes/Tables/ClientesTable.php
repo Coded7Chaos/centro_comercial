@@ -24,19 +24,27 @@ class ClientesTable
                         : 'Sin cuenta vinculada')
                     ->searchable(query: function ($query, string $search) {
                         return $query->whereHas('user', function ($q) use ($search) {
-                            $q->where('nombres', 'like', "%{$search}%")
-                                ->orWhere('apellido_paterno', 'like', "%{$search}%")
-                                ->orWhere('apellido_materno', 'like', "%{$search}%");
+                            $q->where(function ($sq) use ($search) {
+                                $sq->whereRaw("unaccent(lower(nombres)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_paterno)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                                  ->orWhereRaw("unaccent(lower(apellido_materno)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                            });
                         });
                     }),
 
                 TextColumn::make('ci')
                     ->label('CI')
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereRaw("unaccent(lower(ci)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    }),
 
                 TextColumn::make('user.email')
                     ->label('Cuenta asociada')
-                    ->searchable()
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereHas('user', function ($q) use ($search) {
+                            $q->whereRaw("unaccent(lower(email)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                        });
+                    })
                     ->placeholder('Sin cuenta'),
 
                 TextColumn::make('numero_celular')

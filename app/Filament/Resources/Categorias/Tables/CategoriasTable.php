@@ -20,7 +20,9 @@ class CategoriasTable
 
                 // NOMBRE
                 TextColumn::make('nombre')
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereRaw("unaccent(lower(nombre)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    }),
 
                 // TIPO (CATEGORÍA / SUBCATEGORÍA)
                 TextColumn::make('tipo')

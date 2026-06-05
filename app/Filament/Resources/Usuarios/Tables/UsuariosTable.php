@@ -16,13 +16,21 @@ class UsuariosTable
         return $table
             ->columns([
                 TextColumn::make('nombres')
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->where(function ($q) use ($search) {
+                            $q->whereRaw("unaccent(lower(nombres)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                              ->orWhereRaw("unaccent(lower(apellido_paterno)) ILIKE unaccent(lower(?))", ["%{$search}%"])
+                              ->orWhereRaw("unaccent(lower(apellido_materno)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                        });
+                    }),
                 TextColumn::make('apellido_paterno')
                     ->placeholder('NA'),
                 TextColumn::make('apellido_materno')
                     ->placeholder('NA'),
                 TextColumn::make('email')
-                    ->searchable(),
+                    ->searchable(query: function ($query, string $search) {
+                        return $query->whereRaw("unaccent(lower(email)) ILIKE unaccent(lower(?))", ["%{$search}%"]);
+                    }),
                 TextColumn::make('roles.name')
                     ->placeholder('NA')
                     ->label('Roles')
