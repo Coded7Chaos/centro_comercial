@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
             AdministradoresSeeder::class,
             ClientesSeeder::class,
             MallDataSeeder::class,
+            SuscripcionesSeeder::class,
+            PagosSeeder::class,
+            ProductosSeeder::class,
         ]);
     }
 }
