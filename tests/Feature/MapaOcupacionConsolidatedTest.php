@@ -11,9 +11,11 @@ use App\Models\Suscripciones;
 use App\Models\SuscripcionesTarifas;
 use App\Models\EstadoTienda;
 use App\Filament\Widgets\CostoOportunidadVacanciaChart;
+use App\Filament\Widgets\PerdidasMensualesVacanciaChart;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Database\Seeders\EstadosTiendasSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class MapaOcupacionConsolidatedTest extends TestCase
@@ -159,5 +161,102 @@ class MapaOcupacionConsolidatedTest extends TestCase
         $this->actingAs($this->clientUser);
         $this->assertFalse($this->clientUser->can('View:CostoOportunidadVacanciaChart'));
         $this->assertFalse(CostoOportunidadVacanciaChart::canView());
+    }
+
+    public function test_vacancy_chart_accumulates_from_first_vacancy_date(): void
+    {
+        $openingDate = now()->subDays(45);
+
+        $infra = Infraestructuras::create([
+            'nombre' => 'Mall Vacancia Histórica',
+            'ubicacion' => 'Test Town',
+            'pisos' => 1,
+            'created_at' => $openingDate,
+            'updated_at' => $openingDate,
+        ]);
+
+        $piso = InfraestructurasPisos::create([
+            'nombre' => 'Piso histórico',
+            'infraestructura_id' => $infra->id,
+            'created_at' => $openingDate,
+            'updated_at' => $openingDate,
+        ]);
+
+        $disponibleEstado = EstadoTienda::where('estado', 'Disponible')->first();
+
+        $tienda = InfraestructurasTiendas::create([
+            'numero' => 'H-101',
+            'tamano' => '20',
+            'id_estado' => $disponibleEstado->id,
+            'infraestructura_piso_id' => $piso->id,
+            'created_at' => $openingDate,
+            'updated_at' => $openingDate,
+        ]);
+        DB::table('infraestructuras_tiendas')
+            ->where('id', $tienda->id)
+            ->update([
+                'created_at' => $openingDate,
+                'updated_at' => $openingDate,
+            ]);
+
+        $chart = new CostoOportunidadVacanciaChart();
+        $chart->activeInfraId = $infra->id;
+
+        $method = new \ReflectionMethod(CostoOportunidadVacanciaChart::class, 'getData');
+        $method->setAccessible(true);
+        $data = $method->invoke($chart);
+
+        $this->assertSame($openingDate->translatedFormat('M Y'), $data['labels'][0]);
+        $this->assertLessThanOrEqual(3, count($data['labels']));
+        $this->assertGreaterThan(0, end($data['datasets'][0]['data']));
+        $this->assertGreaterThan(0, end($data['datasets'][1]['data']));
+    }
+
+    public function test_monthly_vacancy_loss_chart_shows_non_accumulated_monthly_values(): void
+    {
+        $infra = Infraestructuras::create([
+            'nombre' => 'Mall Perdidas Mensuales',
+            'ubicacion' => 'La Paz',
+            'pisos' => 1,
+        ]);
+
+        $piso = InfraestructurasPisos::create([
+            'infraestructura_id' => $infra->id,
+            'nombre' => 'Piso 1',
+        ]);
+
+        $disponibleEstado = EstadoTienda::firstOrCreate(['estado' => 'Disponible']);
+        $openingDate = now()->startOfMonth()->subMonths(2)->toDateString();
+
+        $tienda = InfraestructurasTiendas::create([
+            'numero' => 'M-101',
+            'tamano' => '20',
+            'id_estado' => $disponibleEstado->id,
+            'infraestructura_piso_id' => $piso->id,
+            'created_at' => $openingDate,
+            'updated_at' => $openingDate,
+        ]);
+
+        DB::table('infraestructuras_tiendas')
+            ->where('id', $tienda->id)
+            ->update([
+                'created_at' => $openingDate,
+                'updated_at' => $openingDate,
+            ]);
+
+        $chart = new PerdidasMensualesVacanciaChart();
+        $chart->activeInfraId = $infra->id;
+
+        $method = new \ReflectionMethod(PerdidasMensualesVacanciaChart::class, 'getData');
+        $method->setAccessible(true);
+        $data = $method->invoke($chart);
+
+        $this->assertGreaterThanOrEqual(2, count($data['labels']));
+        $this->assertCount(count($data['labels']), $data['datasets'][0]['data']);
+        $this->assertGreaterThan(0, max($data['datasets'][0]['data']));
+        $this->assertLessThan(
+            array_sum($data['datasets'][0]['data']),
+            end($data['datasets'][0]['data'])
+        );
     }
 }

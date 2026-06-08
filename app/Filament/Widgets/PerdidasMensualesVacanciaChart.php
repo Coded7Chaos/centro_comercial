@@ -9,10 +9,10 @@ use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 use Livewire\Attributes\On;
 
-class CostoOportunidadVacanciaChart extends ChartWidget
+class PerdidasMensualesVacanciaChart extends ChartWidget
 {
-    protected ?string $heading = 'Costo de Oportunidad por Vacancia (Pérdidas Acumuladas)';
-    protected static ?int $sort = 5;
+    protected ?string $heading = 'Pérdidas Mensuales por Vacancia';
+    protected static ?int $sort = 6;
     protected string $view = 'filament.widgets.costo-oportunidad-vacancia-chart';
     protected int|string|array $columnSpan = [
         'md' => 2,
@@ -34,37 +34,28 @@ class CostoOportunidadVacanciaChart extends ChartWidget
 
     public static function canView(): bool
     {
-        return auth()->user()?->can('View:CostoOportunidadVacanciaChart') ?? false;
+        return auth()->user()?->can('View:PerdidasMensualesVacanciaChart') ?? false;
     }
 
     protected function getData(): array
     {
         $tiendasQuery = InfraestructurasTiendas::whereHas('estado', fn ($q) => $q->where('estado', 'Disponible'));
+
         if ($this->activeInfraId) {
             $tiendasQuery->whereHas('piso', fn ($q) => $q->where('infraestructura_id', $this->activeInfraId));
         }
-        $tiendasDisponibles = $tiendasQuery->with('piso.infraestructura')->get();
 
-        $labels = [];
-        $dataMin = [];
-        $dataMax = [];
+        $tiendasDisponibles = $tiendasQuery->with('piso.infraestructura')->get();
 
         if ($tiendasDisponibles->isEmpty()) {
             return [
                 'datasets' => [
                     [
-                        'label' => 'Pérdida Máxima Estimada (Bs.)',
+                        'label' => 'Pérdida Mensual Estimada (Bs.)',
                         'data' => [],
                         'borderColor' => '#f43f5e',
                         'backgroundColor' => '#f43f5e33',
-                        'fill' => 'origin',
-                    ],
-                    [
-                        'label' => 'Pérdida Mínima Estimada (Bs.)',
-                        'data' => [],
-                        'borderColor' => '#fbbf24',
-                        'backgroundColor' => '#fbbf2433',
-                        'fill' => '-1',
+                        'fill' => false,
                     ],
                 ],
                 'labels' => [],
@@ -79,26 +70,17 @@ class CostoOportunidadVacanciaChart extends ChartWidget
             return [
                 'datasets' => [
                     [
-                        'label' => 'Pérdida Máxima Estimada (Bs.)',
+                        'label' => 'Pérdida Mensual Estimada (Bs.)',
                         'data' => [0],
                         'borderColor' => '#f43f5e',
                         'backgroundColor' => '#f43f5e33',
-                        'fill' => 'origin',
-                    ],
-                    [
-                        'label' => 'Pérdida Mínima Estimada (Bs.)',
-                        'data' => [0],
-                        'borderColor' => '#fbbf24',
-                        'backgroundColor' => '#fbbf2433',
-                        'fill' => '-1',
+                        'fill' => false,
                     ],
                 ],
-                'labels' => [Carbon::now()->format('d/m')],
+                'labels' => [Carbon::now()->translatedFormat('M Y')],
             ];
         }
 
-        // Generar puntos mensuales desde la primera fecha de vacancia real.
-        // El cálculo conserva precisión diaria, pero evita saturar Chart.js con cientos de etiquetas.
         $periodos = [];
         $startDate = $vacancyStarts->min()->startOfMonth();
         $endDate = Carbon::now()->startOfDay();
@@ -110,68 +92,46 @@ class CostoOportunidadVacanciaChart extends ChartWidget
             ];
         }
 
-        $acumuladoMin = 0;
-        $acumuladoMax = 0;
+        $labels = [];
+        $data = [];
 
         foreach ($periodos as $periodo) {
             $labels[] = $periodo['inicio']->translatedFormat('M Y');
-
-            $perdidaDiaMin = 0;
-            $perdidaDiaMax = 0;
+            $perdidaMes = 0;
 
             foreach ($tiendasDisponibles as $tienda) {
                 $fechaLibreDesde = $tienda->getFechaLibreDesde()->startOfDay();
 
-                if ($fechaLibreDesde->lte($periodo['fin'])) {
-                    $tamano = (float) $tienda->tamano;
-
-                    // Cálculo de tarifas
-                    $tarifas1Mes = SuscripcionesTarifas::calcularAlquiler($tamano, 1);
-                    $tarifas12Meses = SuscripcionesTarifas::calcularAlquiler($tamano, 12);
-
-                    $precioReferencial = $tienda->getPrecioMensualReferencial();
-                    $precioMaximo = $tarifas1Mes['precio_mensual_base'] > 0
-                        ? $tarifas1Mes['precio_mensual_base']
-                        : $precioReferencial;
-                    $precioMinimo = $tarifas12Meses['precio_mensual_con_descuento'] > 0
-                        ? $tarifas12Meses['precio_mensual_con_descuento']
-                        : $precioMaximo;
-
-                    $maxDia = $precioMaximo / 30;
-                    $minDia = $precioMinimo / 30;
-
-                    $diasVacantesEnPeriodo = (int) floor(max(
-                        0,
-                        $fechaLibreDesde->max($periodo['inicio'])
-                            ->diffInDays($periodo['fin']) + 1
-                    ));
-
-                    $perdidaDiaMax += $maxDia * $diasVacantesEnPeriodo;
-                    $perdidaDiaMin += $minDia * $diasVacantesEnPeriodo;
+                if ($fechaLibreDesde->gt($periodo['fin'])) {
+                    continue;
                 }
+
+                $tamano = (float) $tienda->tamano;
+                $tarifas1Mes = SuscripcionesTarifas::calcularAlquiler($tamano, 1);
+                $precioReferencial = $tienda->getPrecioMensualReferencial();
+                $precioMaximo = $tarifas1Mes['precio_mensual_base'] > 0
+                    ? $tarifas1Mes['precio_mensual_base']
+                    : $precioReferencial;
+
+                $diasVacantesEnPeriodo = (int) floor(max(
+                    0,
+                    $fechaLibreDesde->max($periodo['inicio'])
+                        ->diffInDays($periodo['fin']) + 1
+                ));
+
+                $perdidaMes += ($precioMaximo / 30) * $diasVacantesEnPeriodo;
             }
 
-            $acumuladoMax += $perdidaDiaMax;
-            $acumuladoMin += $perdidaDiaMin;
-
-            $dataMax[] = round($acumuladoMax, 2);
-            $dataMin[] = round($acumuladoMin, 2);
+            $data[] = round($perdidaMes, 2);
         }
 
         return [
             'datasets' => [
                 [
-                    'label' => 'Pérdida Máxima Estimada (Bs.)',
-                    'data' => $dataMax,
+                    'label' => 'Pérdida Mensual Estimada (Bs.)',
+                    'data' => $data,
                     'borderColor' => '#f43f5e',
                     'backgroundColor' => '#f43f5e33',
-                    'fill' => false,
-                ],
-                [
-                    'label' => 'Pérdida Mínima Estimada (Bs.)',
-                    'data' => $dataMin,
-                    'borderColor' => '#fbbf24',
-                    'backgroundColor' => '#fbbf2433',
                     'fill' => false,
                 ],
             ],
@@ -192,16 +152,15 @@ class CostoOportunidadVacanciaChart extends ChartWidget
             'layout' => [
                 'padding' => [
                     'left' => 12,
-                    'right' => 110,
-                    'top' => 28,
+                    'right' => 120,
+                    'top' => 38,
                     'bottom' => 18,
                 ],
             ],
             'plugins' => [
                 'permanentLabels' => [
                     'display' => true,
-                    'mode' => 'last',
-                    'yOffsets' => [-24, 24],
+                    'yOffsets' => [-20],
                 ],
                 'legend' => [
                     'display' => true,
@@ -210,8 +169,7 @@ class CostoOportunidadVacanciaChart extends ChartWidget
             'scales' => [
                 'x' => [
                     'ticks' => [
-                        'autoSkip' => true,
-                        'autoSkipPadding' => 28,
+                        'autoSkip' => false,
                         'minRotation' => 0,
                         'maxRotation' => 0,
                         'padding' => 18,
@@ -225,7 +183,7 @@ class CostoOportunidadVacanciaChart extends ChartWidget
                     ],
                     'title' => [
                         'display' => true,
-                        'text' => 'Bs. Acumulados',
+                        'text' => 'Bs. del mes',
                     ],
                 ],
             ],

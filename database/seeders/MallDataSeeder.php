@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Carbon;
 
 class MallDataSeeder extends Seeder
 {
@@ -74,6 +75,7 @@ class MallDataSeeder extends Seeder
             $admin = User::role(['super_admin', 'admin'])->with('cliente')->orderBy('id')->first();
             $adminPhone = $admin?->cliente?->numero_celular ?? '+591 7000 0000';
             $adminEmail = $admin?->email ?? 'admin@admin.com';
+            $openingDate = Carbon::parse('2024-01-01 09:00:00');
 
             $infra = Infraestructuras::firstOrCreate(
                 ['nombre' => 'Marble Galleria'],
@@ -82,11 +84,33 @@ class MallDataSeeder extends Seeder
                     'lat'       => '-16.5000',
                     'long'      => '-68.1500',
                     'pisos'     => 4,
+                    'created_at' => $openingDate,
+                    'updated_at' => $openingDate,
                 ]
             );
 
+            if (! $infra->created_at || $infra->created_at->gt($openingDate)) {
+                DB::table('infraestructuras')
+                    ->where('id', $infra->id)
+                    ->update(['created_at' => $openingDate]);
+                $infra->created_at = $openingDate;
+            }
+
             // Si esta infraestructura ya tiene pisos cargados, asumimos que el seed ya corrió.
             if ($infra->pisosInfraestructura()->exists()) {
+                DB::table('infraestructuras_pisos')
+                    ->where('infraestructura_id', $infra->id)
+                    ->where('created_at', '>', $openingDate)
+                    ->update(['created_at' => $openingDate]);
+
+                DB::table('infraestructuras_tiendas')
+                    ->whereIn(
+                        'infraestructura_piso_id',
+                        $infra->pisosInfraestructura()->pluck('id')
+                    )
+                    ->where('created_at', '>', $openingDate)
+                    ->update(['created_at' => $openingDate]);
+
                 InfraestructurasTiendas::whereHas('piso', fn ($query) => $query->where('infraestructura_id', $infra->id))
                     ->whereNull('cliente_id')
                     ->where(function ($query) {
@@ -116,11 +140,19 @@ class MallDataSeeder extends Seeder
                     'numero' => $floorData['numero'],
                     'cantidad_tiendas' => $floorData['count'],
                     'estado' => 'activo',
-                    'imagen_fondo' => $floorData['imagen_fondo']
+                    'imagen_fondo' => $floorData['imagen_fondo'],
+                    'created_at' => $openingDate,
+                    'updated_at' => $openingDate,
                 ]);
+                DB::table('infraestructuras_pisos')
+                    ->where('id', $piso->id)
+                    ->update([
+                        'created_at' => $openingDate,
+                        'updated_at' => $openingDate,
+                    ]);
 
                 for ($index = 0; $index < $floorData['count']; $index++) {
-                    InfraestructurasTiendas::create([
+                    $tienda = InfraestructurasTiendas::create([
                         'infraestructura_piso_id' => $piso->id,
                         'nombre' => null, // Disponible/Vacía no tiene nombre comercial
                         'numero' => sprintf('%03d', ($floorData['level'] * 100) + ($index + 1)),
@@ -130,7 +162,15 @@ class MallDataSeeder extends Seeder
                         'email_contacto' => $adminEmail,
                         'tamano' => rand(25, 90),
                         'cliente_id' => null,
+                        'created_at' => $openingDate,
+                        'updated_at' => $openingDate,
                     ]);
+                    DB::table('infraestructuras_tiendas')
+                        ->where('id', $tienda->id)
+                        ->update([
+                            'created_at' => $openingDate,
+                            'updated_at' => $openingDate,
+                        ]);
                 }
             }
         });

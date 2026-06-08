@@ -11,6 +11,7 @@ use App\Models\SuscripcionesPagos;
 use App\Models\SuscripcionesTarifas;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Spatie\Permission\Models\Permission;
 use Tests\TestCase;
 
 class PdfReportRoutesTest extends TestCase
@@ -152,5 +153,43 @@ class PdfReportRoutesTest extends TestCase
         $response = $this->get("/pdf/suscripcion/movimiento/{$this->subscription->id}");
         $response->assertStatus(200);
         $response->assertHeader('Content-Type', 'application/pdf');
+    }
+
+    public function test_admin_can_download_morosidad_report_pdf(): void
+    {
+        $admin = User::factory()->create();
+        $admin->givePermissionTo(Permission::firstOrCreate(['name' => 'View:ReporteMorosidad', 'guard_name' => 'web']));
+
+        $this->charge->update([
+            'fecha_vencimiento' => now()->subDays(10)->toDateString(),
+            'estado' => 'vencido',
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('pdf.reportes.morosidad'));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/pdf');
+    }
+
+    public function test_admin_can_download_financial_audit_report_pdf(): void
+    {
+        $admin = User::factory()->create();
+        $admin->givePermissionTo(Permission::firstOrCreate(['name' => 'View:BalanceSuscripciones', 'guard_name' => 'web']));
+
+        $response = $this->actingAs($admin)->get(route('pdf.reportes.auditoria-financiera'));
+
+        $response->assertStatus(200);
+        $response->assertHeader('Content-Type', 'application/pdf');
+    }
+
+    public function test_client_cannot_download_admin_financial_reports(): void
+    {
+        $this->actingAs($this->user)
+            ->get(route('pdf.reportes.morosidad'))
+            ->assertForbidden();
+
+        $this->actingAs($this->user)
+            ->get(route('pdf.reportes.auditoria-financiera'))
+            ->assertForbidden();
     }
 }

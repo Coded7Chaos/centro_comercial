@@ -150,7 +150,7 @@ class InfraestructurasTiendas extends Model
         if ($fechaLibre->isFuture()) {
             return 0;
         }
-        return max(0, $fechaLibre->diffInDays(now()));
+        return (int) max(0, floor($fechaLibre->diffInDays(now())));
     }
 
     public function getCostoOportunidad(): float

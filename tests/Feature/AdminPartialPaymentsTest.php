@@ -21,6 +21,82 @@ class AdminPartialPaymentsTest extends TestCase
 {
     use DatabaseTransactions;
 
+    public function test_payment_form_selects_oldest_unpaid_charge_for_shop(): void
+    {
+        $this->seed(RolesAndPermissionsSeeder::class);
+
+        $clientUser = User::factory()->create();
+        $clientUser->assignRole('cliente');
+
+        $cliente = Clientes::create([
+            'user_id' => $clientUser->id,
+            'ci' => '7755331',
+            'numero_celular' => '70000009',
+            'genero' => 'masculino',
+        ]);
+
+        $infraestructura = Infraestructuras::create([
+            'nombre' => 'Mall Cobros Antiguos',
+            'pisos' => 1,
+            'ubicacion' => 'La Paz',
+        ]);
+
+        $piso = InfraestructurasPisos::create([
+            'infraestructura_id' => $infraestructura->id,
+            'nombre' => 'Piso 1',
+        ]);
+
+        $estado = EstadoTienda::firstOrCreate(['estado' => 'Alquilada']);
+
+        $tienda = InfraestructurasTiendas::create([
+            'infraestructura_piso_id' => $piso->id,
+            'cliente_id' => $cliente->id,
+            'numero' => 'F-101',
+            'nombre' => 'Flores Test',
+            'tamano' => '20',
+            'id_estado' => $estado->id,
+        ]);
+
+        $suscripcion = Suscripciones::create([
+            'cliente_id' => $cliente->id,
+            'infraestructuras_tienda_id' => $tienda->id,
+            'infraestructuras_piso_id' => $piso->id,
+            'fecha_inicio' => '2026-03-01',
+            'fecha_fin' => '2027-02-28',
+            'tipo' => '1 año',
+            'precio' => 12000.00,
+        ]);
+
+        $cobroVencidoAntiguo = $suscripcion->cobros()
+            ->whereDate('fecha_vencimiento', '2026-05-01')
+            ->firstOrFail();
+
+        $suscripcion->cobros()
+            ->whereDate('fecha_vencimiento', '<', '2026-05-01')
+            ->update(['estado' => 'pagado', 'saldo_pendiente' => 0]);
+
+        $cobroVencidoAntiguo->update(['estado' => 'vencido']);
+
+        $suscripcion->cobros()
+            ->whereDate('fecha_vencimiento', '2026-06-01')
+            ->update(['estado' => 'vencido']);
+
+        $suscripcion->cobros()
+            ->whereDate('fecha_vencimiento', '>=', '2026-07-01')
+            ->update(['estado' => 'pendiente']);
+
+        $method = new \ReflectionMethod(
+            \App\Filament\Resources\SuscripcionesPagos\Schemas\SuscripcionesPagosForm::class,
+            'buscarCobroMasAntiguoPorTienda'
+        );
+
+        $selectedCobro = $method->invoke(null, $tienda->id);
+
+        $this->assertSame($cobroVencidoAntiguo->id, $selectedCobro?->id);
+        $this->assertSame('vencido', $selectedCobro?->estado);
+        $this->assertSame('2026-05-01', $selectedCobro?->fecha_vencimiento);
+    }
+
     public function test_admin_partial_payment_creates_partial_charge_on_selected_date(): void
     {
         $this->seed(RolesAndPermissionsSeeder::class);

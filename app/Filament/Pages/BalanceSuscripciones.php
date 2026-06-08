@@ -24,6 +24,18 @@ class BalanceSuscripciones extends Page implements HasTable
     }
     protected string $view = 'filament.pages.balance-suscripciones';
 
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('descargar_reporte')
+                ->label('Descargar reporte')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('primary')
+                ->url(route('pdf.reportes.auditoria-financiera'))
+                ->openUrlInNewTab(),
+        ];
+    }
+
     public function table(Table $table): Table
     {
         return $table
@@ -93,7 +105,9 @@ class BalanceSuscripciones extends Page implements HasTable
                         $pagado = 0;
                         foreach ($suscripciones as $sub) {
                             foreach ($sub->cobros as $cobro) {
-                                $pagado += $cobro->pagos->sum('monto_pagado');
+                                $pagado += $cobro->pagos
+                                    ->where('estado_verificacion', 'verificado')
+                                    ->sum('monto_pagado');
                             }
                         }
                         return $pagado;
@@ -116,7 +130,9 @@ class BalanceSuscripciones extends Page implements HasTable
                         foreach ($suscripciones as $sub) {
                             foreach ($sub->cobros as $cobro) {
                                 $deuda += $cobro->monto;
-                                $pagado += $cobro->pagos->sum('monto_pagado');
+                                $pagado += $cobro->pagos
+                                    ->where('estado_verificacion', 'verificado')
+                                    ->sum('monto_pagado');
                             }
                         }
                         return $deuda - $pagado;

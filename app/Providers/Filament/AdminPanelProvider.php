@@ -46,6 +46,7 @@ class AdminPanelProvider extends PanelProvider
                     '    const permanentLabelsPlugin = {' .
                     '        id: "permanentLabels",' .
                     '        afterDatasetsDraw(chart, args, options) {' .
+                    '            if (chart.options.plugins?.permanentLabels?.display === false) return;' .
                     '            const { ctx } = chart;' .
                     '            ctx.save();' .
                     '            const isHorizontal = chart.options.indexAxis === "y";' .
@@ -57,12 +58,34 @@ class AdminPanelProvider extends PanelProvider
                     '                    const dataValue = dataset.data[index];' .
                     '                    if (dataValue === 0 || dataValue === null || dataValue === undefined) return;' .
                     '                    if (chart.config.type === "line") {' .
+                    '                        const labelOptions = chart.options.plugins?.permanentLabels || {};' .
+                    '                        if (labelOptions.mode === "last" && index !== dataset.data.length - 1) return;' .
                     '                        ctx.font = "bold 10px Inter, sans-serif";' .
-                    '                        ctx.fillStyle = "#334155";' .
-                    '                        ctx.textAlign = "center";' .
-                    '                        ctx.textBaseline = "bottom";' .
                     '                        let text = "Bs. " + Number(dataValue).toLocaleString();' .
-                    '                        ctx.fillText(text, element.x, element.y - 6);' .
+                    '                        const textWidth = ctx.measureText(text).width;' .
+                    '                        const pillWidth = textWidth + 14;' .
+                    '                        const pillHeight = 20;' .
+                    '                        const offsets = labelOptions.yOffsets || [-18, 18, -40, 40];' .
+                    '                        const pillX = Math.min(element.x + pillWidth / 2 + 12, chart.chartArea.right - pillWidth / 2);' .
+                    '                        const pillY = Math.max(chart.chartArea.top + pillHeight / 2, Math.min(element.y + offsets[i % offsets.length], chart.chartArea.bottom - pillHeight / 2));' .
+                    '                        ctx.beginPath();' .
+                    '                        const r = 10;' .
+                    '                        ctx.moveTo(pillX - pillWidth/2 + r, pillY - pillHeight/2);' .
+                    '                        ctx.lineTo(pillX + pillWidth/2 - r, pillY - pillHeight/2);' .
+                    '                        ctx.quadraticCurveTo(pillX + pillWidth/2, pillY - pillHeight/2, pillX + pillWidth/2, pillY - pillHeight/2 + r);' .
+                    '                        ctx.lineTo(pillX + pillWidth/2, pillY + pillHeight/2 - r);' .
+                    '                        ctx.quadraticCurveTo(pillX + pillWidth/2, pillY + pillHeight/2, pillX + pillWidth/2 - r, pillY + pillHeight/2);' .
+                    '                        ctx.lineTo(pillX - pillWidth/2 + r, pillY + pillHeight/2);' .
+                    '                        ctx.quadraticCurveTo(pillX - pillWidth/2, pillY + pillHeight/2, pillX - pillWidth/2, pillY + pillHeight/2 - r);' .
+                    '                        ctx.lineTo(pillX - pillWidth/2, pillY - pillHeight/2 + r);' .
+                    '                        ctx.quadraticCurveTo(pillX - pillWidth/2, pillY - pillHeight/2, pillX - pillWidth/2 + r, pillY - pillHeight/2);' .
+                    '                        ctx.closePath();' .
+                    '                        ctx.fillStyle = dataset.borderColor || "#0f172a";' .
+                    '                        ctx.fill();' .
+                    '                        ctx.fillStyle = "#ffffff";' .
+                    '                        ctx.textAlign = "center";' .
+                    '                        ctx.textBaseline = "middle";' .
+                    '                        ctx.fillText(text, pillX, pillY);' .
                     '                    }' .
                     '                    else if (chart.config.type === "bar") {' .
                     '                        ctx.font = "bold 10px Inter, sans-serif";' .
@@ -227,6 +250,7 @@ class AdminPanelProvider extends PanelProvider
                 \App\Filament\Widgets\MetodoPagoChart::class,
                 \App\Filament\Widgets\TopMorososWidget::class,
                 \App\Filament\Widgets\CostoOportunidadVacanciaChart::class,
+                \App\Filament\Widgets\PerdidasMensualesVacanciaChart::class,
             ])
             ->middleware([
                 EncryptCookies::class,

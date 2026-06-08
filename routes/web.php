@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Pdf\ReporteCobrosController;
+use App\Http\Controllers\Pdf\ReporteAuditoriaFinancieraPdfController;
+use App\Http\Controllers\Pdf\ReporteMorosidadPdfController;
 use App\Http\Controllers\Pdf\ReportePagosController;
 use App\Http\Controllers\Pdf\ReporteSuscripcionMovimiento;
 use App\Http\Controllers\DirectorioController;
@@ -130,6 +132,14 @@ Route::get('/pdf/pago/{id}', [ReportePagosController::class, 'pago'])
 
 Route::get('/pdf/suscripcion/movimiento/{id}', [ReporteSuscripcionMovimiento::class, 'movimiento'])
     ->name('pdf.suscripcion.movimiento');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/pdf/reportes/morosidad', [ReporteMorosidadPdfController::class, 'descargar'])
+        ->name('pdf.reportes.morosidad');
+
+    Route::get('/pdf/reportes/auditoria-financiera', [ReporteAuditoriaFinancieraPdfController::class, 'descargar'])
+        ->name('pdf.reportes.auditoria-financiera');
+});
 
 Route::get('/directorio', [DirectorioController::class, 'index'])->name('directorio.index');
 Route::get('/directorio/{id}/catalogo', [DirectorioController::class, 'catalogo'])->name('directorio.catalogo');

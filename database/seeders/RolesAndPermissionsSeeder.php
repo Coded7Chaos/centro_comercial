@@ -68,6 +68,7 @@ class RolesAndPermissionsSeeder extends Seeder
             'MetodoPagoChart',
             'TopMorososWidget',
             'CostoOportunidadVacanciaChart',
+            'PerdidasMensualesVacanciaChart',
         ];
 
         // Create Permissions
@@ -142,6 +143,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'View:OcupacionPorPisoChart',
                 'View:MetodoPagoChart',
                 'View:CostoOportunidadVacanciaChart',
+                'View:PerdidasMensualesVacanciaChart',
             ])
             ->unique()
             ->values();

@@ -8,6 +8,7 @@ use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Actions\Action;
 use Illuminate\Support\Carbon;
 
 class ReporteMorosidad extends Page implements HasTable
@@ -23,6 +24,18 @@ class ReporteMorosidad extends Page implements HasTable
     public static function canAccess(): bool
     {
         return auth()->user()?->can('View:ReporteMorosidad') ?? false;
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('descargar_reporte')
+                ->label('Descargar reporte')
+                ->icon('heroicon-o-arrow-down-tray')
+                ->color('primary')
+                ->url(route('pdf.reportes.morosidad'))
+                ->openUrlInNewTab(),
+        ];
     }
 
     protected static function baseQuery()
@@ -42,7 +55,11 @@ class ReporteMorosidad extends Page implements HasTable
         $cobros = static::baseQuery()->get();
 
         $totalMonto  = (float) $cobros->sum('monto');
-        $totalPagado = (float) $cobros->sum(fn ($c) => $c->pagos->sum('monto_pagado'));
+        $totalPagado = (float) $cobros->sum(
+            fn ($c) => $c->pagos
+                ->where('estado_verificacion', 'verificado')
+                ->sum('monto_pagado')
+        );
         $deuda       = max(0, $totalMonto - $totalPagado);
 
         $totalCobros   = $cobros->count();
@@ -109,12 +126,16 @@ class ReporteMorosidad extends Page implements HasTable
                     ->money('BOB'),
                 TextColumn::make('pagado')
                     ->label('Pagado')
-                    ->state(fn (SuscripcionesCobros $r) => (float) $r->pagos->sum('monto_pagado'))
+                    ->state(fn (SuscripcionesCobros $r) => (float) $r->pagos
+                        ->where('estado_verificacion', 'verificado')
+                        ->sum('monto_pagado'))
                     ->money('BOB')
                     ->color('success'),
                 TextColumn::make('saldo')
                     ->label('Saldo')
-                    ->state(fn (SuscripcionesCobros $r) => max(0, ((float) $r->monto) - ((float) $r->pagos->sum('monto_pagado'))))
+                    ->state(fn (SuscripcionesCobros $r) => max(0, ((float) $r->monto) - ((float) $r->pagos
+                        ->where('estado_verificacion', 'verificado')
+                        ->sum('monto_pagado'))))
                     ->money('BOB')
                     ->weight('bold')
                     ->color('danger'),

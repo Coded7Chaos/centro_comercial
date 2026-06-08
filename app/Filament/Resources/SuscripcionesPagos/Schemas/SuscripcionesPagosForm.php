@@ -17,6 +17,41 @@ use Filament\Notifications\Notification;
 
 class SuscripcionesPagosForm
 {
+    private static function estadosCobroSeleccionables(): array
+    {
+        return [
+            'vencido',
+            'parcial',
+            'pendiente',
+        ];
+    }
+
+    private static function buscarCobroMasAntiguoPorTienda(int|string $tiendaId): ?SuscripcionesCobros
+    {
+        return SuscripcionesCobros::with([
+            'suscripcion.infraestructurasTienda.piso.infraestructura',
+            'pagos',
+        ])
+            ->whereHas('suscripcion', function ($query) use ($tiendaId) {
+                $query->where('infraestructuras_tienda_id', $tiendaId);
+            })
+            ->whereIn('estado', self::estadosCobroSeleccionables())
+            ->orderBy('fecha_vencimiento')
+            ->orderBy('id')
+            ->first();
+    }
+
+    private static function formatCobroOption(SuscripcionesCobros $cobro): string
+    {
+        return $cobro->concepto
+            . ' - Vence: '
+            . \Carbon\Carbon::parse($cobro->fecha_vencimiento)->format('d/m/Y')
+            . ' - '
+            . ucfirst(str_replace('_', ' ', $cobro->estado))
+            . ' - Bs '
+            . number_format((float) $cobro->monto, 2);
+    }
+
     private static function formatLocation($infra, $piso): string
     {
         $pisoNombre = $piso?->nombre ?? '---';
@@ -197,29 +232,7 @@ class SuscripcionesPagosForm
     |----------------------------------------------------------------------
     */
 
-                    $cobro = SuscripcionesCobros::with([
-                        'suscripcion.infraestructurasTienda.piso.infraestructura'
-                    ])
-
-                        ->whereHas(
-                            'suscripcion',
-                            function ($query) use ($state) {
-
-                                $query->where(
-                                    'infraestructuras_tienda_id',
-                                    $state
-                                );
-                            }
-                        )
-
-                        ->whereIn('estado', [
-                            'pendiente',
-                            'parcial',
-                        ])
-
-                        ->latest()
-
-                        ->first();
+                    $cobro = self::buscarCobroMasAntiguoPorTienda($state);
 
                     if (!$cobro) {
 
@@ -413,24 +426,8 @@ class SuscripcionesPagosForm
                         return [];
                     }
 
-                    $suscripcion =
-                        $cobro->suscripcion;
-
                     return [
-
-                        $cobro->id =>
-
-                        'Cobro #'
-
-                            . $cobro->id
-
-                            . ' - '
-
-                            . ucfirst($suscripcion?->tipo)
-
-                            . ' - Bs '
-
-                            . $cobro->monto
+                        $cobro->id => self::formatCobroOption($cobro),
                     ];
                 })
 
