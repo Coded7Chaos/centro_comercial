@@ -5,7 +5,6 @@ namespace App\Filament\Resources\SuscripcionesPagos\Tables;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -142,49 +141,6 @@ class SuscripcionesPagosTable
 
                 /*
                 |------------------------------------------------------------------
-                | ESTADO
-                |------------------------------------------------------------------
-                */
-
-                TextColumn::make('estado_snapshot')
-
-                    ->label('Estado del pago')
-
-                    ->badge()
-
-                    ->formatStateUsing(function ($state) {
-                        return $state === 'pagado' ? 'completo' : $state;
-                    })
-
-                    ->color(function ($state) {
-
-                        return match ($state) {
-
-                            'pagado', 'completo' => 'success',
-
-                            'parcial' => 'warning',
-
-                            'pendiente' => 'gray',
-
-                            'vencido' => 'danger',
-
-                            default => 'gray',
-                        };
-                    }),
-
-                TextColumn::make('estado_verificacion')
-                    ->label('Verificación')
-                    ->badge()
-                    ->color(fn ($state) => match ($state) {
-                        'pendiente' => 'warning',
-                        'verificado' => 'success',
-                        'rechazado' => 'danger',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn ($state) => ucfirst($state)),
-
-                /*
-                |------------------------------------------------------------------
                 | FECHA
                 |------------------------------------------------------------------
                 */
@@ -233,9 +189,6 @@ class SuscripcionesPagosTable
             ->recordActions([
 
                 ViewAction::make(),
-
-                EditAction::make()
-                    ->visible(fn ($record) => $record->estado_verificacion === 'verificado'),
 
                 Action::make('pdf')
 

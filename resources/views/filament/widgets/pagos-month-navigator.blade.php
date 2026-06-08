@@ -5,8 +5,12 @@
             {{-- Etiqueta --}}
             <div class="flex items-center gap-2 text-sm font-bold text-gray-700 dark:text-gray-300">
                 <x-heroicon-o-calendar-days class="w-4 h-4 text-amber-500" />
-                <span>Filtrando pagos de</span>
-                <span class="text-amber-600 dark:text-amber-400 font-black">{{ $mesNombreActual }}</span>
+                @if($sinFiltro)
+                    <span>Mostrando todos los pagos (sin filtrar por fecha)</span>
+                @else
+                    <span>Filtrando pagos de</span>
+                    <span class="text-amber-600 dark:text-amber-400 font-black">{{ $mesNombreActual }}</span>
+                @endif
             </div>
 
             {{-- Navegador --}}
@@ -61,6 +65,15 @@
                     title="Ir al mes actual"
                 >
                     Hoy
+                </button>
+
+                {{-- Botón "Limpiar filtro" --}}
+                <button
+                    wire:click="limpiarFiltro"
+                    class="rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-50 hover:border-slate-400 hover:text-slate-600 transition-all shadow-sm"
+                    title="Mostrar todos los registros"
+                >
+                    Limpiar filtro
                 </button>
             </div>
         </div>

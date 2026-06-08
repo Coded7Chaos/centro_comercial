@@ -22,8 +22,17 @@ class MiEstadoDeCuenta extends Page implements HasTable
 
     public static function canAccess(): bool
     {
-        // Solo visible para usuarios que tienen un perfil de Cliente asociado
-        return Auth::check() && Auth::user()->cliente !== null;
+        $user = Auth::user();
+
+        return Auth::check()
+            && $user?->hasRole('cliente')
+            && $user?->cliente !== null
+            && $user?->can('View:MiEstadoDeCuenta');
+    }
+
+    public static function shouldRegisterNavigation(): bool
+    {
+        return static::canAccess();
     }
 
     public function table(Table $table): Table

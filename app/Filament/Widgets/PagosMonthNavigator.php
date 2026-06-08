@@ -19,10 +19,13 @@ class PagosMonthNavigator extends Widget
 
     public int $anio;
 
+    public bool $sinFiltro = false;
+
     public function mount(): void
     {
         $this->mes = (int) session('pagos_nav_mes', now()->month);
         $this->anio = (int) session('pagos_nav_anio', now()->year);
+        $this->sinFiltro = (bool) session('pagos_nav_sin_filtro', false);
     }
 
     public function previousMonth(): void
@@ -60,9 +63,21 @@ class PagosMonthNavigator extends Widget
         $this->sync();
     }
 
+    public function limpiarFiltro(): void
+    {
+        $this->sinFiltro = true;
+        session(['pagos_nav_sin_filtro' => true]);
+        $this->dispatch('pagosNavChanged', mes: $this->mes, anio: $this->anio);
+    }
+
     private function sync(): void
     {
-        session(['pagos_nav_mes' => $this->mes, 'pagos_nav_anio' => $this->anio]);
+        $this->sinFiltro = false;
+        session([
+            'pagos_nav_mes' => $this->mes,
+            'pagos_nav_anio' => $this->anio,
+            'pagos_nav_sin_filtro' => false,
+        ]);
         $this->dispatch('pagosNavChanged', mes: $this->mes, anio: $this->anio);
     }
 

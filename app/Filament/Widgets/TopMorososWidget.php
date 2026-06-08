@@ -68,7 +68,7 @@ class TopMorososWidget extends BaseWidget
 
         return $table
             ->query(
-                Clientes::query()
+                Clientes::withTrashed()
                     ->select('clientes.*')
                     ->selectRaw("{$deudaSql} AS deuda_vencida")
                     ->whereRaw("{$deudaSql} > 0")

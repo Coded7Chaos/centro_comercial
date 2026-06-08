@@ -39,7 +39,7 @@ class Suscripciones extends Model
         return $this->belongsTo(
             Clientes::class,
             'cliente_id'
-        );
+        )->withTrashed();
     }
 
     public function marca(): BelongsTo
@@ -47,7 +47,7 @@ class Suscripciones extends Model
         return $this->belongsTo(
             Marcas::class,
             'marca_id'
-        );
+        )->withTrashed();
     }
 
     public function cobros(): HasMany

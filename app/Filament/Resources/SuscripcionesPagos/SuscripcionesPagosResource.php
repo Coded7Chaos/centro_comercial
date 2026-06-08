@@ -3,7 +3,6 @@
 namespace App\Filament\Resources\SuscripcionesPagos;
 
 use App\Filament\Resources\SuscripcionesPagos\Pages\CreateSuscripcionesPagos;
-use App\Filament\Resources\SuscripcionesPagos\Pages\EditSuscripcionesPagos;
 use App\Filament\Resources\SuscripcionesPagos\Pages\ListSuscripcionesPagos;
 use App\Filament\Resources\SuscripcionesPagos\Pages\ViewSuscripcionesPagos;
 use App\Filament\Resources\SuscripcionesPagos\Schemas\SuscripcionesPagosForm;
@@ -15,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class SuscripcionesPagosResource extends Resource
 {
@@ -47,6 +47,48 @@ class SuscripcionesPagosResource extends Resource
         return SuscripcionesPagosTable::configure($table);
     }
 
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->can('ViewAny:SuscripcionesPagos') ?? false;
+    }
+
+    public static function canView(Model $record): bool
+    {
+        return auth()->user()?->can('View:SuscripcionesPagos') ?? false;
+    }
+
+    public static function canCreate(): bool
+    {
+        return auth()->user()?->can('Create:SuscripcionesPagos') ?? false;
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        $user = auth()->user();
+
+        if ($user?->hasRole('admin')) {
+            return false;
+        }
+
+        return $user?->can('Delete:SuscripcionesPagos') ?? false;
+    }
+
+    public static function canDeleteAny(): bool
+    {
+        $user = auth()->user();
+
+        if ($user?->hasRole('admin')) {
+            return false;
+        }
+
+        return $user?->can('DeleteAny:SuscripcionesPagos') ?? false;
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -60,7 +102,6 @@ class SuscripcionesPagosResource extends Resource
             'index' => ListSuscripcionesPagos::route('/'),
             'create' => CreateSuscripcionesPagos::route('/create'),
             'view' => ViewSuscripcionesPagos::route('/{record}'),
-            'edit' => EditSuscripcionesPagos::route('/{record}/edit'),
         ];
     }
 

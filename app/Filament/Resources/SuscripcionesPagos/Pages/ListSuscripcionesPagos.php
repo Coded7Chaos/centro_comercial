@@ -81,6 +81,10 @@ class ListSuscripcionesPagos extends ListRecords
                     return $query;
                 }
 
+                if (session('pagos_nav_sin_filtro', false)) {
+                    return $query;
+                }
+
                 $mes = (int) session('pagos_nav_mes', now()->month);
                 $anio = (int) session('pagos_nav_anio', now()->year);
 

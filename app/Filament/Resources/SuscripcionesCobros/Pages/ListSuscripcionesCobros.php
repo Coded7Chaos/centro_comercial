@@ -36,6 +36,10 @@ class ListSuscripcionesCobros extends ListRecords
     {
         return parent::table($table)
             ->modifyQueryUsing(function ($query) {
+                if (session('cobros_nav_sin_filtro', false)) {
+                    return $query;
+                }
+
                 $mes = (int) session('cobros_nav_mes', now()->month);
                 $anio = (int) session('cobros_nav_anio', now()->year);
 

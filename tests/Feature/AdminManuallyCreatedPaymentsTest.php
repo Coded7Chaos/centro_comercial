@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\SuscripcionesPagos\Pages\ListSuscripcionesPagos;
+use App\Filament\Resources\SuscripcionesPagos\Pages\ViewSuscripcionesPagos;
+use App\Filament\Resources\SuscripcionesPagos\SuscripcionesPagosResource;
 use App\Models\Clientes;
 use App\Models\Infraestructuras;
 use App\Models\InfraestructurasPisos;
@@ -54,6 +56,7 @@ class AdminManuallyCreatedPaymentsTest extends TestCase
 
         $piso = InfraestructurasPisos::create([
             'nombre' => 'Piso 1',
+            'numero' => 'Nivel 1',
             'infraestructura_id' => $infra->id,
         ]);
 
@@ -154,7 +157,9 @@ class AdminManuallyCreatedPaymentsTest extends TestCase
         Livewire::test(ListSuscripcionesPagos::class)
             ->set('activeTab', 'pendientes')
             ->assertCanSeeTableRecords([$clientPendingPayment])
-            ->assertCanNotSeeTableRecords([$adminPayment, $clientVerifiedPayment, $clientRejectedPayment]);
+            ->assertCanNotSeeTableRecords([$adminPayment, $clientVerifiedPayment, $clientRejectedPayment])
+            ->assertDontSee('Estado del pago')
+            ->assertDontSee('Verificación');
 
         // Check "Pagos Confirmados" (verificados tab)
         Livewire::test(ListSuscripcionesPagos::class)
@@ -167,5 +172,69 @@ class AdminManuallyCreatedPaymentsTest extends TestCase
             ->set('activeTab', 'rechazados')
             ->assertCanSeeTableRecords([$clientRejectedPayment])
             ->assertCanNotSeeTableRecords([$adminPayment, $clientPendingPayment, $clientVerifiedPayment]);
+    }
+
+    public function test_payment_request_view_hides_operational_fields_and_shows_location_and_day_difference(): void
+    {
+        $payment = SuscripcionesPagos::create([
+            'suscripcion_cobro_id' => $this->charge->id,
+            'monto_pagado' => 100,
+            'pago_pendiente' => 900,
+            'fecha_pago' => '2026-06-25',
+            'metodo_pago' => 'qr',
+            'estado_verificacion' => 'pendiente',
+            'creado_por_admin' => false,
+        ]);
+
+        Livewire::actingAs($this->adminUser)
+            ->test(ViewSuscripcionesPagos::class, ['record' => $payment->getRouteKey()])
+            ->assertSee('Localización')
+            ->assertSee('Mall Test Center - Piso Piso 1 (Nivel 1)')
+            ->assertSee('Monto abonado')
+            ->assertSee('Días de diferencia')
+            ->assertSee('-5 días (adelantado)')
+            ->assertDontSee('Nuevo pago')
+            ->assertDontSee('Pago pendiente')
+            ->assertDontSee('Fecha de vencimiento')
+            ->assertDontSee('ID de operación / Folio QR')
+            ->assertDontSee('Billetera / Aplicación origen');
+    }
+
+    public function test_admin_cannot_access_payment_edit_page(): void
+    {
+        $payment = SuscripcionesPagos::create([
+            'suscripcion_cobro_id' => $this->charge->id,
+            'monto_pagado' => 100,
+            'pago_pendiente' => 900,
+            'fecha_pago' => '2026-06-25',
+            'metodo_pago' => 'efectivo',
+            'estado_verificacion' => 'verificado',
+            'creado_por_admin' => true,
+        ]);
+
+        $this->actingAs($this->adminUser);
+
+        $this->assertFalse(SuscripcionesPagosResource::canEdit($payment));
+        $this->assertFalse(SuscripcionesPagosResource::canDelete($payment));
+        $this->assertFalse(SuscripcionesPagosResource::canDeleteAny());
+    }
+
+    public function test_payment_request_view_shows_receipt_preview_and_new_tab_link(): void
+    {
+        $payment = SuscripcionesPagos::create([
+            'suscripcion_cobro_id' => $this->charge->id,
+            'monto_pagado' => 100,
+            'pago_pendiente' => 900,
+            'fecha_pago' => '2026-06-25',
+            'metodo_pago' => 'qr',
+            'comprobante' => 'pagos/comprobantes/test_comprobante.pdf',
+            'estado_verificacion' => 'pendiente',
+            'creado_por_admin' => false,
+        ]);
+
+        Livewire::actingAs($this->adminUser)
+            ->test(ViewSuscripcionesPagos::class, ['record' => $payment->getRouteKey()])
+            ->assertSee('Comprobante de Pago')
+            ->assertSee('Abrir comprobante en nueva pestaña ↗');
     }
 }

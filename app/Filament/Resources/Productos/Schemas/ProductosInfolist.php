@@ -3,10 +3,9 @@
 namespace App\Filament\Resources\Productos\Schemas;
 
 use Filament\Infolists\Components\ImageEntry;
-use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 
 class ProductosInfolist
 {
@@ -23,17 +22,16 @@ class ProductosInfolist
                         $imagen = $record->imagenes
                             ->where('tipo', 'principal')
                             ->first();
-                        if (!$imagen) {
+                        if (! $imagen) {
                             return null;
                         }
+
                         return str_starts_with($imagen->url, 'http')
                             ? $imagen->url
-                            : asset('storage/' . $imagen->url);
+                            : asset('storage/'.$imagen->url);
                     })
                     ->height(260)
                     ->width(260),
-
-
 
                 TextEntry::make('id')
                     ->label('Producto ID'),
@@ -49,7 +47,7 @@ class ProductosInfolist
 
                 TextEntry::make('estado')
                     ->badge()
-                    ->color(fn(string $state): string => match ($state) {
+                    ->color(fn (string $state): string => match ($state) {
                         'activo' => 'success',
                         'inactivo' => 'danger',
                         default => 'gray',
@@ -66,8 +64,6 @@ class ProductosInfolist
                 TextEntry::make('marca.nombre')
                     ->label('Marca')
                     ->placeholder('-'),
-
-
 
                 TextEntry::make('descripcion')
                     ->label('Descripción')
@@ -94,7 +90,7 @@ class ProductosInfolist
 
                         $schema->getRecord()
                             ->imagenes
-                            ->where('tipo', 'secundaria')
+                            ->whereIn('tipo', ['otro', 'secundaria'])
                             ->map(function ($imagen) {
 
                                 return Grid::make(1)
@@ -105,7 +101,7 @@ class ProductosInfolist
                                             ->state(
                                                 str_starts_with($imagen->url, 'http')
                                                     ? $imagen->url
-                                                    : asset('storage/' . $imagen->url)
+                                                    : asset('storage/'.$imagen->url)
                                             )
 
                                             ->height(180)

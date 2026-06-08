@@ -19,10 +19,13 @@ class CobrosMonthNavigator extends Widget
 
     public int $anio;
 
+    public bool $sinFiltro = false;
+
     public function mount(): void
     {
         $this->mes = (int) session('cobros_nav_mes', now()->month);
         $this->anio = (int) session('cobros_nav_anio', now()->year);
+        $this->sinFiltro = (bool) session('cobros_nav_sin_filtro', false);
     }
 
     public function previousMonth(): void
@@ -60,9 +63,21 @@ class CobrosMonthNavigator extends Widget
         $this->sync();
     }
 
+    public function limpiarFiltro(): void
+    {
+        $this->sinFiltro = true;
+        session(['cobros_nav_sin_filtro' => true]);
+        $this->dispatch('cobrosNavChanged', mes: $this->mes, anio: $this->anio);
+    }
+
     private function sync(): void
     {
-        session(['cobros_nav_mes' => $this->mes, 'cobros_nav_anio' => $this->anio]);
+        $this->sinFiltro = false;
+        session([
+            'cobros_nav_mes' => $this->mes,
+            'cobros_nav_anio' => $this->anio,
+            'cobros_nav_sin_filtro' => false,
+        ]);
         $this->dispatch('cobrosNavChanged', mes: $this->mes, anio: $this->anio);
     }
 

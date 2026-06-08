@@ -87,28 +87,68 @@ class RolesAndPermissionsSeeder extends Seeder
 
         // --- Super Admin ---
         $superAdmin = Role::firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web']);
-        $superAdmin->syncPermissions(Permission::all());
+        $superAdmin->syncPermissions(
+            Permission::query()
+                ->where('name', '!=', 'View:MiEstadoDeCuenta')
+                ->get()
+        );
 
         // --- Admin ---
         $admin = Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
-        $adminPermissions = Permission::all()->reject(function ($permission) {
-            return in_array($permission->name, [
-                // No puede modificar cobros
-                'Update:SuscripcionesCobros',
-                'Delete:SuscripcionesCobros',
-                'DeleteAny:SuscripcionesCobros',
-                'ForceDelete:SuscripcionesCobros',
-                'ForceDeleteAny:SuscripcionesCobros',
-                 // No accede al widget de top morosos (lista personal)
-                'View:TopMorososWidget',
-                // No accede a la auditoría del sistema
+        $allActionsFor = fn (string $resource): array => array_map(
+            fn (string $action): string => "{$action}:{$resource}",
+            $actions
+        );
+        $viewOnlyFor = fn (string $resource): array => [
+            "ViewAny:{$resource}",
+            "View:{$resource}",
+        ];
+
+        $adminPermissionNames = collect()
+            ->merge($viewOnlyFor('Role'))
+            ->merge($viewOnlyFor('User'))
+            ->merge([
+                'ViewAny:Suscripciones',
+                'View:Suscripciones',
+                'Create:Suscripciones',
+                'ViewAny:SuscripcionesPagos',
+                'View:SuscripcionesPagos',
+                'Create:SuscripcionesPagos',
+                'ViewAny:SuscripcionesCobros',
+                'View:SuscripcionesCobros',
+                'ViewAny:Productos',
+                'View:Productos',
+                'Delete:Productos',
+                'DeleteAny:Productos',
+            ])
+            ->merge($allActionsFor('Categorias'))
+            ->merge($allActionsFor('Clientes'))
+            ->merge($allActionsFor('ClientesDocumentos'))
+            ->merge($allActionsFor('Infraestructuras'))
+            ->merge($allActionsFor('InfraestructurasPisos'))
+            ->merge($allActionsFor('InfraestructurasTiendas'))
+            ->merge($allActionsFor('Tiendas'))
+            ->merge($allActionsFor('Marcas'))
+            ->merge($allActionsFor('SuscripcionesTarifas'))
+            ->merge([
+                'View:BalanceSuscripciones',
+                'View:MapaOcupacion',
+                'View:ReporteMorosidad',
+                'View:SimuladorAlquiler',
                 'View:Auditoria',
-                // Restricciones de usuarios: El usuario dijo que solo puede crear Clientes.
-                // Mantendremos Create:User pero luego en la lógica de negocio o Policy
-                // controlaremos que no pueda asignar roles superiores.
-            ]);
-        });
-        $admin->syncPermissions($adminPermissions);
+                'View:IngresosMensualesChart',
+                'View:StatsOverview',
+                'View:CobrosPorEstadoChart',
+                'View:OcupacionPorPisoChart',
+                'View:MetodoPagoChart',
+                'View:CostoOportunidadVacanciaChart',
+            ])
+            ->unique()
+            ->values();
+
+        $admin->syncPermissions(
+            Permission::whereIn('name', $adminPermissionNames)->get()
+        );
 
         // --- Cliente ---
         $cliente = Role::firstOrCreate(['name' => 'cliente', 'guard_name' => 'web']);

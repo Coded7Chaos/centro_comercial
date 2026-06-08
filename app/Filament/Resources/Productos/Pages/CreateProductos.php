@@ -4,8 +4,8 @@ namespace App\Filament\Resources\Productos\Pages;
 
 use App\Filament\Resources\Productos\ProductosResource;
 use App\Models\ProductosImagenes;
-use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\CreateRecord;
 
 class CreateProductos extends CreateRecord
 {
@@ -17,30 +17,15 @@ class CreateProductos extends CreateRecord
     {
         $imagenes = collect($data['imagenes'] ?? []);
 
-        $principales = $imagenes
-            ->where('tipo', 'principal')
-            ->count();
-
         // =========================
         // VALIDACIONES
         // =========================
 
-        if ($principales < 1) {
+        if ($imagenes->isEmpty()) {
 
             Notification::make()
                 ->title('Error al crear producto')
-                ->body('Debe existir una imagen principal.')
-                ->danger()
-                ->send();
-
-            $this->halt();
-        }
-
-        if ($principales > 1) {
-
-            Notification::make()
-                ->title('Error al crear producto')
-                ->body('Solo puede existir una imagen principal.')
+                ->body('Debe existir al menos una imagen.')
                 ->danger()
                 ->send();
 
@@ -62,8 +47,13 @@ class CreateProductos extends CreateRecord
         // GUARDAR TEMPORALMENTE
         // =========================
 
+        if (! empty($data['subcategoria_id'])) {
+            $data['categoria_id'] = $data['subcategoria_id'];
+        }
+
         $this->imagenesTemporales = $imagenes->toArray();
 
+        unset($data['subcategoria_id']);
         unset($data['imagenes']);
 
         return $data;
@@ -71,13 +61,23 @@ class CreateProductos extends CreateRecord
 
     protected function afterCreate(): void
     {
-        foreach ($this->imagenesTemporales as $imagen) {
+        foreach ($this->imagenesTemporales as $index => $imagen) {
+            $url = $this->normalizeImagePath($imagen['url'] ?? null);
 
             ProductosImagenes::create([
                 'producto_id' => $this->record->id,
-                'url' => $imagen['url'],
-                'tipo' => $imagen['tipo'],
+                'url' => $url,
+                'tipo' => $index === 0 ? 'principal' : 'otro',
             ]);
         }
+    }
+
+    private function normalizeImagePath(mixed $state): ?string
+    {
+        if (is_array($state)) {
+            return reset($state) ?: null;
+        }
+
+        return $state;
     }
 }

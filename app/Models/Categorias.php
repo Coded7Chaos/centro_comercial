@@ -12,6 +12,22 @@ class Categorias extends Model
 {
     use LogsActivity;
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Categorias $categoria): void {
+            Productos::where('categoria_id', $categoria->id)->update(['categoria_id' => null]);
+
+            if ($categoria->categoria_padre_id === null) {
+                $subcategoryIds = $categoria->subcategorias()->pluck('id');
+
+                if ($subcategoryIds->isNotEmpty()) {
+                    Productos::whereIn('categoria_id', $subcategoryIds)->update(['categoria_id' => null]);
+                    $categoria->subcategorias()->delete();
+                }
+            }
+        });
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

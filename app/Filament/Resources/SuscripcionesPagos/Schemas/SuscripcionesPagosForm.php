@@ -17,6 +17,38 @@ use Filament\Notifications\Notification;
 
 class SuscripcionesPagosForm
 {
+    private static function formatLocation($infra, $piso): string
+    {
+        $pisoNombre = $piso?->nombre ?? '---';
+        $pisoNumero = $piso?->numero ? " ({$piso->numero})" : '';
+
+        return ($infra?->nombre ?? 'Sin infraestructura')
+            . ' - Piso '
+            . $pisoNombre
+            . $pisoNumero;
+    }
+
+    private static function formatPaymentDifference($fechaPago, $fechaVencimiento): string
+    {
+        if (! $fechaPago || ! $fechaVencimiento) {
+            return '---';
+        }
+
+        $difference = (int) \Carbon\Carbon::parse($fechaVencimiento)
+            ->startOfDay()
+            ->diffInDays(\Carbon\Carbon::parse($fechaPago)->startOfDay(), false);
+
+        if ($difference > 0) {
+            return "+{$difference} días (retrasado)";
+        }
+
+        if ($difference < 0) {
+            return "{$difference} días (adelantado)";
+        }
+
+        return '0 días';
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema->components([
@@ -33,7 +65,7 @@ class SuscripcionesPagosForm
 
                 ->options(
 
-                    Clientes::with('user')->get()
+                    Clientes::withTrashed()->with('user')->get()
 
                         ->mapWithKeys(function ($cliente) {
 
@@ -74,6 +106,8 @@ class SuscripcionesPagosForm
                     $set('monto_pagado', null);
 
                     $set('pago_pendiente', null);
+
+                    $set('dias_diferencia', null);
                 }),
 
             /*
@@ -151,6 +185,8 @@ class SuscripcionesPagosForm
 
                     $set('fecha_vencimiento', null);
 
+                    $set('dias_diferencia', null);
+
                     if (!$state) {
                         return;
                     }
@@ -209,6 +245,8 @@ class SuscripcionesPagosForm
 
                         $set('fecha_vencimiento', null);
 
+                        $set('dias_diferencia', null);
+
                         /*
     |----------------------------------------------------------------------
     | NOTIFICACIÓN
@@ -260,16 +298,7 @@ class SuscripcionesPagosForm
     |----------------------------------------------------------------------
     */
 
-                    $set(
-
-                        'localizacion',
-
-                        ($infra?->nombre ?? 'Sin infraestructura')
-
-                            . ' - Piso '
-
-                            . ($piso?->nombre ?? '---')
-                    );
+                    $set('localizacion', self::formatLocation($infra, $piso));
 
                     /*
     |----------------------------------------------------------------------
@@ -341,6 +370,11 @@ class SuscripcionesPagosForm
                         now()->format('H:i:s')
                     );
 
+                    $set(
+                        'dias_diferencia',
+                        self::formatPaymentDifference(now()->format('Y-m-d'), $cobro->fecha_vencimiento)
+                    );
+
                     /*
     |----------------------------------------------------------------------
     | COBRO ID
@@ -400,7 +434,7 @@ class SuscripcionesPagosForm
                     ];
                 })
 
-                ->afterStateHydrated(function ($state, Set $set) {
+                ->afterStateHydrated(function ($state, Set $set, Get $get) {
 
                     if (!$state) {
                         return;
@@ -448,15 +482,7 @@ class SuscripcionesPagosForm
     |--------------------------------------------------------------------------
     */
 
-                    $set(
-                        'localizacion',
-
-                        ($infra?->nombre ?? 'Sin infraestructura')
-
-                            . ' - Piso '
-
-                            . ($piso?->nombre ?? '---')
-                    );
+                    $set('localizacion', self::formatLocation($infra, $piso));
 
                     /*
     |--------------------------------------------------------------------------
@@ -500,6 +526,11 @@ class SuscripcionesPagosForm
                         'fecha_vencimiento',
                         $cobro->fecha_vencimiento
                     );
+
+                    $set(
+                        'dias_diferencia',
+                        self::formatPaymentDifference($get('fecha_pago'), $cobro->fecha_vencimiento)
+                    );
                 }),
 
             /*
@@ -512,13 +543,28 @@ class SuscripcionesPagosForm
 
                 ->label('Localización')
 
+                ->afterStateHydrated(function (TextInput $component, $state, $record) {
+                    $piso = $record?->cobro?->suscripcion?->infraestructurasTienda?->piso;
+                    $infra = $piso?->infraestructura;
+
+                    if ($record) {
+                        $component->state(self::formatLocation($infra, $piso));
+                    }
+                })
+
                 ->disabled()
 
                 ->dehydrated(false),
 
             TextInput::make('total_pagado')
 
-                ->label('Total pagado hasta ahora')
+                ->label('Monto abonado')
+
+                ->afterStateHydrated(function (TextInput $component, $state, $record) {
+                    if ($record?->cobro) {
+                        $component->state($record->cobro->pagos()->sum('monto_pagado'));
+                    }
+                })
 
                 ->prefix('Bs')
 
@@ -535,6 +581,8 @@ class SuscripcionesPagosForm
             TextInput::make('monto_pagado')
 
                 ->label('Nuevo pago')
+
+                ->visible(fn (string $operation): bool => $operation !== 'view')
 
                 ->numeric()
 
@@ -606,6 +654,8 @@ class SuscripcionesPagosForm
 
                 ->label('Pago pendiente')
 
+                ->visible(fn (string $operation): bool => $operation !== 'view')
+
                 ->disabled()
 
                 ->dehydrated(),
@@ -624,6 +674,22 @@ class SuscripcionesPagosForm
 
                 ->minDate(today())
 
+                ->live()
+
+                ->afterStateHydrated(function ($state, Set $set, Get $get) {
+                    $set(
+                        'dias_diferencia',
+                        self::formatPaymentDifference($state, $get('fecha_vencimiento'))
+                    );
+                })
+
+                ->afterStateUpdated(function (Get $get, Set $set, $state) {
+                    $set(
+                        'dias_diferencia',
+                        self::formatPaymentDifference($state, $get('fecha_vencimiento'))
+                    );
+                })
+
                 ->required(),
 
             /*
@@ -636,9 +702,32 @@ class SuscripcionesPagosForm
 
                 ->label('Fecha de vencimiento')
 
+                ->visible(fn (string $operation): bool => $operation !== 'view')
+
                 ->disabled()
 
                 ->dehydrated(false),
+
+            TextInput::make('dias_diferencia')
+
+                ->label('Días de diferencia')
+
+                ->afterStateHydrated(function (TextInput $component, $state, $record) {
+                    if ($record) {
+                        $component->state(
+                            self::formatPaymentDifference(
+                                $record->fecha_pago,
+                                $record->cobro?->fecha_vencimiento
+                            )
+                        );
+                    }
+                })
+
+                ->disabled()
+
+                ->dehydrated(false)
+
+                ->visible(fn (string $operation): bool => $operation === 'view'),
 
             /*
 |--------------------------------------------------------------------------
@@ -778,12 +867,14 @@ class SuscripcionesPagosForm
 
                 ->label('ID de operación / Folio QR')
 
-                ->required(
-                    fn(Get $get) =>
+                ->visible(
+                    fn(Get $get, string $operation) =>
+                    $operation !== 'view'
+                    &&
                     $get('metodo_pago') === 'qr'
                 )
 
-                ->visible(
+                ->required(
                     fn(Get $get) =>
                     $get('metodo_pago') === 'qr'
                 ),
@@ -811,7 +902,9 @@ class SuscripcionesPagosForm
                 )
 
                 ->visible(
-                    fn(Get $get) =>
+                    fn(Get $get, string $operation) =>
+                    $operation !== 'view'
+                    &&
                     $get('metodo_pago') === 'qr'
                 )
 
@@ -822,8 +915,10 @@ class SuscripcionesPagosForm
                 ->label('Nombre de la aplicación')
 
                 ->visible(
-                    fn(Get $get) =>
+                    fn(Get $get, string $operation) =>
 
+                    $operation !== 'view'
+                        &&
                     $get('metodo_pago') === 'qr'
                         &&
                         $get('billetera_origen') === 'Otro'
@@ -911,6 +1006,8 @@ class SuscripcionesPagosForm
 
                     'application/pdf',
                 ])
+
+                ->openable()
 
                 ->required(
                     fn(Get $get) =>

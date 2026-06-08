@@ -710,16 +710,7 @@ class ClientDashboardController extends Controller
         $cliente = $this->getClienteOrAbort();
 
         $categoria = Categorias::where('cliente_id', $cliente->id)
-            ->withCount(['subcategorias', 'productos'])
             ->findOrFail($id);
-
-        if ($categoria->subcategorias_count > 0) {
-            return back()->with('error', 'No puedes eliminar una categoría que tiene subcategorías. Elimínalas primero.');
-        }
-
-        if ($categoria->productos_count > 0) {
-            return back()->with('error', 'No puedes eliminar esta categoría porque tiene productos asociados.');
-        }
 
         $categoria->delete();
 

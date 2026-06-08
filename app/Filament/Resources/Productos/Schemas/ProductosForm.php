@@ -3,16 +3,16 @@
 namespace App\Filament\Resources\Productos\Schemas;
 
 use App\Models\Categorias;
-use App\Models\Marcas;
 use App\Models\Clientes;
 use App\Models\InfraestructurasTiendas;
+use App\Models\Marcas;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Utilities\Get;
 
 class ProductosForm
 {
@@ -58,7 +58,7 @@ class ProductosForm
                 // FORMATO VISUAL
                 ->formatStateUsing(function ($state) {
 
-                    if (!$state) {
+                    if (! $state) {
                         return null;
                     }
 
@@ -72,17 +72,15 @@ class ProductosForm
                 ->validationMessages([
                     'required' => 'El precio es obligatorio.',
 
-                    'regex' =>
-                    'Formato válido: 1.000,50',
+                    'regex' => 'Formato válido: 1.000,50',
 
-                    'max_length' =>
-                    'El precio es demasiado largo.',
+                    'max_length' => 'El precio es demasiado largo.',
                 ])
 
                 // LIMPIAR ANTES DE GUARDAR
                 ->dehydrateStateUsing(function ($state) {
 
-                    if (!$state) {
+                    if (! $state) {
                         return null;
                     }
 
@@ -120,41 +118,44 @@ class ProductosForm
             Select::make('cliente_temp')
                 ->label('Cliente')
                 ->options(
-                    Clientes::with('user')->get()
+                    fn () => Clientes::with('user')->get()
                         ->mapWithKeys(function ($cliente) {
-                            $u = $cliente->user;
-                            $nombre = $u
-                                ? trim(($u->nombres ?? '') . ' ' . ($u->apellido_paterno ?? ''))
-                                : ('Cliente #' . $cliente->id);
-                            return [$cliente->id => $nombre ?: ('Cliente #' . $cliente->id)];
+                            $nombre = $cliente->nombre_completo;
+
+                            return [$cliente->id => "{$cliente->id} - {$nombre}"];
                         })
                 )
-                ->live()
-                ->dehydrated(false)
-                ->required(),
+                ->disabled()
+                ->dehydrated(false),
 
             // TIENDA
 
             Select::make('infraestructuras_tienda_id')
                 ->label('Tienda')
-
-                ->options(function ($get) {
-
-                    $clienteId = $get('cliente_temp');
-
-                    if (!$clienteId) {
-                        return [];
-                    }
-
-                    return InfraestructurasTiendas::where('cliente_id', $clienteId)
+                ->options(
+                    fn () => InfraestructurasTiendas::with(['cliente.user', 'piso.infraestructura'])
+                        ->whereHas('estado', fn ($query) => $query->where('estado', 'Alquilada'))
+                        ->orderBy('numero')
                         ->get()
-                        ->mapWithKeys(fn($tienda) => [
-                            $tienda->id => $tienda->nombre ?: "Tienda #{$tienda->numero}"
-                        ]);
-                })
+                        ->mapWithKeys(function ($tienda) {
+                            $cliente = $tienda->cliente?->nombre_completo ?? 'Sin cliente';
+                            $ubicacion = trim(($tienda->piso?->infraestructura?->nombre ?? '').' '.$tienda->piso?->nombre);
+                            $nombre = $tienda->nombre ?: "Tienda #{$tienda->numero}";
+
+                            return [$tienda->id => "{$nombre} - {$cliente}".($ubicacion ? " ({$ubicacion})" : '')];
+                        })
+                )
 
                 ->required()
-                ->searchable(),
+                ->searchable()
+                ->live()
+                ->afterStateUpdated(function (Set $set, $state) {
+                    $clienteId = $state
+                        ? InfraestructurasTiendas::whereKey($state)->value('cliente_id')
+                        : null;
+
+                    $set('cliente_temp', $clienteId);
+                }),
 
             // =========================
             // CATEGORÍA
@@ -177,7 +178,7 @@ class ProductosForm
                 ])
 
                 ->afterStateUpdated(
-                    fn($set) => $set('subcategoria_id', null)
+                    fn ($set) => $set('subcategoria_id', null)
                 ),
 
             // =========================
@@ -188,9 +189,7 @@ class ProductosForm
                 ->label('Subcategoría')
 
                 ->options(
-                    fn($get) =>
-
-                    $get('categoria_id')
+                    fn ($get) => $get('categoria_id')
 
                         ? Categorias::where(
                             'categoria_padre_id',
@@ -212,34 +211,22 @@ class ProductosForm
 
             Select::make('marca_id')
                 ->label('Marca')
-                ->options(function (Get $get) {
-                    $clienteId = $get('cliente_temp');
-                    $query = Marcas::query()->whereNull('cliente_id');
-                    if ($clienteId) {
-                        $query->orWhere('cliente_id', $clienteId);
-                    }
-                    return $query->pluck('nombre', 'id');
-                })
+                ->options(
+                    fn () => Marcas::with('cliente.user')
+                        ->orderBy('nombre')
+                        ->get()
+                        ->mapWithKeys(function ($marca) {
+                            $origen = $marca->cliente
+                                ? 'Privada - '.$marca->cliente->nombre_completo
+                                : 'Pública';
+
+                            return [$marca->id => "{$marca->nombre} ({$origen})"];
+                        })
+                )
                 ->required()
                 ->validationMessages([
                     'required' => 'Debes seleccionar una marca.',
                 ]),
-
-            // =========================
-            // ESTADO
-            // =========================
-
-            Select::make('estado')
-                ->label('Estado')
-
-                ->options([
-                    'activo' => 'Activo',
-                    'inactivo' => 'Inactivo',
-                ])
-
-                ->default('activo')
-
-                ->required(),
 
             // =========================
             // IMÁGENES
@@ -281,28 +268,25 @@ class ProductosForm
 
                         ->directory('productos')
 
+                        ->fetchFileInformation(false)
+
+                        ->getUploadedFileUsing(function (FileUpload $component, string $file, string|array|null $storedFileNames): ?array {
+                            return [
+                                'name' => basename($file),
+                                'size' => 0,
+                                'type' => null,
+                                'url' => str_starts_with($file, 'http')
+                                    ? $file
+                                    : asset('storage/'.$file),
+                            ];
+                        })
+
                         ->required()
 
                         ->validationMessages([
                             'required' => 'La imagen es obligatoria.',
                         ]),
 
-                    Select::make('tipo')
-
-                        ->label('Tipo de imagen')
-
-                        ->options([
-                            'principal' => 'Imagen principal',
-                            'secundaria' => 'Imagen secundaria',
-                        ])
-
-                        ->required()
-
-                        ->native(false)
-
-                        ->validationMessages([
-                            'required' => 'Debes seleccionar el tipo de imagen.',
-                        ]),
                 ]),
         ]);
     }
