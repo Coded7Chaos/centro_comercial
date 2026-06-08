@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Models\Clientes;
+use App\Filament\Resources\SuscripcionesTarifas\Pages\ListSuscripcionesTarifas;
 use App\Models\DescuentoTiempo;
+use App\Models\Infraestructuras;
+use App\Models\InfraestructurasPisos;
 use App\Models\InfraestructurasTiendas;
 use App\Models\SuscripcionesTarifas;
 use App\Models\TamanoEtiqueta;
@@ -11,6 +13,7 @@ use App\Models\TamanoPrecio;
 use App\Models\User;
 use Database\Seeders\RolesAndPermissionsSeeder;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class SuscripcionesTarifasCustomTest extends TestCase
@@ -18,6 +21,7 @@ class SuscripcionesTarifasCustomTest extends TestCase
     use DatabaseTransactions;
 
     protected $adminUser;
+
     protected $shop;
 
     protected function setUp(): void
@@ -32,12 +36,12 @@ class SuscripcionesTarifasCustomTest extends TestCase
         $this->adminUser->assignRole('admin');
 
         // Setup infrastructure
-        $infra = \App\Models\Infraestructuras::create([
+        $infra = Infraestructuras::create([
             'nombre' => 'Mall Custom Test',
             'ubicacion' => 'Test Location',
             'pisos' => 3,
         ]);
-        $piso = \App\Models\InfraestructurasPisos::create([
+        $piso = InfraestructurasPisos::create([
             'nombre' => 'Piso Custom Test',
             'infraestructura_id' => $infra->id,
         ]);
@@ -152,6 +156,42 @@ class SuscripcionesTarifasCustomTest extends TestCase
             'precio_mensual_con_descuento' => 720.00,
             'precio_total_con_descuento' => 2160.00,
             'pago_inicial' => 1440.00, // 2 months rent equivalent (first month + deposit)
+        ]);
+    }
+
+    public function test_admin_cannot_create_size_label_inside_existing_range(): void
+    {
+        Livewire::actingAs($this->adminUser)
+            ->test(ListSuscripcionesTarifas::class)
+            ->set('etiquetaNombre', 'Duplicado Pequeño')
+            ->set('etiquetaDesde', 10.00)
+            ->set('etiquetaHasta', 20.00)
+            ->call('saveEtiqueta')
+            ->assertHasErrors([
+                'etiquetaDesde',
+                'etiquetaHasta',
+            ])
+            ->assertSee('Ya existe una etiqueta de tamaño en el rango escogido');
+
+        $this->assertDatabaseMissing('tamano_etiquetas', [
+            'nombre' => 'Duplicado Pequeño',
+        ]);
+    }
+
+    public function test_admin_can_create_size_label_after_existing_range_without_overlap(): void
+    {
+        Livewire::actingAs($this->adminUser)
+            ->test(ListSuscripcionesTarifas::class)
+            ->set('etiquetaNombre', 'Grande Custom')
+            ->set('etiquetaDesde', 60.01)
+            ->set('etiquetaHasta', 100.00)
+            ->call('saveEtiqueta')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('tamano_etiquetas', [
+            'nombre' => 'Grande Custom',
+            'desde' => 60.01,
+            'hasta' => 100.00,
         ]);
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
@@ -28,6 +28,7 @@ class Categorias extends Model
         'tipo',
         'categoria_padre_id',
         'infraestructura_id',
+        'cliente_id',
     ];
 
     public function productos(): HasMany
@@ -38,6 +39,11 @@ class Categorias extends Model
     public function padre(): BelongsTo
     {
         return $this->belongsTo(Categorias::class, 'categoria_padre_id');
+    }
+
+    public function cliente(): BelongsTo
+    {
+        return $this->belongsTo(Clientes::class, 'cliente_id');
     }
 
     public function subcategorias(): HasMany

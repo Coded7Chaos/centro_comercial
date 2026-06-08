@@ -2,8 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\InfraestructurasTiendas;
-use App\Observers\SuscripcionObserver;
+use App\Services\ExpiredSubscriptionsService;
 use Illuminate\Console\Command;
 
 class ReleaseExpiredSubscriptions extends Command
@@ -25,23 +24,9 @@ class ReleaseExpiredSubscriptions extends Command
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(ExpiredSubscriptionsService $service): int
     {
-        $tiendas = InfraestructurasTiendas::all();
-        $contador = 0;
-
-        foreach ($tiendas as $tienda) {
-            $estadoAnterior = $tienda->id_estado;
-            
-            // Invocar sincronización centralizada
-            SuscripcionObserver::syncTienda($tienda->id);
-            
-            // Verificar si el estado cambió a "Disponible" (liberación)
-            $tienda->refresh();
-            if ($estadoAnterior !== $tienda->id_estado && $tienda->estado?->estado === 'Disponible') {
-                $contador++;
-            }
-        }
+        $contador = $service->process();
 
         $this->info("Proceso completado. Tiendas liberadas hoy por expiración: {$contador}");
 

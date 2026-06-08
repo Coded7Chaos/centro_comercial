@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Cliente;
 use App\Http\Controllers\Controller;
 use App\Models\Categorias;
 use App\Models\Clientes;
-use App\Models\EstadoTienda;
-use App\Models\InfraestructurasTiendas;
+use App\Models\ClientNotification;
 use App\Models\Marcas;
+use App\Models\PaymentSettings;
 use App\Models\Productos;
 use App\Models\ProductosImagenes;
 use App\Models\Suscripciones;
@@ -23,23 +23,39 @@ class ClientDashboardController extends Controller
     {
         $user = Auth::user();
         $cliente = $user->cliente;
-        if (!$cliente) {
+        if (! $cliente) {
             abort(403, 'Su cuenta de usuario no está vinculada a ningún Cliente. Contacte al administrador.');
         }
+
         return $cliente;
+    }
+
+    private function categoriasVisiblesPara(Clientes $cliente)
+    {
+        return Categorias::whereNull('categoria_padre_id')
+            ->where(fn ($query) => $query
+                ->whereNull('cliente_id')
+                ->orWhere('cliente_id', $cliente->id)
+            )
+            ->with(['subcategorias' => fn ($query) => $query
+                ->whereNull('cliente_id')
+                ->orWhere('cliente_id', $cliente->id),
+            ])
+            ->orderBy('nombre')
+            ->get();
     }
 
     public function dashboard()
     {
         $cliente = $this->getClienteOrAbort();
-        
+
         // Tiendas asociadas
         $tiendas = $cliente->tiendas()->with(['piso.infraestructura', 'estado'])->get();
-        
+
         // Conteo de productos
         $tiendaIds = $tiendas->pluck('id')->toArray();
         $cantProductos = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)->count();
-        
+
         // Suscripciones activas
         $suscripciones = Suscripciones::where('cliente_id', $cliente->id)
             ->with(['infraestructurasTienda'])
@@ -53,7 +69,7 @@ class ClientDashboardController extends Controller
             ->with('pagos')
             ->orderBy('fecha_vencimiento', 'asc')
             ->get();
-            
+
         // Resumen financiero
         $totalDeuda = 0;
         foreach ($cobrosPendientes as $c) {
@@ -66,9 +82,9 @@ class ClientDashboardController extends Controller
             ->selectRaw('categoria_id, count(*) as total')
             ->groupBy('categoria_id')
             ->get()
-            ->map(fn($p) => [
+            ->map(fn ($p) => [
                 'nombre' => $p->categoria ? $p->categoria->nombre : 'Sin Categoría',
-                'total' => (int) $p->total
+                'total' => (int) $p->total,
             ]);
 
         $productosPorMarca = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)
@@ -76,17 +92,17 @@ class ClientDashboardController extends Controller
             ->selectRaw('marca_id, count(*) as total')
             ->groupBy('marca_id')
             ->get()
-            ->map(fn($p) => [
+            ->map(fn ($p) => [
                 'nombre' => $p->marca ? $p->marca->nombre : 'Sin Marca',
-                'total' => (int) $p->total
+                'total' => (int) $p->total,
             ]);
 
         return view('cliente.dashboard', compact(
-            'cliente', 
-            'tiendas', 
-            'cantProductos', 
-            'suscripciones', 
-            'cobrosPendientes', 
+            'cliente',
+            'tiendas',
+            'cantProductos',
+            'suscripciones',
+            'cobrosPendientes',
             'totalDeuda',
             'productosPorCategoria',
             'productosPorMarca'
@@ -97,7 +113,7 @@ class ClientDashboardController extends Controller
     {
         $cliente = $this->getClienteOrAbort();
         $tiendas = $cliente->tiendas()->with('piso.infraestructura')->get();
-        
+
         return view('cliente.tienda', compact('cliente', 'tiendas'));
     }
 
@@ -113,7 +129,7 @@ class ClientDashboardController extends Controller
         ]);
 
         $tienda = $cliente->tiendas()->findOrFail($request->tienda_id);
-        
+
         $tienda->nombre = $request->nombre;
         $tienda->descripcion = $request->descripcion;
         $tienda->telefono_referencia = $request->telefono_referencia;
@@ -135,7 +151,7 @@ class ClientDashboardController extends Controller
     {
         $cliente = $this->getClienteOrAbort();
         $tiendaIds = $cliente->tiendas->pluck('id')->toArray();
-        
+
         $productos = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)
             ->with(['categoria.padre', 'marca', 'imagenes', 'tienda'])
             ->orderBy('id', 'desc')
@@ -148,12 +164,12 @@ class ClientDashboardController extends Controller
     {
         $cliente = $this->getClienteOrAbort();
         $tiendas = $cliente->tiendas;
-        
+
         if ($tiendas->isEmpty()) {
             return redirect()->route('cliente.dashboard')->with('error', 'Debe tener al menos una tienda asignada para registrar productos.');
         }
 
-        $categorias = Categorias::whereNull('categoria_padre_id')->with('subcategorias')->get();
+        $categorias = $this->categoriasVisiblesPara($cliente);
         $marcas = Marcas::where('cliente_id', $cliente->id)->orWhereNull('cliente_id')->get(); // Incluye marcas globales
 
         return view('cliente.productos.create', compact('tiendas', 'categorias', 'marcas'));
@@ -168,7 +184,7 @@ class ClientDashboardController extends Controller
             'nombre' => 'required|string|max:80',
             'precio' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string|max:1000',
-            'infraestructuras_tienda_id' => 'required|in:' . implode(',', $tiendaIds),
+            'infraestructuras_tienda_id' => 'required|in:'.implode(',', $tiendaIds),
             'categoria_id' => 'required|exists:categorias,id',
             'subcategoria_id' => 'required|exists:categorias,id',
             'marca_id' => 'required|exists:marcas,id',
@@ -201,13 +217,13 @@ class ClientDashboardController extends Controller
     {
         $cliente = $this->getClienteOrAbort();
         $tiendaIds = $cliente->tiendas->pluck('id')->toArray();
-        
+
         $producto = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)->findOrFail($id);
         $tiendas = $cliente->tiendas;
-        
+
         // Categorías
-        $categorias = Categorias::whereNull('categoria_padre_id')->with('subcategorias')->get();
-        
+        $categorias = $this->categoriasVisiblesPara($cliente);
+
         // Obtener categoría padre del producto
         $subcat = Categorias::find($producto->categoria_id);
         $categoriaPadreId = $subcat ? $subcat->categoria_padre_id : null;
@@ -221,14 +237,14 @@ class ClientDashboardController extends Controller
     {
         $cliente = $this->getClienteOrAbort();
         $tiendaIds = $cliente->tiendas->pluck('id')->toArray();
-        
+
         $producto = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)->findOrFail($id);
 
         $request->validate([
             'nombre' => 'required|string|max:80',
             'precio' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string|max:1000',
-            'infraestructuras_tienda_id' => 'required|in:' . implode(',', $tiendaIds),
+            'infraestructuras_tienda_id' => 'required|in:'.implode(',', $tiendaIds),
             'categoria_id' => 'required|exists:categorias,id',
             'subcategoria_id' => 'required|exists:categorias,id',
             'marca_id' => 'required|exists:marcas,id',
@@ -267,7 +283,7 @@ class ClientDashboardController extends Controller
     {
         $cliente = $this->getClienteOrAbort();
         $tiendaIds = $cliente->tiendas->pluck('id')->toArray();
-        
+
         $producto = Productos::whereIn('infraestructuras_tienda_id', $tiendaIds)->findOrFail($id);
 
         // Borrar imágenes físicas y registros
@@ -286,13 +302,13 @@ class ClientDashboardController extends Controller
         $cliente = $this->getClienteOrAbort();
         $suscripciones = Suscripciones::where('cliente_id', $cliente->id)->get();
         $suscripcionIds = $suscripciones->pluck('id')->toArray();
-        
+
         $cobros = SuscripcionesCobros::whereIn('suscripcion_id', $suscripcionIds)
             ->with(['pagos', 'suscripcion.infraestructurasTienda'])
             ->orderBy('fecha_vencimiento', 'desc')
             ->get();
 
-        $settings = \App\Models\PaymentSettings::first();
+        $settings = PaymentSettings::first();
 
         return view('cliente.estado-cuenta', compact('cobros', 'settings'));
     }
@@ -302,7 +318,7 @@ class ClientDashboardController extends Controller
         $cliente = $this->getClienteOrAbort();
         $suscripciones = Suscripciones::where('cliente_id', $cliente->id)->get();
         $suscripcionIds = $suscripciones->pluck('id')->toArray();
-        
+
         $request->validate([
             'suscripcion_cobro_id' => 'required|exists:suscripciones_cobros,id',
             'metodo_pago' => 'required|in:transferencia,qr',
@@ -358,7 +374,7 @@ class ClientDashboardController extends Controller
     public function marcarNotificacionLeida($id)
     {
         $cliente = $this->getClienteOrAbort();
-        $notif = \App\Models\ClientNotification::where('cliente_id', $cliente->id)->findOrFail($id);
+        $notif = ClientNotification::where('cliente_id', $cliente->id)->findOrFail($id);
         $notif->update(['leido' => true]);
 
         return redirect()->back()->with('success', 'Notificación descartada.');
@@ -418,6 +434,7 @@ class ClientDashboardController extends Controller
     {
         $cliente = $this->getClienteOrAbort();
         $marca = Marcas::where('cliente_id', $cliente->id)->findOrFail($id);
+
         return view('cliente.marcas.form', compact('marca'));
     }
 
@@ -480,19 +497,19 @@ class ClientDashboardController extends Controller
     {
         $cliente = $this->getClienteOrAbort();
         $tiendas = $cliente->tiendas()->with(['piso.infraestructura', 'marcas', 'productos.imagenes'])->get();
-        
+
         $selectedTiendaId = $request->input('tienda_id');
         $tienda = null;
         if ($selectedTiendaId) {
             $tienda = $tiendas->firstWhere('id', $selectedTiendaId);
         }
-        if (!$tienda && $tiendas->isNotEmpty()) {
+        if (! $tienda && $tiendas->isNotEmpty()) {
             $tienda = $tiendas->first();
         }
 
         $productosVitrina = $tienda ? $tienda->productos()->with(['imagenes', 'categoria', 'marca'])->take(3)->get() : collect();
-        
-        $categorias = Categorias::whereNull('categoria_padre_id')->with('subcategorias')->get();
+
+        $categorias = $this->categoriasVisiblesPara($cliente);
         $marcas = Marcas::where('cliente_id', $cliente->id)->orWhereNull('cliente_id')->get();
 
         return view('cliente.personalizar', compact('cliente', 'tiendas', 'tienda', 'productosVitrina', 'categorias', 'marcas'));
@@ -510,11 +527,11 @@ class ClientDashboardController extends Controller
         ]);
 
         $tienda = $cliente->tiendas()->findOrFail($request->tienda_id);
-        
+
         $tienda->nombre = $request->nombre;
         $tienda->descripcion = $request->descripcion;
         $tienda->telefono_referencia = $request->telefono_referencia;
-        
+
         if ($request->filled('marca_id')) {
             $tienda->marcas()->sync([$request->marca_id]);
         } else {
@@ -537,7 +554,7 @@ class ClientDashboardController extends Controller
         ]);
 
         $tienda = $cliente->tiendas()->findOrFail($request->tienda_id);
-        $slotField = 'vitrina_' . $request->slot;
+        $slotField = 'vitrina_'.$request->slot;
 
         if ($tienda->$slotField) {
             Storage::disk('public')->delete($tienda->$slotField);
@@ -558,7 +575,7 @@ class ClientDashboardController extends Controller
 
         $request->validate([
             'producto_id' => 'nullable|exists:productos,id',
-            'tienda_id' => 'required|in:' . implode(',', $tiendaIds),
+            'tienda_id' => 'required|in:'.implode(',', $tiendaIds),
             'nombre' => 'required|string|max:80',
             'precio' => 'required|numeric|min:0',
             'descripcion' => 'nullable|string|max:1000',
@@ -592,7 +609,7 @@ class ClientDashboardController extends Controller
                     'tipo' => 'principal',
                 ]);
             }
-            
+
             $msg = 'Producto actualizado correctamente.';
         } else {
             $request->validate([
@@ -654,46 +671,47 @@ class ClientDashboardController extends Controller
 
     public function categorias()
     {
-        $this->getClienteOrAbort();
+        $cliente = $this->getClienteOrAbort();
 
         // Categorías raíz con sus subcategorías
-        $categorias = Categorias::whereNull('categoria_padre_id')
-            ->with('subcategorias')
-            ->orderBy('nombre')
-            ->get();
+        $categorias = $this->categoriasVisiblesPara($cliente);
 
         return view('cliente.categorias.index', compact('categorias'));
     }
 
     public function storeCategoria(Request $request)
     {
-        $this->getClienteOrAbort();
+        $cliente = $this->getClienteOrAbort();
 
         $request->validate([
-            'nombre'             => 'required|string|max:100',
+            'nombre' => 'required|string|max:100',
             'categoria_padre_id' => 'nullable|exists:categorias,id',
         ], [
             'nombre.required' => 'El nombre es obligatorio.',
-            'nombre.max'      => 'El nombre no puede superar los 100 caracteres.',
+            'nombre.max' => 'El nombre no puede superar los 100 caracteres.',
         ]);
 
         Categorias::create([
-            'nombre'             => $request->nombre,
-            'descripcion'        => $request->descripcion,
+            'nombre' => $request->nombre,
+            'descripcion' => $request->descripcion,
             'categoria_padre_id' => $request->categoria_padre_id ?: null,
-            'estado'             => 'activo',
-            'tipo'               => 'categoria',
+            'estado' => 'activo',
+            'tipo' => $request->categoria_padre_id ? 'subcategoria' : 'categoria',
+            'cliente_id' => $cliente->id,
         ]);
 
         $tipo = $request->categoria_padre_id ? 'Subcategoría' : 'Categoría';
+
         return back()->with('success', "{$tipo} creada correctamente.");
     }
 
     public function destroyCategoria($id)
     {
-        $this->getClienteOrAbort();
+        $cliente = $this->getClienteOrAbort();
 
-        $categoria = Categorias::withCount(['subcategorias', 'productos'])->findOrFail($id);
+        $categoria = Categorias::where('cliente_id', $cliente->id)
+            ->withCount(['subcategorias', 'productos'])
+            ->findOrFail($id);
 
         if ($categoria->subcategorias_count > 0) {
             return back()->with('error', 'No puedes eliminar una categoría que tiene subcategorías. Elimínalas primero.');
@@ -708,4 +726,3 @@ class ClientDashboardController extends Controller
         return back()->with('success', 'Categoría eliminada correctamente.');
     }
 }
-

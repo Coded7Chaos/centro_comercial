@@ -3,8 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Suscripciones;
-use App\Models\InfraestructurasTiendas;
-use App\Models\EstadoTienda;
+use App\Services\ExpiredSubscriptionsService;
 
 class SuscripcionObserver
 {
@@ -13,46 +12,11 @@ class SuscripcionObserver
      */
     public static function syncTienda(?int $tiendaId): void
     {
-        if (!$tiendaId) {
+        if (! $tiendaId) {
             return;
         }
 
-        $tienda = InfraestructurasTiendas::find($tiendaId);
-        if (!$tienda) {
-            return;
-        }
-
-        $today = now()->toDateString();
-
-        // Buscar si existe un contrato activo para el día de hoy en esta tienda
-        $suscripcionActiva = Suscripciones::where('infraestructuras_tienda_id', $tiendaId)
-            ->where('fecha_inicio', '<=', $today)
-            ->where('fecha_fin', '>=', $today)
-            ->first();
-
-        if ($suscripcionActiva) {
-            $estadoAlquilada = EstadoTienda::where('estado', 'Alquilada')->first();
-            if ($estadoAlquilada) {
-                $tienda->update([
-                    'cliente_id' => $suscripcionActiva->cliente_id,
-                    'id_estado' => $estadoAlquilada->id,
-                ]);
-                if ($suscripcionActiva->marca_id) {
-                    $tienda->marcas()->sync([$suscripcionActiva->marca_id]);
-                } else {
-                    $tienda->marcas()->detach();
-                }
-            }
-        } else {
-            $estadoDisponible = EstadoTienda::where('estado', 'Disponible')->first();
-            if ($estadoDisponible) {
-                $tienda->update([
-                    'cliente_id' => null,
-                    'id_estado' => $estadoDisponible->id,
-                ]);
-                $tienda->marcas()->detach();
-            }
-        }
+        app(ExpiredSubscriptionsService::class)->syncStoreForToday($tiendaId);
     }
 
     /**

@@ -3,9 +3,9 @@
 namespace App\Filament\Resources\SuscripcionesTarifas\Pages;
 
 use App\Filament\Resources\SuscripcionesTarifas\SuscripcionesTarifasResource;
+use App\Models\DescuentoTiempo;
 use App\Models\TamanoEtiqueta;
 use App\Models\TamanoPrecio;
-use App\Models\DescuentoTiempo;
 use Filament\Resources\Pages\Page;
 use Illuminate\Validation\Rule;
 
@@ -17,21 +17,31 @@ class ListSuscripcionesTarifas extends Page
 
     // Properties for Size Labels
     public $etiquetas = [];
+
     public $etiquetaId = null;
+
     public $etiquetaNombre = '';
+
     public $etiquetaDesde = '';
+
     public $etiquetaHasta = '';
 
     // Properties for Size Prices
     public $precios = [];
+
     public $precioId = null;
+
     public $precioEtiquetaId = '';
+
     public $precioMensual = '';
 
     // Properties for Time Discounts
     public $descuentos = [];
+
     public $descuentoId = null;
+
     public $descuentoMinMeses = '';
+
     public $descuentoGlobal = '';
 
     public function mount(): void
@@ -84,6 +94,15 @@ class ListSuscripcionesTarifas extends Page
             'etiquetaHasta.gt' => 'El valor "Hasta" debe ser mayor que "Desde".',
         ]);
 
+        if ($this->etiquetaRangeOverlapsExisting()) {
+            $message = 'Ya existe una etiqueta de tamaño en el rango escogido';
+
+            $this->addError('etiquetaDesde', $message);
+            $this->addError('etiquetaHasta', $message);
+
+            return;
+        }
+
         TamanoEtiqueta::updateOrCreate(
             ['id' => $this->etiquetaId],
             [
@@ -96,6 +115,18 @@ class ListSuscripcionesTarifas extends Page
         session()->flash('success', $this->etiquetaId ? 'Etiqueta de tamaño actualizada correctamente.' : 'Etiqueta de tamaño agregada correctamente.');
         $this->resetFormFields();
         $this->refreshData();
+    }
+
+    private function etiquetaRangeOverlapsExisting(): bool
+    {
+        $desde = (float) $this->etiquetaDesde;
+        $hasta = (float) $this->etiquetaHasta;
+
+        return TamanoEtiqueta::query()
+            ->when($this->etiquetaId, fn ($query) => $query->whereKeyNot($this->etiquetaId))
+            ->where('desde', '<=', $hasta)
+            ->where('hasta', '>=', $desde)
+            ->exists();
     }
 
     public function editEtiqueta($id)

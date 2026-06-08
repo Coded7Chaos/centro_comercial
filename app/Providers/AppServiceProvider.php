@@ -9,6 +9,7 @@ use App\Models\Suscripciones;
 use App\Models\User;
 use App\Observers\SuscripcionObserver;
 use App\Observers\UserObserver;
+use App\Services\ExpiredSubscriptionsService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
@@ -66,6 +67,10 @@ class AppServiceProvider extends ServiceProvider
 
         Suscripciones::observe(SuscripcionObserver::class);
         User::observe(UserObserver::class);
+
+        if (! app()->runningInConsole()) {
+            app(ExpiredSubscriptionsService::class)->process();
+        }
     }
 
     private function configureSystemDate(): void

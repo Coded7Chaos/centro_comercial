@@ -3,15 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
 use Spatie\Activitylog\Support\LogOptions;
 
 class Clientes extends Model
 {
-    use SoftDeletes, LogsActivity;
+    use LogsActivity, SoftDeletes;
 
     public function getActivitylogOptions(): LogOptions
     {
@@ -58,6 +58,22 @@ class Clientes extends Model
         if ($this->user) {
             return "{$this->user->nombres} {$this->user->apellido_paterno}";
         }
+
         return "Cliente #{$this->id}";
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Clientes $cliente) {
+            if (! $cliente->isForceDeleting() && $cliente->user && ! $cliente->user->trashed()) {
+                $cliente->user->delete();
+            }
+        });
+
+        static::restoring(function (Clientes $cliente) {
+            if ($cliente->user && $cliente->user->trashed()) {
+                $cliente->user->restore();
+            }
+        });
     }
 }

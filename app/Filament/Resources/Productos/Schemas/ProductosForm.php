@@ -12,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Utilities\Get;
 
 class ProductosForm
 {
@@ -211,7 +212,7 @@ class ProductosForm
 
             Select::make('marca_id')
                 ->label('Marca')
-                ->options(function (\Filament\Forms\Get $get) {
+                ->options(function (Get $get) {
                     $clienteId = $get('cliente_temp');
                     $query = Marcas::query()->whereNull('cliente_id');
                     if ($clienteId) {
