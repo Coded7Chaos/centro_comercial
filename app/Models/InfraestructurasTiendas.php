@@ -14,7 +14,7 @@ class InfraestructurasTiendas extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['nombre', 'numero', 'descripcion', 'telefono_referencia', 'tamano', 'cliente_id', 'id_estado', 'vitrina_1', 'vitrina_2', 'vitrina_3'])
+            ->logOnly(['nombre', 'numero', 'descripcion', 'telefono_referencia', 'email_contacto', 'tamano', 'cliente_id', 'id_estado', 'vitrina_1', 'vitrina_2', 'vitrina_3'])
             ->logOnlyDirty()
             ->dontLogEmptyChanges()
             ->useLogName('infraestructura');
@@ -26,6 +26,7 @@ class InfraestructurasTiendas extends Model
         'numero',
         'descripcion',
         'telefono_referencia',
+        'email_contacto',
         'tamano',
         'cliente_id',
         'id_estado',
@@ -174,4 +175,3 @@ class InfraestructurasTiendas extends Model
         });
     }
 }
-

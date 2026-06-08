@@ -149,6 +149,10 @@
                                                                     {{ $tienda->telefono_referencia ?: 'Sin teléfono' }}
                                                                 </p>
                                                                 <p class="text-[11px] text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                                                                    <x-heroicon-o-envelope class="w-3.5 h-3.5" />
+                                                                    <span class="truncate">{{ $tienda->email_contacto ?: 'Sin email' }}</span>
+                                                                </p>
+                                                                <p class="text-[11px] text-gray-600 dark:text-gray-400 flex items-center gap-2">
                                                                     <x-heroicon-o-arrows-pointing-out class="w-3.5 h-3.5" />
                                                                     {{ $tienda->tamano ?: '0' }} m²
                                                                 </p>

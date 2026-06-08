@@ -55,6 +55,18 @@ class CreateInfraestructurasCustom extends Page
         $this->addPiso();
     }
 
+    protected function defaultStorePhone(): string
+    {
+        return auth()->user()?->cliente?->numero_celular
+            ? (string) auth()->user()->cliente->numero_celular
+            : '+591 7000 0000';
+    }
+
+    protected function defaultStoreEmail(): ?string
+    {
+        return auth()->user()?->email;
+    }
+
     public function addPiso()
     {
         $numeroPiso = count($this->pisos) + 1;
@@ -66,10 +78,10 @@ class CreateInfraestructurasCustom extends Page
             'imagen_fondo' => '/images/backgrounds/bg_mall_white.jpg',
             'tiendas' => [
                 [
-                    'nombre' => '',
                     'numero' => '1',
-                    'telefono_referencia' => '',
-                    'tamano' => '',
+                    'telefono_referencia' => $this->defaultStorePhone(),
+                    'email_contacto' => $this->defaultStoreEmail(),
+                    'tamano' => '20',
                     'descripcion' => '',
                     'estado' => 1,
                 ],
@@ -89,10 +101,10 @@ class CreateInfraestructurasCustom extends Page
     {
         $proximoNumero = count($this->pisos[$pisoIndex]['tiendas']) + 1;
         $this->pisos[$pisoIndex]['tiendas'][] = [
-            'nombre' => '',
             'numero' => (string) $proximoNumero,
-            'telefono_referencia' => '',
-            'tamano' => '',
+            'telefono_referencia' => $this->defaultStorePhone(),
+            'email_contacto' => $this->defaultStoreEmail(),
+            'tamano' => '20',
             'descripcion' => '',
             'estado' => 1,
         ];
@@ -226,10 +238,11 @@ class CreateInfraestructurasCustom extends Page
             'pisos.*.numero' => 'required',
             'pisos.*.estado' => 'required|in:activo,inactivo',
             'pisos.*.imagen_fondo' => 'required|string',
-            'pisos.*.tiendas.*.nombre' => 'nullable',
             'pisos.*.tiendas.*.numero' => 'required',
-            'pisos.*.tiendas.*.telefono_referencia' => 'nullable',
-            'pisos.*.tiendas.*.tamano' => 'nullable|numeric',
+            'pisos.*.tiendas.*.telefono_referencia' => 'required|string|max:30',
+            'pisos.*.tiendas.*.email_contacto' => 'nullable|email|max:255',
+            'pisos.*.tiendas.*.tamano' => 'required|numeric|min:0.01',
+            'pisos.*.tiendas.*.descripcion' => 'nullable|string|max:1000',
         ]);
 
         try {
@@ -257,11 +270,12 @@ class CreateInfraestructurasCustom extends Page
                     foreach ($pisoData['tiendas'] as $tiendaData) {
                         InfraestructurasTiendas::create([
                             'infraestructura_piso_id' => $piso->id,
-                            'nombre' => $tiendaData['nombre'],
+                            'nombre' => null,
                             'numero' => $tiendaData['numero'],
                             'telefono_referencia' => $tiendaData['telefono_referencia'],
+                            'email_contacto' => $tiendaData['email_contacto'] ?? null,
                             'tamano' => $tiendaData['tamano'],
-                            'descripcion' => $tiendaData['descripcion'],
+                            'descripcion' => $tiendaData['descripcion'] ?? null,
                             'id_estado' => $tiendaData['estado'],
                         ]);
                     }

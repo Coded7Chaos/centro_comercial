@@ -52,7 +52,7 @@ class EditInfraestructurasCustom extends Page
 
     public function mount($record)
     {
-        $infra = Infraestructuras::with(['pisosInfraestructura.tiendas'])->findOrFail($record);
+        $infra = Infraestructuras::with(['pisosInfraestructura.tiendas' => fn ($query) => $query->orderBy('numero')])->findOrFail($record);
 
         $this->infraId = $infra->id;
         $this->nombre = $infra->nombre;
@@ -68,6 +68,7 @@ class EditInfraestructurasCustom extends Page
                     'nombre' => $tienda->nombre,
                     'numero' => $tienda->numero,
                     'telefono_referencia' => $tienda->telefono_referencia,
+                    'email_contacto' => $tienda->email_contacto,
                     'tamano' => $tienda->tamano,
                     'descripcion' => $tienda->descripcion,
                     'estado' => $tienda->id_estado,
@@ -85,6 +86,18 @@ class EditInfraestructurasCustom extends Page
         }
     }
 
+    protected function defaultStorePhone(): string
+    {
+        return auth()->user()?->cliente?->numero_celular
+            ? (string) auth()->user()->cliente->numero_celular
+            : '+591 7000 0000';
+    }
+
+    protected function defaultStoreEmail(): ?string
+    {
+        return auth()->user()?->email;
+    }
+
     public function addPiso()
     {
         $numeroPiso = count($this->pisos) + 1;
@@ -96,10 +109,10 @@ class EditInfraestructurasCustom extends Page
             'imagen_fondo' => '/images/backgrounds/bg_mall_white.jpg',
             'tiendas' => [
                 [
-                    'nombre' => '',
                     'numero' => '1',
-                    'telefono_referencia' => '',
-                    'tamano' => '',
+                    'telefono_referencia' => $this->defaultStorePhone(),
+                    'email_contacto' => $this->defaultStoreEmail(),
+                    'tamano' => '20',
                     'descripcion' => '',
                     'estado' => 1,
                 ],
@@ -117,10 +130,10 @@ class EditInfraestructurasCustom extends Page
     {
         $proximoNumero = count($this->pisos[$pisoIndex]['tiendas']) + 1;
         $this->pisos[$pisoIndex]['tiendas'][] = [
-            'nombre' => '',
             'numero' => (string) $proximoNumero,
-            'telefono_referencia' => '',
-            'tamano' => '',
+            'telefono_referencia' => $this->defaultStorePhone(),
+            'email_contacto' => $this->defaultStoreEmail(),
+            'tamano' => '20',
             'descripcion' => '',
             'estado' => 1,
         ];
@@ -268,10 +281,11 @@ class EditInfraestructurasCustom extends Page
             'pisos.*.numero' => 'required',
             'pisos.*.estado' => 'required|in:activo,inactivo',
             'pisos.*.imagen_fondo' => 'required|string',
-            'pisos.*.tiendas.*.nombre' => 'nullable',
             'pisos.*.tiendas.*.numero' => 'required',
-            'pisos.*.tiendas.*.telefono_referencia' => 'nullable',
-            'pisos.*.tiendas.*.tamano' => 'nullable|numeric',
+            'pisos.*.tiendas.*.telefono_referencia' => 'required|string|max:30',
+            'pisos.*.tiendas.*.email_contacto' => 'nullable|email|max:255',
+            'pisos.*.tiendas.*.tamano' => 'required|numeric|min:0.01',
+            'pisos.*.tiendas.*.descripcion' => 'nullable|string|max:1000',
         ]);
 
         try {
@@ -308,11 +322,11 @@ class EditInfraestructurasCustom extends Page
                             ['id' => $tiendaData['id'] ?? null],
                             [
                                 'infraestructura_piso_id' => $piso->id,
-                                'nombre' => $tiendaData['nombre'],
                                 'numero' => $tiendaData['numero'],
                                 'telefono_referencia' => $tiendaData['telefono_referencia'],
+                                'email_contacto' => $tiendaData['email_contacto'] ?? null,
                                 'tamano' => $tiendaData['tamano'],
-                                'descripcion' => $tiendaData['descripcion'],
+                                'descripcion' => $tiendaData['descripcion'] ?? null,
                                 'id_estado' => $tiendaData['estado'],
                             ]
                         );

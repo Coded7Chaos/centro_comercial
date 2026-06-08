@@ -178,6 +178,7 @@ Route::get('/suscripciones', function () {
         'nombre'   => $t->nombre ?: 'Local ' . $t->numero,
         'tamano'   => (float) ($t->tamano ?? 0),
         'telefono' => $t->telefono_referencia,
+        'email_contacto' => $t->email_contacto,
     ])->values();
 
     // tamaño inicial: tienda seleccionada → URL param → 15 m² por defecto
@@ -186,7 +187,8 @@ Route::get('/suscripciones', function () {
     // Teléfono del administrador — mismo que muestra el modal de tienda disponible en el welcome
     $adminUser  = \App\Models\User::role(['super_admin', 'admin'])
         ->with('cliente')->orderBy('id')->first();
-    $adminPhone = $adminUser?->cliente?->numero_celular ?? '+591 7000 0000';
+    $adminPhone = $selectedTienda?->telefono_referencia
+        ?: ($adminUser?->cliente?->numero_celular ?? '+591 7000 0000');
 
     return view('suscripciones', compact(
         'tamanos', 'descuentos', 'tiendas',

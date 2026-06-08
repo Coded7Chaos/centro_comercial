@@ -295,6 +295,7 @@
                                         target.nombre = store.nombre;
                                         target.descripcion = store.descripcion;
                                         target.telefono = store.telefono;
+                                        target.email_contacto = store.email_contacto;
                                         target.marca = store.marca;
                                         target.marca_logo = store.marca_logo;
                                         target.inquilino = store.inquilino;
@@ -745,7 +746,7 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div class="rounded-2xl border border-slate-200 dark:border-slate-700 p-5 bg-white dark:bg-slate-900/60">
-                                    <div class="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-slate-500 mb-3">Contacto del administrador</div>
+                                    <div class="text-[10px] md:text-xs font-black tracking-[0.2em] uppercase text-slate-500 mb-3">Contacto configurado para este local</div>
                                     <div class="space-y-2 text-sm md:text-base">
                                         <div class="flex items-center gap-3">
                                             <div class="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
@@ -753,19 +754,19 @@
                                             </div>
                                             <span class="font-bold text-slate-800 dark:text-white" x-text="contacto.nombre"></span>
                                         </div>
-                                        <a :href="'mailto:' + contacto.email + '?subject=Consulta%20de%20alquiler%20-%20Local%20' + (activeStore?.numero ?? '')"
+                                        <a :href="'mailto:' + (activeStore?.email_contacto || contacto.email) + '?subject=Consulta%20de%20alquiler%20-%20Local%20' + (activeStore?.numero ?? '')"
                                             class="flex items-center gap-3 group hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-lg p-1 -mx-1 transition">
                                             <div class="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                                                 <x-heroicon-o-envelope class="w-4 h-4 text-slate-600 dark:text-slate-300" />
                                             </div>
-                                            <span class="text-slate-700 dark:text-slate-200 group-hover:text-emerald-700 truncate" x-text="contacto.email"></span>
+                                            <span class="text-slate-700 dark:text-slate-200 group-hover:text-emerald-700 truncate" x-text="activeStore?.email_contacto || contacto.email"></span>
                                         </a>
-                                        <a :href="'tel:' + (contacto.telefono ?? '').replace(/\s+/g,'')"
+                                        <a :href="'tel:' + ((activeStore?.telefono || contacto.telefono || '').replace(/\s+/g,''))"
                                             class="flex items-center gap-3 group hover:bg-slate-50 dark:hover:bg-slate-800/60 rounded-lg p-1 -mx-1 transition">
                                             <div class="h-9 w-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
                                                 <x-heroicon-o-phone class="w-4 h-4 text-slate-600 dark:text-slate-300" />
                                             </div>
-                                            <span class="text-slate-700 dark:text-slate-200 group-hover:text-emerald-700" x-text="contacto.telefono"></span>
+                                            <span class="text-slate-700 dark:text-slate-200 group-hover:text-emerald-700" x-text="activeStore?.telefono || contacto.telefono"></span>
                                         </a>
                                     </div>
                                 </div>

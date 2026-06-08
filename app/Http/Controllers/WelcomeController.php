@@ -26,6 +26,8 @@ class WelcomeController extends Controller
             $infraestructura = $query->first();
         }
 
+        $contactoAdmin = $this->contactoAdmin();
+
         if (! $infraestructura) {
             $mall = [
                 'id'     => 'mall-none',
@@ -45,7 +47,8 @@ class WelcomeController extends Controller
                                 'nombre' => 'Local Comercial',
                                 'descripcion' => 'Espacio comercial disponible.',
                                 'tamano' => '10.00',
-                                'telefono' => null,
+                                'telefono' => $contactoAdmin['telefono'],
+                                'email_contacto' => $contactoAdmin['email'],
                                 'estado' => 'Disponible',
                                 'is_alquilada' => false,
                                 'marca' => null,
@@ -63,7 +66,7 @@ class WelcomeController extends Controller
             ];
             return view('welcome', [
                 'mall'             => $mall,
-                'contacto'         => $this->contactoAdmin(),
+                'contacto'         => $contactoAdmin,
                 'suscripcionesUrl' => route('suscripciones'),
             ]);
         }
@@ -76,11 +79,11 @@ class WelcomeController extends Controller
         $floors = $infraestructura->pisosInfraestructura
             ->sortBy('id')
             ->values()
-            ->map(function ($piso, $pisoIndex) use ($palettes) {
+            ->map(function ($piso, $pisoIndex) use ($palettes, $contactoAdmin) {
                 $stores = $piso->tiendas
                     ->sortBy('numero')
                     ->values()
-                    ->map(function ($t) use ($palettes) {
+                    ->map(function ($t) use ($palettes, $contactoAdmin) {
                         $estadoLabel = $t->estado?->estado ?? 'Disponible';
                         $isAlquilada = strcasecmp($estadoLabel, 'Alquilada') === 0;
 
@@ -90,7 +93,8 @@ class WelcomeController extends Controller
                             'nombre'       => $t->nombre ?: ('Local ' . $t->numero),
                             'descripcion'  => $t->descripcion ?: 'Espacio comercial dentro del centro.',
                             'tamano'       => $t->tamano,
-                            'telefono'     => $t->telefono_referencia,
+                            'telefono'     => $t->telefono_referencia ?: $contactoAdmin['telefono'],
+                            'email_contacto' => $t->email_contacto ?: $contactoAdmin['email'],
                             'estado'       => $estadoLabel,
                             'is_alquilada' => $isAlquilada,
                             'marca'        => $isAlquilada
@@ -153,7 +157,8 @@ class WelcomeController extends Controller
                     'nombre'       => 'Sin tiendas aún',
                     'descripcion'  => 'Esta infraestructura aún no tiene pisos ni tiendas. Configúrala desde el panel de administración.',
                     'tamano'       => null,
-                    'telefono'     => null,
+                    'telefono'     => $contactoAdmin['telefono'],
+                    'email_contacto' => $contactoAdmin['email'],
                     'estado'       => 'Disponible',
                     'is_alquilada' => false,
                     'marca'        => null,
@@ -183,7 +188,7 @@ class WelcomeController extends Controller
 
         return view('welcome', [
             'mall'             => $mall,
-            'contacto'         => $this->contactoAdmin(),
+            'contacto'         => $contactoAdmin,
             'suscripcionesUrl' => route('suscripciones'),
         ]);
     }

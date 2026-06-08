@@ -89,7 +89,7 @@
             </div>
 
             @foreach($pisos as $pIndex => $piso)
-                <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-3xl overflow-hidden shadow-sm" wire:key="piso-{{ $pIndex }}">
+                <div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-3xl overflow-hidden shadow-sm" wire:key="piso-{{ $piso['id'] ?? 'new-'.$pIndex }}">
                     <div class="px-6 py-4 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
                         <div class="flex items-center gap-4 flex-1">
                             <div class="text-gray-400 flex-shrink-0">
@@ -150,7 +150,7 @@
 
                         <div class="space-y-4">
                             @foreach($piso['tiendas'] as $tIndex => $tienda)
-                                <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 shadow-sm relative group" wire:key="piso-{{ $pIndex }}-tienda-{{ $tIndex }}">
+                                <div class="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl p-6 shadow-sm relative group" wire:key="piso-{{ $piso['id'] ?? 'new-'.$pIndex }}-tienda-{{ $tienda['id'] ?? 'new-'.$tIndex }}">
                                     <div class="absolute -left-3 top-1/2 -translate-y-1/2 text-gray-200 group-hover:text-gray-300 transition">
                                         <x-heroicon-m-bars-3 class="w-6 h-6" />
                                     </div>
@@ -164,9 +164,9 @@
                                         </div>
                                         
                                         <div class="flex-1 flex justify-center">
-                                            <input type="text" wire:model="pisos.{{ $pIndex }}.tiendas.{{ $tIndex }}.nombre"
-                                                class="text-lg font-extrabold text-gray-900 dark:text-white border-none bg-transparent focus:ring-0 p-0 text-center w-full max-w-xs"
-                                                placeholder="NOMBRE DE LA TIENDA">
+                                            <span class="text-[10px] font-black tracking-[0.2em] uppercase text-gray-400 dark:text-gray-500">
+                                                Local disponible sin nombre comercial
+                                            </span>
                                         </div>
 
                                         <button type="button" wire:click="removeTienda({{ $pIndex }}, {{ $tIndex }})" 
@@ -176,22 +176,32 @@
                                     </div>
                                     <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                                         <div class="md:col-span-2">
-                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Teléfono de referencia <span class="text-red-500">*</span></label>
+                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Número de referencia <span class="text-red-500">*</span></label>
                                             <input type="text" wire:model="pisos.{{ $pIndex }}.tiendas.{{ $tIndex }}.telefono_referencia"
                                                 class="block w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm px-4 py-2.5 focus:ring-primary-500"
                                                 placeholder="Ej. +591 ...">
+                                            @error("pisos.$pIndex.tiendas.$tIndex.telefono_referencia") <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                                        </div>
+                                        <div class="md:col-span-3">
+                                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Email de contacto</label>
+                                            <input type="email" wire:model="pisos.{{ $pIndex }}.tiendas.{{ $tIndex }}.email_contacto"
+                                                class="block w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm px-4 py-2.5 focus:ring-primary-500"
+                                                placeholder="admin@correo.com">
+                                            @error("pisos.$pIndex.tiendas.$tIndex.email_contacto") <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                                         </div>
                                         <div class="md:col-span-2">
                                             <label class="block text-[9px] font-bold text-gray-400 uppercase mb-1">Tamaño (m²) <span class="text-red-500">*</span></label>
                                             <input type="number" wire:model="pisos.{{ $pIndex }}.tiendas.{{ $tIndex }}.tamano"
                                                 class="block w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm px-4 py-2.5 focus:ring-primary-500"
                                                 placeholder="0.00">
+                                            @error("pisos.$pIndex.tiendas.$tIndex.tamano") <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                                         </div>
-                                        <div class="md:col-span-8">
+                                        <div class="md:col-span-5">
                                             <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Descripción</label>
                                             <textarea wire:model="pisos.{{ $pIndex }}.tiendas.{{ $tIndex }}.descripcion" rows="1"
                                                 class="block w-full border-gray-200 dark:border-gray-700 dark:bg-gray-900 rounded-xl text-sm px-4 py-2.5 focus:ring-primary-500"
-                                                placeholder="Breve descripción..."></textarea>
+                                                placeholder="Ej. apto para cocina, no apto para cocina..."></textarea>
+                                            @error("pisos.$pIndex.tiendas.$tIndex.descripcion") <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                                         </div>
                                         </div>
 

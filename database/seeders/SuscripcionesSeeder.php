@@ -64,6 +64,7 @@ class SuscripcionesSeeder extends Seeder
                     'nombre'              => $tiendaData['nombre'],
                     'descripcion'         => $tiendaData['descripcion'],
                     'telefono_referencia' => $tiendaData['telefono'],
+                    'email_contacto'      => $contrato['email'],
                     'foto_referencial'    => $tiendaData['foto_referencial'],
                     'vitrina_1'           => $tiendaData['vitrina_1'],
                     'vitrina_2'           => $tiendaData['vitrina_2'],

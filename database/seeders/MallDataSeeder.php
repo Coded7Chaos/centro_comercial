@@ -71,6 +71,10 @@ class MallDataSeeder extends Seeder
             ]);
 
             // 2. Crear Infraestructura (Marble Galleria)
+            $admin = User::role(['super_admin', 'admin'])->with('cliente')->orderBy('id')->first();
+            $adminPhone = $admin?->cliente?->numero_celular ?? '+591 7000 0000';
+            $adminEmail = $admin?->email ?? 'admin@admin.com';
+
             $infra = Infraestructuras::firstOrCreate(
                 ['nombre' => 'Marble Galleria'],
                 [
@@ -83,6 +87,17 @@ class MallDataSeeder extends Seeder
 
             // Si esta infraestructura ya tiene pisos cargados, asumimos que el seed ya corrió.
             if ($infra->pisosInfraestructura()->exists()) {
+                InfraestructurasTiendas::whereHas('piso', fn ($query) => $query->where('infraestructura_id', $infra->id))
+                    ->whereNull('cliente_id')
+                    ->where(function ($query) {
+                        $query->whereNull('telefono_referencia')
+                            ->orWhereNull('email_contacto');
+                    })
+                    ->update([
+                        'telefono_referencia' => $adminPhone,
+                        'email_contacto' => $adminEmail,
+                    ]);
+
                 return;
             }
 
@@ -111,7 +126,8 @@ class MallDataSeeder extends Seeder
                         'numero' => sprintf('%03d', ($floorData['level'] * 100) + ($index + 1)),
                         'descripcion' => null,
                         'id_estado' => 1, // Disponible
-                        'telefono_referencia' => null,
+                        'telefono_referencia' => $adminPhone,
+                        'email_contacto' => $adminEmail,
                         'tamano' => rand(25, 90),
                         'cliente_id' => null,
                     ]);

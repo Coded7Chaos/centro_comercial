@@ -156,7 +156,7 @@
             },
 
             get whatsappUrl() {
-                let phone = (this.adminPhone || '').replace(/\D/g, '');
+                let phone = ((this.selectedTienda?.telefono || this.adminPhone || '') + '').replace(/\D/g, '');
                 let tienda = this.selectedTienda;
                 let localInfo = tienda
                     ? `\n- Local: ${tienda.nombre} (N° ${tienda.numero})`
